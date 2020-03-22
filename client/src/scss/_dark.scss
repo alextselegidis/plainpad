@@ -1,0 +1,150 @@
+body {
+  .app {
+    &.dark {
+      background-color: $gray-900;
+
+      .app-header {
+        background-color: $gray-900;
+        border-bottom-color: $gray-700;
+
+        .navbar-brand-title {
+          color: $white;
+        }
+
+        .fa {
+          color: $white;
+        }
+
+        .navbar-toggler-icon {
+          color: $white;
+        }
+
+        .bg-white {
+          background-color: $gray-900 !important;
+        }
+      }
+
+      .app-body {
+        background-color: $gray-900;
+
+        .sidebar {
+          background-color: $gray-900;
+          border-right-color: $gray-700 !important;
+          color: $white;
+
+          .border-bottom {
+            border-bottom-color: $gray-700 !important;
+          }
+
+          .input-group {
+            border-bottom-color: $gray-700 !important;
+          }
+
+          .new-note {
+            color: $white;
+          }
+
+          .nav-link {
+            color: $white;
+
+            &.active {
+              color: $white !important;
+              background: #171a1c;
+              border-right: 1px solid #5c6873;
+
+              .nav-icon {
+                color: #9e8db7;
+              }
+            }
+          }
+
+          .filter-addon-content {
+            background-color: $gray-900 !important;
+          }
+
+          .filter {
+            background-color: $gray-900;
+            color: $white;
+          }
+
+          a {
+            color: #9e8db7;
+          }
+        }
+
+        main {
+          .welcome-message {
+            background-color: $gray-900 !important;
+            color: $white !important;
+          }
+
+          .note-content {
+            background-color: $gray-900 !important;
+            color: $white !important;
+          }
+
+          .table {
+            color: $white !important;
+
+            tr:hover {
+              td {
+                color: $white;
+              }
+            }
+          }
+
+          .card {
+            background-color: $gray-900;
+            border-color: $gray-700;
+            color: $white;
+
+            .card-header {
+              background-color: $gray-900;
+              border-bottom-color: $gray-700;
+              color: $white;
+            }
+
+            .card-footer {
+              background-color: $gray-900;
+              border-top-color: $gray-700;
+              color: $white;
+            }
+          }
+        }
+      }
+
+      .aside-menu {
+        background-color: $gray-900;
+        border-left-color: $gray-700 !important;
+        color: $white;
+
+        .border-bottom {
+          border-bottom-color: $gray-700 !important;
+        }
+      }
+
+      .dropdown-menu {
+        background-color: $gray-900;
+        border-color: $gray-700;
+
+        .dropdown-header {
+          background-color: $gray-900;
+          border-bottom-color: $gray-700;
+          color: $white;
+        }
+
+        .dropdown-item {
+          color: $white;
+
+          &:hover {
+            color: $gray-900 !important;
+
+            i {
+              color: $gray-900 !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}

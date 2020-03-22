@@ -1,0 +1,257 @@
+/*
+  Plainpad - Self Hosted Note Taking App
+
+  Copyright (C) 2020 Alex Tselegidis - https://alextselegidis.com
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>
+*/
+
+#root {
+  transition: .3s opacity linear;
+}
+
+.navbar-brand-title {
+  font-family: 'Roboto Mono', 'Roboto', 'Helvetica', sans-serif;
+  font-weight: bolder;
+  color: $primary;
+}
+
+.app-body {
+  .main {
+    overflow-y: hidden;
+  }
+
+  .aside-menu {
+    .btn-block {
+      max-width: 180px;
+    }
+  }
+}
+
+.swal2-container{
+  font-family: 'Roboto Mono', 'Roboto', 'Helvetica', sans-serif;
+
+  .swal2-backdrop-show {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .swal2-modal {
+    border-radius: 0 !important;
+
+    .swal2-content {
+      font-size: 1rem !important;
+    }
+
+    .swal2-actions {
+      button {
+        border-radius: 0 !important;
+        margin: .3125em .5em;
+      }
+
+    }
+  }
+}
+
+#toast-container > div {
+  border-radius: $border-radius !important;
+  box-shadow: none;
+  opacity: 1;
+  background-size: 15px;
+  padding-left: 40px;
+
+  &:hover {
+    box-shadow: none !important;
+  }
+
+  .toast-message {
+    font-size: .75rem;
+  }
+}
+
+.toast {
+  background-color: $gray-800 !important;
+}
+
+.toast-success {
+  background-color: $success !important;
+}
+
+.toast-error {
+  background-color: $danger !important;
+}
+
+.toast-info {
+  background-color: $info !important;
+}
+
+.toast-warning {
+  background-color: $warning !important;
+  color: $gray-700 !important;
+}
+
+#toast-container > div:hover {
+  -moz-box-shadow: 0 0 12px #c3c3c3;
+  -webkit-box-shadow: 0 0 12px #c3c3c3;
+  box-shadow: 0 0 12px #c3c3c3;
+}
+
+.filter {
+  padding: 22px 10px;
+  outline: none;
+}
+
+.filter-addon-content {
+  background: $white !important;
+
+  i {
+    color: #73818f;
+  }
+}
+
+.new-note {
+  padding: .75rem .5rem;
+  box-shadow: none !important;
+
+  &:hover {
+    color: $white !important;
+  }
+
+  &.disabled {
+
+  }
+}
+
+.app-header {
+  .navbar-toggler {
+    outline: none;
+    color: $primary;
+  }
+
+  .fa,
+  .navbar-toggler-icon {
+    color: $primary;
+  }
+
+  .sidebar-toggler .navbar-toggler-icon {
+    height: 30px;
+  }
+
+  .aside-toggler .navbar-toggler-icon {
+    background-image: none !important;
+    font-family: FontAwesome;
+    font-size: 1.7rem;
+    speak: none;
+    font-style: normal;
+    font-weight: 400;
+    -webkit-font-feature-settings: normal;
+    font-feature-settings: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    color: $primary;
+
+    &:before {
+      content: "\f15c";
+      position: relative;
+      top: -3px;
+    }
+  }
+
+  .aside-toggler.saving {
+    .navbar-toggler-icon {
+      color: $primary;
+      animation: spin 2s infinite linear;
+
+      &:before {
+        content: "\f110";
+      }
+    }
+  }
+}
+
+.note-content {
+  font-family: 'Roboto Mono', Courier, monospace;
+  min-height: 100%;
+  resize: none;
+  margin: auto;
+  color: $gray-900 !important;
+
+  &[readonly] {
+    background: $white;
+  }
+}
+
+.sidebar {
+  .sidebar-nav {
+    .nav-link {
+      &.active {
+        color: $primary !important;
+        background: #f7f7f7;
+        border-right: 1px solid #c8ced3;
+
+        .nav-icon {
+          color: $primary;
+        }
+      }
+    }
+  }
+}
+
+.sidebar-footer {
+  line-height: 1.3;
+}
+
+.updates-available > * {
+  color: $yellow !important;
+
+  .fa {
+    color: $yellow !important;
+  }
+}
+
+.offline-mode {
+  position: fixed;
+  top: 11px;
+  left: 50%;
+  margin-left: -30px;
+  padding: 5px 10px;
+  font-weight: bold;
+  color: $white;
+  background: $danger;
+  z-index: 9999;
+  text-align: center;
+}
+
+@media(min-width: map-get($grid-breakpoints, sm)) {
+  .narrow-line {
+    max-width: 800px;
+  }
+}
+
+.table {
+  thead th {
+    border-bottom-width: $table-border-width;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(359deg);
+  }
+}

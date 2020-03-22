@@ -1,0 +1,72 @@
+/*
+  Plainpad - Self Hosted Note Taking App
+
+  Copyright (C) 2020 Alex Tselegidis - https://alextselegidis.com
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>
+*/
+
+$blue: #4da3ff !default;
+$indigo: #7e3cf0 !default;
+$purple:  #564b65 !default;
+$pink: #e673a8 !default;
+$red: #d94e5c !default;
+$orange: #fc9744 !default;
+$yellow: #ffce3b !default;
+$green: #53a663 !default;
+$teal: #bbc7c3 !default;
+$cyan: #17a2b8 !default;
+
+$primary: $purple;
+$secondary: #ced4da;
+
+$body-bg: #fff;
+
+$grid-gutter-width: 15px !default;
+
+$border-radius: 0;
+
+$navbar-brand-width: 205px;
+$navbar-active-color: #fff;
+
+$sidebar-width: 250px;
+$sidebar-bg: rgba(0, 0, 0, 0);
+$sidebar-nav-link-color: #212529;
+$sidebar-nav-link-active-bg: rgba(0, 0, 0, 0);
+$sidebar-nav-link-active-color: $primary;
+$sidebar-footer-bg: none;
+$sidebar-bg: #fff;
+$sidebar-color: #212529;
+
+$card-border-radius: 0;
+$card-cap-bg: #fff;
+
+$input-color: #212529;
+$input-border-color: #c8ced3;
+
+$input-border-radius: 0;
+$input-border-radius-lg: 0;
+$input-border-radius-sm: 0;
+
+$btn-border-radius: 0;
+$btn-border-radius-lg: 0;
+$btn-border-radius-sm: 0;
+
+$dropdown-border-radius: 0;
+
+$modal-content-border-radius: 0;
+
+$custom-select-border-radius: 0;
+
+$sidebar-nav-link-padding-x: .5rem;
