@@ -22,7 +22,7 @@
   <a href="#license">License</a>
 </p>
 
-![screenshot](screenshot.gif)
+![screenshot](screenshot.png)
 
 ## About
 
