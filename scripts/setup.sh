@@ -7,6 +7,7 @@ cd ../../
 
 echo "Setup Client"
 cd client
+cp .env.example .env
 npm install
 cd ../../
 
