@@ -19,3 +19,5 @@ app right after filling a simple form.
 
 Being an PWA application, Plainpad will give you access to your notes even when are offline. Changes will be synced once 
 you get back online.
+
+[Back](readme.md)

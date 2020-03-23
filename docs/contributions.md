@@ -25,3 +25,5 @@ You are more than welcome to help with the translation progress of the user inte
 translated into a big variety of languages but as new features are added new strings need to be translated. You can 
 send your translations with a pull request in GitHub or per email 
 to [alextselegidis@gmail.com](mailto:alextselegidis@gmail.com)
+
+[Back](readme.md)

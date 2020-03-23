@@ -28,3 +28,4 @@ installation form.
 
 Make sure the application has writable permissions so that the auto update feature works smoothly.  
     
+[Back](readme.md)
