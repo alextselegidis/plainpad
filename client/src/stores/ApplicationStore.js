@@ -116,6 +116,7 @@ class ApplicationStore {
   async initialize() {
     this.observeNetworkStatus();
     this.suppressSidebarOverlap();
+    this.autoResizeEditor();
 
     const account = JSON.parse(localStorage.getItem('Plainpad.Account'));
     accountStore.load(account);
@@ -183,6 +184,10 @@ class ApplicationStore {
         document.body.classList.remove('aside-menu-show');
       }
     });
+  }
+
+  autoResizeEditor() {
+    window.addEventListener('resize', () => notesStore.resizeEditor());
   }
 }
 

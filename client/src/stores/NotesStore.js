@@ -111,6 +111,7 @@ class NotesStore {
       this.pinned = localNote.pinned;
       this.createdAt = localNote.created_at;
       this.updatedAt = localNote.updated_at;
+      this.resizeEditor();
     }
 
     try {
@@ -126,6 +127,7 @@ class NotesStore {
         this.pinned = serverNote.pinned;
         this.createdAt = serverNote.created_at;
         this.updatedAt = serverNote.updated_at;
+        this.resizeEditor();
       }
     } catch (error) {
       if (error instanceof OfflineError) {
@@ -309,6 +311,8 @@ class NotesStore {
       return;
     }
 
+    noteContent.style.height = 'auto'; // Reset
+
     if (noteContent.clientHeight < noteContent.scrollHeight) {
       noteContent.style.height = noteContent.scrollHeight + 'px';
       if (noteContent.clientHeight < noteContent.scrollHeight) {
@@ -335,6 +339,7 @@ class NotesStore {
     }
 
     this.timeout = setTimeout(() => {
+      this.resizeEditor();
       this.save();
       this.unlockPage();
     }, 1000);

@@ -53,8 +53,6 @@ class Notes extends Component {
     if (id && id !== previousId) {
       notesStore.select(id);
     }
-
-    notesStore.resizeEditor();
   }
 
   componentWillUnmount() {
