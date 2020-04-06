@@ -219,9 +219,10 @@ class Profile extends Component {
                       </option>
                     </Input>
                   </FormGroup>
-                  <FormGroup>
-                    <Button className="secondary" hidden={!online}
+                  <FormGroup className="text-center py-4">
+                    <Button className="secondary" hidden={!online} size="lg" outline={true}
                             onClick={() => accountStore.invalidateCache()}>
+                      <i className="fa fa-eraser mr-2" />
                       <FormattedMessage id="profile.invalidateCache" />
                     </Button>
                   </FormGroup>
