@@ -5,7 +5,7 @@ body {
 
       .app-header {
         background-color: $gray-900;
-        border-bottom-color: $gray-700;
+        border-bottom-color: $dark-gray;
 
         .navbar-brand-title {
           color: $white;
@@ -29,15 +29,15 @@ body {
 
         .sidebar {
           background-color: $gray-900;
-          border-right-color: $gray-700 !important;
+          border-right-color: $dark-gray !important;
           color: $white;
 
           .border-bottom {
-            border-bottom-color: $gray-700 !important;
+            border-bottom-color: $dark-gray !important;
           }
 
           .input-group {
-            border-bottom-color: $gray-700 !important;
+            border-bottom-color: $dark-gray !important;
           }
 
           .new-note {
@@ -95,18 +95,18 @@ body {
 
           .card {
             background-color: $gray-900;
-            border-color: $gray-700;
+            border-color: $dark-gray;
             color: $white;
 
             .card-header {
               background-color: $gray-900;
-              border-bottom-color: $gray-700;
+              border-bottom-color: $dark-gray;
               color: $white;
             }
 
             .card-footer {
               background-color: $gray-900;
-              border-top-color: $gray-700;
+              border-top-color: $dark-gray;
               color: $white;
             }
           }
@@ -115,21 +115,21 @@ body {
 
       .aside-menu {
         background-color: $gray-900;
-        border-left-color: $gray-700 !important;
+        border-left-color: $dark-gray !important;
         color: $white;
 
         .border-bottom {
-          border-bottom-color: $gray-700 !important;
+          border-bottom-color: $dark-gray !important;
         }
       }
 
       .dropdown-menu {
         background-color: $gray-900;
-        border-color: $gray-700;
+        border-color: $dark-gray;
 
         .dropdown-header {
           background-color: $gray-900;
-          border-bottom-color: $gray-700;
+          border-bottom-color: $dark-gray;
           color: $white;
         }
 
