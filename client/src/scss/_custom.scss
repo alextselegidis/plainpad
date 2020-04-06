@@ -119,6 +119,14 @@
   }
 }
 
+.clear-filter {
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
+  border-right: 1px solid $input-border-color;
+  cursor: pointer;
+}
+
 .new-note {
   padding: .75rem .5rem;
   box-shadow: none !important;
@@ -199,7 +207,7 @@
       &.active {
         color: $primary !important;
         background: #f7f7f7;
-        border-right: 1px solid #c8ced3;
+        border-right: 1px solid $input-border-color;
 
         .nav-icon {
           color: $primary;

@@ -99,7 +99,7 @@ class NoteLayout extends Component {
             <AppSidebarForm />
 
             <InputGroup className="border-bottom">
-              <InputGroupAddon addonType="prepend" className="rounded-0 border-0a">
+              <InputGroupAddon addonType="prepend" className="rounded-0">
                 <InputGroupText className="filter-addon-content rounded-0 border-0 pr-0">
                   <i className="fa fa-search" />
                 </InputGroupText>
@@ -108,6 +108,13 @@ class NoteLayout extends Component {
               <Input value={filter} className="filter rounded-0 border-0 shadow-none pl-2"
                      placeholder={translate('notes.filter').toUpperCase()}
                      onChange={(event) => notesStore.updateFilter(event.target.value)} />
+
+              <InputGroupAddon addonType="prepend" className="rounded-0 clear-filter" hidden={!filter.length}
+                               onClick={() => notesStore.updateFilter('')}>
+                <InputGroupText className="filter-addon-content rounded-0 border-0">
+                  <i className="fa fa-times" />
+                </InputGroupText>
+              </InputGroupAddon>
             </InputGroup>
 
             <Button color="primary" outline block className="new-note text-muted text-left rounded-0 border-top-0 border-left-0 border-right-0 border-bottom"
