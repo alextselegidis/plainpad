@@ -1,6 +1,6 @@
 <?php
 
-$version = 'v1.0.0-alpha.1';
+$version = 'v1.0.0-beta.1';
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
