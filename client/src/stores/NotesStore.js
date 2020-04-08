@@ -311,14 +311,17 @@ class NotesStore {
       return;
     }
 
+    const scrollTop = window.scrollY;
+
     noteContent.style.height = 'auto'; // Reset
 
     if (noteContent.clientHeight < noteContent.scrollHeight) {
-      noteContent.style.height = noteContent.scrollHeight + 'px';
+      noteContent.style.height = (noteContent.scrollHeight + 500) + 'px';
       if (noteContent.clientHeight < noteContent.scrollHeight) {
         noteContent.style.height =
-          (noteContent.scrollHeight * 2 - noteContent.clientHeight) + 'px';
+          (noteContent.scrollHeight * 2 - noteContent.clientHeight + 500) + 'px';
       }
+      window.scrollTo(0, scrollTop);
     }
   }
 
@@ -326,6 +329,8 @@ class NotesStore {
     this.lockPage();
 
     this.content = content;
+
+    this.resizeEditor();
 
     if (content.includes("\n")) {
       const title = content.match(/^(.*)\n/)[1];
@@ -339,7 +344,6 @@ class NotesStore {
     }
 
     this.timeout = setTimeout(() => {
-      this.resizeEditor();
       this.save();
       this.unlockPage();
     }, 1000);
