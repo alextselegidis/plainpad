@@ -21,7 +21,7 @@ import {decorate, observable} from 'mobx';
 import NotesHttpClient from '../http/NotesHttpClient';
 import applicationStore from './ApplicationStore';
 import accountStore from './AccountStore';
-import {translate} from '../i18n';
+import {translate} from '../lang';
 import Swal from 'sweetalert2'
 import moment from 'moment';
 import storage from '../storage';

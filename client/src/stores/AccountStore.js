@@ -18,7 +18,7 @@
 */
 
 import {decorate, observable} from 'mobx';
-import {translate} from '../i18n';
+import {translate} from '../lang';
 import applicationStore from './ApplicationStore';
 import notesStore from './NotesStore';
 import SessionsHttpClient from '../http/SessionsHttpClient';

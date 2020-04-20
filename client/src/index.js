@@ -14,7 +14,7 @@ import notesStore from './stores/NotesStore';
 import usersStore from './stores/UsersStore';
 import settingsStore from './stores/SettingsStore';
 import {IntlProvider} from 'react-intl';
-import {messages} from './i18n';
+import {messages} from './lang';
 
 applicationStore.initialize();
 

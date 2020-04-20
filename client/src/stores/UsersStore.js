@@ -20,7 +20,7 @@
 import {decorate, observable} from 'mobx';
 import UsersHttpClient from '../http/UsersHttpClient';
 import applicationStore from './ApplicationStore';
-import {translate} from '../i18n';
+import {translate} from '../lang';
 import Swal from 'sweetalert2';
 
 class UsersStore {

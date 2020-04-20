@@ -33,7 +33,7 @@ import {
 import routes from '../../routes';
 import NoteAside from './NoteAside';
 import {inject, observer} from 'mobx-react';
-import {translate} from '../../i18n';
+import {translate} from '../../lang';
 import NoteCopyright from './NoteCopyright';
 
 const NoteHeader = React.lazy(() => import('./NoteHeader'));

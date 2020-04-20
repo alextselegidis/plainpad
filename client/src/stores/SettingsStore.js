@@ -20,7 +20,7 @@
 import {decorate, observable} from 'mobx';
 import SettingsHttpClient from '../http/SettingsHttpClient';
 import applicationStore from './ApplicationStore';
-import {translate} from '../i18n';
+import {translate} from '../lang';
 
 class SettingStore {
   defaultLocale = 'en-US';

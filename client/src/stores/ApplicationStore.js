@@ -24,7 +24,7 @@ import ApplicationHttpClient from '../http/ApplicationHttpClient';
 import accountStore from './AccountStore';
 import notesStore from './NotesStore';
 import OfflineError from '../http/OfflineError';
-import {translate} from '../i18n';
+import {translate} from '../lang';
 
 class ApplicationStore {
   config = null;
