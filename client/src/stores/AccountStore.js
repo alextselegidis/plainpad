@@ -29,8 +29,7 @@ import OfflineError from '../http/OfflineError';
 class AccountStore {
   session = null;
   user = null;
-  recovered = false;
-  registered = false;
+  passwordRecovered = false;
 
   load(account) {
     if (!account) {
@@ -97,7 +96,7 @@ class AccountStore {
   async recoverPassword(email) {
     try {
       await UsersHttpClient.recoverPassword(email);
-      this.recovered = true;
+      this.passwordRecovered = true;
       applicationStore.success(translate('account.successfullyRecoveredPassword'));
     } catch (error) {
       applicationStore.error(translate('account.failedToRecoverPassword'));
@@ -177,6 +176,7 @@ class AccountStore {
 
 decorate(AccountStore, {
   user: observable,
+  passwordRecovered: observable,
   session: observable,
 });
 

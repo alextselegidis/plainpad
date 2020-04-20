@@ -45,14 +45,14 @@ class RecoverPassword extends Component {
     } = this.props;
 
     const {
-      recovered
-    } = this;
+      passwordRecovered
+    } = accountStore;
 
     const {
       email,
     } = this;
 
-    if (recovered) {
+    if (passwordRecovered) {
       return <Redirect to="/login"/>
     }
 
