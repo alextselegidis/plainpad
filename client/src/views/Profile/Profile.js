@@ -22,71 +22,41 @@ import {Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, In
 import {FormattedMessage} from 'react-intl';
 import {translate} from '../../lang';
 import {inject, observer} from 'mobx-react';
+import {decorate, observable} from 'mobx';
 
 class Profile extends Component {
+  name = '';
+  email = '';
+  password = '';
+  passwordConfirmation = '';
+  locale = 'en-US';
+  view = 'compact';
+  line = 'full';
+  sort = 'modified';
+  theme = 'light';
+  encrypt = '0';
+
   constructor(props) {
     super(props);
 
-    const {user} = props.accountStore
-
-    this.state = {
-      name: user ? user.name : '',
-      email: user ? user.email : '',
-      password: '',
-      passwordConfirmation: '',
-      locale: user ? user.locale : '',
-      view: user ? user.view : '',
-      line: user ? user.line : '',
-      sort: user ? user.sort : '',
-      theme: user ? user.theme : '',
-      encrypt: user ? user.encrypt : '',
-    };
-  }
-
-  onNameChange(event) {
-    this.setState({
-      name: event.target.value
-    });
-  }
-
-  onEmailChange(event) {
-    this.setState({
-      email: event.target.value
-    });
-  }
-
-  onFormSubmit(event) {
-    event.preventDefault();
-
-    const {
-      name,
-      email,
-      password,
-      passwordConfirmation,
-      locale,
-      view,
-      line,
-      sort,
-      theme,
-      encrypt,
-    } = this.state;
-
     const {
       accountStore
-    } = this.props;
+    } = props;
 
-    accountStore.updateProfile(
-      name,
-      email,
-      password,
-      passwordConfirmation,
-      locale,
-      view,
-      line,
-      sort,
-      theme,
-      encrypt,
-    );
+    const {
+      user
+    } = accountStore;
+
+    if (user) {
+      this.name = user.name;
+      this.email = user.email;
+      this.locale = user.locale;
+      this.view = user.view;
+      this.line = user.line;
+      this.sort = user.sort;
+      this.theme = user.theme;
+      this.encrypt = user.encrypt;
+    }
   }
 
   render() {
@@ -106,16 +76,30 @@ class Profile extends Component {
       sort,
       theme,
       encrypt,
-    } = this.state;
+    } = this;
 
     const {
       installation,
       online
-    } = this.props.applicationStore;
+    } = applicationStore;
 
     return (
       <div className="my-5 animated fadeIn">
-        <Form onSubmit={this.onFormSubmit.bind(this)}>
+        <Form onSubmit={(event) => {
+          event.preventDefault();
+          accountStore.save({
+            name,
+            email,
+            password,
+            passwordConfirmation,
+            locale,
+            view,
+            line,
+            sort,
+            theme,
+            encrypt,
+          });
+        }}>
           <Row>
             <Col sm={6}>
               <Card>
@@ -127,7 +111,8 @@ class Profile extends Component {
                     <Label>
                       <FormattedMessage id="profile.name"/>
                     </Label>
-                    <Input placeholder="Name" value={name} onChange={this.onNameChange.bind(this)} />
+                    <Input placeholder="Name" value={name}
+                           onChange={(e) => this.name = e.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -135,7 +120,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.email"/>
                     </Label>
                     <Input type="email" placeholder="username@example.org" value={email}
-                           onChange={(e) => profile.email = e.target.value}/>
+                           onChange={(e) => this.email = e.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -143,7 +128,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.password"/>
                     </Label>
                     <Input type="password" placeholder="" value={password} autoComplete="new-password"
-                           onChange={(e) => profile.password = e.target.value}/>
+                           onChange={(e) => this.password = e.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -151,7 +136,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.passwordConfirmation"/>
                     </Label>
                     <Input type="password" placeholder="" value={passwordConfirmation}
-                           onChange={(e) => profile.passwordConfirmation = e.target.value}/>
+                           onChange={(e) => this.passwordConfirmation = e.target.value}/>
                   </FormGroup>
                 </CardBody>
                 <CardFooter>
@@ -168,12 +153,12 @@ class Profile extends Component {
                 </CardHeader>
                 <CardBody>
                   <p>
-                    <FormattedMessage id="profile.youCanInstallPlainpad" />
+                    <FormattedMessage id="profile.youCanInstallPlainpad"/>
                   </p>
 
                   <Button onClick={() => applicationStore.install()}>
                     <i className="fa fa-cloud-download mr-2"/>
-                    <FormattedMessage id="profile.install" />
+                    <FormattedMessage id="profile.install"/>
                   </Button>
                 </CardBody>
               </Card>
@@ -190,7 +175,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.locale"/>
                     </Label>
                     <Input type="select" value={locale}
-                           onChange={(e) => profile.locale = e.target.value}>
+                           onChange={(e) => this.locale = e.target.value}>
                       <option value="en-US">
                         en-US
                       </option>
@@ -205,7 +190,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.view"/>
                     </Label>
                     <Input type="select" value={view}
-                           onChange={(e) => profile.view = e.target.value}>
+                           onChange={(e) => this.view = e.target.value}>
                       <option value="comfortable">
                         {translate('profile.comfortable')}
                       </option>
@@ -220,7 +205,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.line"/>
                     </Label>
                     <Input type="select" value={line}
-                           onChange={(e) => profile.line = e.target.value}>
+                           onChange={(e) => this.line = e.target.value}>
                       <option value="full">
                         {translate('profile.full')}
                       </option>
@@ -235,7 +220,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.sort"/>
                     </Label>
                     <Input type="select" value={sort}
-                           onChange={(e) => profile.sort = e.target.value}>
+                           onChange={(e) => this.sort = e.target.value}>
                       <option value="modified">
                         {translate('profile.lastModifiedFirst')}
                       </option>
@@ -253,7 +238,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.theme"/>
                     </Label>
                     <Input type="select" value={theme}
-                           onChange={(event) => profile.theme = event.target.value}>
+                           onChange={(event) => this.theme = event.target.value}>
                       <option value="light">
                         {translate('profile.light')}
                       </option>
@@ -267,7 +252,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.encrypt"/>
                     </Label>
                     <Input type="select" value={encrypt === true || encrypt === '1' ? '1' : '0'}
-                           onChange={(event) => profile.encrypt = event.target.value}>
+                           onChange={(event) => this.encrypt = event.target.value}>
                       <option value="1">
                         {translate('profile.yes')}
                       </option>
@@ -279,8 +264,8 @@ class Profile extends Component {
                   <FormGroup className="text-center py-4">
                     <Button className="secondary" hidden={!online} size="lg" outline={true}
                             onClick={() => accountStore.invalidateCache()}>
-                      <i className="fa fa-eraser mr-2" />
-                      <FormattedMessage id="profile.invalidateCache" />
+                      <i className="fa fa-eraser mr-2"/>
+                      <FormattedMessage id="profile.invalidateCache"/>
                     </Button>
                   </FormGroup>
                 </CardBody>
@@ -298,6 +283,19 @@ class Profile extends Component {
     );
   }
 }
+
+decorate(Profile, {
+  name: observable,
+  email: observable,
+  password: observable,
+  passwordConfirmation: observable,
+  locale: observable,
+  view: observable,
+  line: observable,
+  sort: observable,
+  theme: observable,
+  encrypt: observable,
+});
 
 export default inject('accountStore', 'applicationStore')(
   observer(Profile)

@@ -31,19 +31,6 @@ class AccountStore {
   user = null;
   recovered = false;
   registered = false;
-  profile = {
-    name: '',
-    email: '',
-    password: '',
-    passwordConfirmation: '',
-    locale: 'en-US',
-    view: 'compact',
-    line: 'full',
-    sort: 'modified',
-    theme: 'light',
-    encrypt: '0'
-  };
-
 
   load(account) {
     if (!account) {
@@ -53,15 +40,14 @@ class AccountStore {
     this.user = account.user;
     this.session = account.session;
 
-    this.updateProfile(account.user);
     this.observeSessionExpiration();
 
     notesStore.sync();
   }
 
-  async login() {
+  async login(email, password) {
     try {
-      const session = await SessionsHttpClient.create(this.profile.email, this.profile.password);
+      const session = await SessionsHttpClient.create(email, password);
 
       this.session = session;
       this.observeSessionExpiration();
@@ -74,8 +60,6 @@ class AccountStore {
         session,
         user
       };
-
-      this.updateProfile(user);
 
       localStorage.setItem('Plainpad.Account', JSON.stringify(account));
 
@@ -92,8 +76,6 @@ class AccountStore {
     localStorage.removeItem('Plainpad.Account');
 
     this.user = null;
-
-    this.updateProfile(null);
 
     if (!this.session) {
       return;
@@ -112,9 +94,9 @@ class AccountStore {
     this.session = null;
   }
 
-  async recoverPassword() {
+  async recoverPassword(email) {
     try {
-      await UsersHttpClient.recoverPassword(this.profile.email);
+      await UsersHttpClient.recoverPassword(email);
       this.recovered = true;
       applicationStore.success(translate('account.successfullyRecoveredPassword'));
     } catch (error) {
@@ -123,15 +105,15 @@ class AccountStore {
     }
   }
 
-  async save() {
-    if (this.profile.password && this.profile.password !== this.profile.passwordConfirmation) {
+  async save(profile) {
+    if (profile.password && profile.password !== profile.passwordConfirmation) {
       applicationStore.error(translate('account.passwordsMismatch'));
       return;
     }
 
-    const reload = this.profile.locale !== this.user.locale;
+    const reload = profile.locale !== this.user.locale;
 
-    this.user = {...this.user, ...this.profile};
+    this.user = {...this.user, ...profile};
 
     const account = {
       session: this.session,
@@ -191,26 +173,10 @@ class AccountStore {
 
     setTimeout(() => this.observeSessionExpiration(), 60000);
   }
-
-  updateProfile(user) {
-    this.profile = {
-      name: user ? user.name : '',
-      email: user ? user.email : '',
-      password: '',
-      passwordConfirmation: '',
-      locale: user ? user.locale : 'en-US',
-      view: user ? user.view : 'compact',
-      line: user ? user.line : 'full',
-      sort: user ? user.sort : 'modified',
-      theme: user ? user.theme : 'light',
-      encrypt: user ? user.encrypt : '0',
-    };
-  }
 }
 
 decorate(AccountStore, {
   user: observable,
-  profile: observable,
   session: observable,
 });
 

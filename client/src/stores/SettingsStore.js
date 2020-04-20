@@ -22,50 +22,33 @@ import SettingsHttpClient from '../http/SettingsHttpClient';
 import applicationStore from './ApplicationStore';
 import {translate} from '../lang';
 
-class SettingStore {
-  defaultLocale = 'en-US';
-  mailDriver = 'smtp';
-  mailHost = 'smtp.example.com';
-  mailPort = '2525';
-  mailUsername = '';
-  mailPassword = '';
-  mailEncryption = 'tls';
-  mailFromAddress = 'from@example.org';
-  mailFromName = 'Plainpad';
+class SettingsStore {
+  settings = null;
 
   async fetch() {
     try {
-      const settings = await SettingsHttpClient.retrieve();
-      this.defaultLocale = settings.default_locale;
-      this.mailDriver = settings.mail_driver;
-      this.mailHost = settings.mail_host;
-      this.mailPort = settings.mail_port;
-      this.mailUsername = settings.mail_username;
-      this.mailPassword = settings.mail_password;
-      this.mailEncryption = settings.mail_encryption;
-      this.mailFromAddress = settings.mail_from_address;
-      this.mailFromName = settings.mail_from_name;
+      this.settings = await SettingsHttpClient.retrieve();
     } catch (error) {
       applicationStore.error(translate('settings.fetchFailure'));
       console.error(error);
     }
   }
 
-  async save() {
+  async save(settings) {
     try {
-      const settings = {
-        default_locale: this.defaultLocale,
-        mail_driver: this.mailDriver,
-        mail_host: this.mailHost,
-        mail_port: this.mailPort,
-        mail_username: this.mailUsername,
-        mail_password: this.mailPassword,
-        mail_encryption: this.mailEncryption,
-        mail_from_address: this.mailFromAddress,
-        mail_from_name: this.mailFromName,
+      this.settings = {
+        default_locale: settings.defaultLocale,
+        mail_driver: settings.mailDriver,
+        mail_host: settings.mailHost,
+        mail_port: settings.mailPort,
+        mail_username: settings.mailUsername,
+        mail_password: settings.mailPassword,
+        mail_encryption: settings.mailEncryption,
+        mail_from_address: settings.mailFromAddress,
+        mail_from_name: settings.mailFromName,
       };
 
-      await SettingsHttpClient.update(settings);
+      await SettingsHttpClient.update(this.settings);
 
       applicationStore.success(translate('settings.saveSuccess'));
     } catch (error) {
@@ -75,16 +58,8 @@ class SettingStore {
   }
 }
 
-decorate(SettingStore, {
-  defaultLocale: observable,
-  mailDriver: observable,
-  mailHost: observable,
-  mailPort: observable,
-  mailUsername: observable,
-  mailPassword: observable,
-  mailEncryption: observable,
-  mailFromAddress: observable,
-  mailFromName: observable,
+decorate(SettingsStore, {
+  settings: observable,
 });
 
-export default new SettingStore();
+export default new SettingsStore();

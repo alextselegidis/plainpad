@@ -34,21 +34,23 @@ import {
   Row
 } from 'reactstrap';
 import {Redirect} from 'react-router-dom';
+import {decorate, observable} from 'mobx';
 
 class RecoverPassword extends Component {
+  email = '';
+
   render() {
     const {
       accountStore
     } = this.props;
 
     const {
-      recovered,
-      profile
-    } = accountStore;
+      recovered
+    } = this;
 
     const {
-      email
-    } = profile;
+      email,
+    } = this;
 
     if (recovered) {
       return <Redirect to="/login"/>
@@ -64,7 +66,7 @@ class RecoverPassword extends Component {
                   <CardBody>
                     <Form onSubmit={(event) => {
                       event.preventDefault();
-                      accountStore.recoverPassword();
+                      accountStore.recoverPassword(email);
                     }}>
                       <h1>Recover Password</h1>
                       <p className="text-muted">Recover your account password</p>
@@ -75,8 +77,8 @@ class RecoverPassword extends Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input type="text" placeholder="Email" autoComplete="email"
-                               value={email || ''}
-                               onChange={event => profile.email = event.target.value}/>
+                               value={email}
+                               onChange={event => this.email = event.target.value}/>
                       </InputGroup>
                       <Row>
                         <Col xs="6">
@@ -94,6 +96,10 @@ class RecoverPassword extends Component {
     );
   }
 }
+
+decorate(RecoverPassword, {
+  email: observable,
+})
 
 export default inject('accountStore')(
   observer(RecoverPassword)

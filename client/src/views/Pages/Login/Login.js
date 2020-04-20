@@ -15,57 +15,25 @@ import {
   Row
 } from 'reactstrap';
 import {inject, observer} from 'mobx-react';
+import {decorate, observable} from 'mobx';
 
 class Login extends Component {
-  constructor(props) {
-    super(props);
+  email = '';
+  password = '';
 
-    this.state = {
-      email: '',
-      password: ''
-    };
-  }
-
-  handleEmailChange(event) {
-    this.setState({
-      email: event.target.value
-    });
-  }
-
-  handlePasswordChange(event) {
-    this.setState({
-      password: event.target.value
-    });
-  }
-
-  handleFormSubmit(event) {
-    event.preventDefault();
-
+  render() {
     const {
       accountStore
     } = this.props;
 
     const {
-      email,
-      password
-    } = this.state;
-
-    accountStore.login(email, password);
-  }
-
-  render() {
-    const {
       user,
     } = accountStore;
 
-    if (user) {
-      return Redirect
-    }
-
     const {
       email,
       password
-    } = this.state;
+    } = this;
 
     return (
       <div className="app flex-row align-items-center">
@@ -77,7 +45,10 @@ class Login extends Component {
               <CardGroup>
                 <Card className="p-4">
                   <CardBody>
-                    <Form onSubmit={this.handleFormSubmit.bind(this)}>
+                    <Form onSubmit={(event) => {
+                      event.preventDefault();
+                      this.props.accountStore.login(this.email, this.password);
+                    }}>
                       <h1>Login</h1>
                       <p className="text-muted">Sign In to your account</p>
                       <InputGroup className="mb-3">
@@ -87,7 +58,7 @@ class Login extends Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input type="text" placeholder="Email" autoComplete="email" value={email}
-                               onChange={this.handleEmailChange.bind(this)}/>
+                               onChange={(event) => this.email = event.target.value}/>
                       </InputGroup>
                       <InputGroup className="mb-4">
                         <InputGroupAddon addonType="prepend">
@@ -96,7 +67,7 @@ class Login extends Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input type="password" placeholder="Password" autoComplete="current-password" value={password}
-                               onChange={this.handlePasswordChange.bind(this)}/>
+                               onChange={(event) => this.password = event.target.value}/>
                       </InputGroup>
                       <Row>
                         <Col xs="6">
@@ -119,6 +90,11 @@ class Login extends Component {
     );
   }
 }
+
+decorate(Login, {
+  email: observable,
+  password: observable
+});
 
 export default inject('accountStore')(
   observer(Login)

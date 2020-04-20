@@ -23,8 +23,43 @@ import {FormattedMessage} from 'react-intl';
 import {inject, observer} from 'mobx-react';
 import {Redirect} from 'react-router-dom';
 import {translate} from '../../lang';
+import {decorate, observable} from 'mobx';
 
 class Settings extends Component {
+  defaultLocale = 'en-US';
+  mailDriver = 'smtp';
+  mailHost = 'smtp.example.com';
+  mailPort = '2525';
+  mailUsername = '';
+  mailPassword = '';
+  mailEncryption = 'tls';
+  mailFromAddress = 'from@example.org';
+  mailFromName = 'Plainpad';
+
+  constructor(props) {
+    super(props);
+
+    const {
+      settingsStore
+    } = props;
+
+    const {
+      settings
+    } = settingsStore;
+
+    if (settings) {
+      this.defaultLocale = settings.default_locale;
+      this.mailDriver = settings.mail_driver;
+      this.mailHost = settings.mail_host;
+      this.mailPort = settings.mail_port;
+      this.mailUsername = settings.mail_username;
+      this.mailPassword = settings.mail_password;
+      this.mailEncryption = settings.mail_encryption;
+      this.mailFromAddress = settings.mail_from_address;
+      this.mailFromName = settings.mail_from_name;
+    }
+  }
+
   componentDidMount() {
     const {
       settingsStore,
@@ -45,6 +80,7 @@ class Settings extends Component {
 
     if (!online) {
       applicationStore.warning(translate('layout.pageNotAvailableOffline'));
+
       return <Redirect to="/notes"/>;
     }
 
@@ -58,7 +94,7 @@ class Settings extends Component {
       mailEncryption,
       mailFromAddress,
       mailFromName,
-    } = settingsStore;
+    } = this;
 
     const {
       config
@@ -68,10 +104,20 @@ class Settings extends Component {
       <div className="my-5 animated fadeIn">
         <Form onSubmit={(event) => {
           event.preventDefault();
-          settingsStore.save();
+          settingsStore.save({
+            defaultLocale,
+            mailDriver,
+            mailHost,
+            mailPort,
+            mailUsername,
+            mailPassword,
+            mailEncryption,
+            mailFromAddress,
+            mailFromName,
+          });
         }}>
           <Row>
-            <Col sm={6}>
+            <Col sm="6">
               <Card>
                 <CardHeader>
                   <FormattedMessage id="settings.settings"/>
@@ -82,7 +128,7 @@ class Settings extends Component {
                       <FormattedMessage id="settings.defaultLocale"/>
                     </Label>
                     <Input type="select" value={defaultLocale}
-                           onChange={(e) => settingsStore.defaultLocale = e.target.value}>
+                           onChange={(event) => this.defaultLocale = event.target.value}>
                       <option value="en-US">
                         en-US
                       </option>
@@ -123,7 +169,7 @@ class Settings extends Component {
               </Card>
             </Col>
 
-            <Col sm={6}>
+            <Col sm="6">
               <Card>
                 <CardHeader>
                   <FormattedMessage id="settings.mail"/>
@@ -134,7 +180,7 @@ class Settings extends Component {
                       <FormattedMessage id="settings.driver"/>
                     </Label>
                     <Input placeholder="smtp" value={mailDriver}
-                           onChange={(e) => settingsStore.mailDriver = e.target.value}/>
+                           onChange={(event) => this.mailDriver = event.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -142,7 +188,7 @@ class Settings extends Component {
                       <FormattedMessage id="settings.host"/>
                     </Label>
                     <Input placeholder="localhost" value={mailHost}
-                           onChange={(e) => settingsStore.mailHost = e.target.value}/>
+                           onChange={(event) => this.mailHost = event.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -150,7 +196,7 @@ class Settings extends Component {
                       <FormattedMessage id="settings.port"/>
                     </Label>
                     <Input placeholder="2525" value={mailPort}
-                           onChange={(e) => settingsStore.mailPort = e.target.value}/>
+                           onChange={(event) => this.mailPort = event.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -158,7 +204,7 @@ class Settings extends Component {
                       <FormattedMessage id="settings.username"/>
                     </Label>
                     <Input placeholder="Username" value={mailUsername}
-                           onChange={(e) => settingsStore.mailUsername = e.target.value}/>
+                           onChange={(event) => this.mailUsername = event.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -166,7 +212,7 @@ class Settings extends Component {
                       <FormattedMessage id="settings.password"/>
                     </Label>
                     <Input type="password" value={mailPassword} placeholder="Password"
-                           onChange={(e) => settingsStore.mailPassword = e.target.value}/>
+                           onChange={(event) => this.mailPassword = event.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -174,7 +220,7 @@ class Settings extends Component {
                       <FormattedMessage id="settings.encryption"/>
                     </Label>
                     <Input placeholder="tls" value={mailEncryption}
-                           onChange={(e) => settingsStore.defaultLocale = e.target.value}/>
+                           onChange={(event) => this.defaultLocale = event.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -182,7 +228,7 @@ class Settings extends Component {
                       <FormattedMessage id="settings.fromAddress"/>
                     </Label>
                     <Input placeholder="from@example.org" value={mailFromAddress}
-                           onChange={(e) => settingsStore.mailFromAddress = e.target.value}/>
+                           onChange={(event) => this.mailFromAddress = event.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -190,7 +236,7 @@ class Settings extends Component {
                       <FormattedMessage id="settings.fromName"/>
                     </Label>
                     <Input placeholder="Plainpad" value={mailFromName}
-                           onChange={(e) => settingsStore.mailFromName = e.target.value}/>
+                           onChange={(event) => this.mailFromName = event.target.value}/>
                   </FormGroup>
                 </CardBody>
                 <CardFooter>
@@ -207,6 +253,18 @@ class Settings extends Component {
     );
   }
 }
+
+decorate(Settings, {
+  defaultLocale: observable,
+  mailDriver: observable,
+  mailHost: observable,
+  mailPort: observable,
+  mailUsername: observable,
+  mailPassword: observable,
+  mailEncryption: observable,
+  mailFromAddress: observable,
+  mailFromName: observable,
+});
 
 export default inject('settingsStore', 'applicationStore')(
   observer(Settings)
