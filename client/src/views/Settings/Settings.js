@@ -36,36 +36,29 @@ class Settings extends Component {
   mailFromAddress = 'from@example.org';
   mailFromName = 'Plainpad';
 
-  constructor(props) {
-    super(props);
-
-    const {
-      settingsStore
-    } = props;
-
-    const {
-      settings
-    } = settingsStore;
-
-    if (settings) {
-      this.defaultLocale = settings.default_locale;
-      this.mailDriver = settings.mail_driver;
-      this.mailHost = settings.mail_host;
-      this.mailPort = settings.mail_port;
-      this.mailUsername = settings.mail_username;
-      this.mailPassword = settings.mail_password;
-      this.mailEncryption = settings.mail_encryption;
-      this.mailFromAddress = settings.mail_from_address;
-      this.mailFromName = settings.mail_from_name;
-    }
-  }
-
   componentDidMount() {
     const {
       settingsStore,
     } = this.props;
 
-    settingsStore.fetch();
+    settingsStore.fetch()
+      .then(() => {
+        const {
+          settings
+        } = settingsStore;
+
+        if (settings) {
+          this.defaultLocale = settings.default_locale;
+          this.mailDriver = settings.mail_driver;
+          this.mailHost = settings.mail_host;
+          this.mailPort = settings.mail_port;
+          this.mailUsername = settings.mail_username;
+          this.mailPassword = settings.mail_password;
+          this.mailEncryption = settings.mail_encryption;
+          this.mailFromAddress = settings.mail_from_address;
+          this.mailFromName = settings.mail_from_name;
+        }
+      });
   }
 
   render() {
