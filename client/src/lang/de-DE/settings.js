@@ -36,7 +36,5 @@ export default {
   fetchFailure: 'Einstellungen konnten nicht abgerufen werden.',
   updates: 'Updates',
   update: 'Update',
-  newUpdateAvailable: 'Es sind neue Updates zum Herunterladen verfügbar.',
-  updateSuccess: 'Die Updates wurden erfolgreich installiert.',
-  updateFailure: 'Die Updates konnten nicht installiert werden.'
+  newUpdatesAvailable: 'Es sind neue Updates zum Herunterladen verfügbar.',
 }
