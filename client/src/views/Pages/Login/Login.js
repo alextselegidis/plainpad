@@ -17,20 +17,55 @@ import {
 import {inject, observer} from 'mobx-react';
 
 class Login extends Component {
-  render() {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      email: '',
+      password: ''
+    };
+  }
+
+  handleEmailChange(event) {
+    this.setState({
+      email: event.target.value
+    });
+  }
+
+  handlePasswordChange(event) {
+    this.setState({
+      password: event.target.value
+    });
+  }
+
+  handleFormSubmit(event) {
+    event.preventDefault();
+
     const {
       accountStore
     } = this.props;
 
     const {
+      email,
+      password
+    } = this.state;
+
+    accountStore.login(email, password);
+  }
+
+  render() {
+    const {
       user,
-      profile
     } = accountStore;
+
+    if (user) {
+      return Redirect
+    }
 
     const {
       email,
       password
-    } = profile;
+    } = this.state;
 
     return (
       <div className="app flex-row align-items-center">
@@ -42,10 +77,7 @@ class Login extends Component {
               <CardGroup>
                 <Card className="p-4">
                   <CardBody>
-                    <Form onSubmit={(event) => {
-                      event.preventDefault();
-                      this.props.accountStore.login();
-                    }}>
+                    <Form onSubmit={this.handleFormSubmit.bind(this)}>
                       <h1>Login</h1>
                       <p className="text-muted">Sign In to your account</p>
                       <InputGroup className="mb-3">
@@ -55,7 +87,7 @@ class Login extends Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input type="text" placeholder="Email" autoComplete="email" value={email}
-                               onChange={(event) => profile.email = event.target.value}/>
+                               onChange={this.handleEmailChange.bind(this)}/>
                       </InputGroup>
                       <InputGroup className="mb-4">
                         <InputGroupAddon addonType="prepend">
@@ -64,7 +96,7 @@ class Login extends Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input type="password" placeholder="Password" autoComplete="current-password" value={password}
-                               onChange={(event) => profile.password = event.target.value}/>
+                               onChange={this.handlePasswordChange.bind(this)}/>
                       </InputGroup>
                       <Row>
                         <Col xs="6">

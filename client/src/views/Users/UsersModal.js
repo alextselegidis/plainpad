@@ -21,7 +21,7 @@ import React, {Component} from 'react';
 import {Button, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader,} from 'reactstrap';
 import {inject, observer} from 'mobx-react';
 import {FormattedMessage} from 'react-intl';
-import {translate} from '../../i18n';
+import {translate} from '../../lang';
 
 class UsersModal extends Component {
   toggle() {

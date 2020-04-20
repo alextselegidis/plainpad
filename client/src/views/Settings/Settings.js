@@ -22,7 +22,7 @@ import {Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, In
 import {FormattedMessage} from 'react-intl';
 import {inject, observer} from 'mobx-react';
 import {Redirect} from 'react-router-dom';
-import {translate} from '../../i18n';
+import {translate} from '../../lang';
 
 class Settings extends Component {
   componentDidMount() {

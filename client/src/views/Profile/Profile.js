@@ -20,19 +20,43 @@
 import React, {Component} from 'react';
 import {Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, Label, Row} from 'reactstrap';
 import {FormattedMessage} from 'react-intl';
-import {translate} from '../../i18n';
+import {translate} from '../../lang';
 import {inject, observer} from 'mobx-react';
 
 class Profile extends Component {
-  render() {
-    const {
-      accountStore,
-      applicationStore,
-    } = this.props;
+  constructor(props) {
+    super(props);
 
-    const {
-      profile
-    } = accountStore;
+    const {user} = props.accountStore
+
+    this.state = {
+      name: user ? user.name : '',
+      email: user ? user.email : '',
+      password: '',
+      passwordConfirmation: '',
+      locale: user ? user.locale : '',
+      view: user ? user.view : '',
+      line: user ? user.line : '',
+      sort: user ? user.sort : '',
+      theme: user ? user.theme : '',
+      encrypt: user ? user.encrypt : '',
+    };
+  }
+
+  onNameChange(event) {
+    this.setState({
+      name: event.target.value
+    });
+  }
+
+  onEmailChange(event) {
+    this.setState({
+      email: event.target.value
+    });
+  }
+
+  onFormSubmit(event) {
+    event.preventDefault();
 
     const {
       name,
@@ -45,7 +69,44 @@ class Profile extends Component {
       sort,
       theme,
       encrypt,
-    } = profile;
+    } = this.state;
+
+    const {
+      accountStore
+    } = this.props;
+
+    accountStore.updateProfile(
+      name,
+      email,
+      password,
+      passwordConfirmation,
+      locale,
+      view,
+      line,
+      sort,
+      theme,
+      encrypt,
+    );
+  }
+
+  render() {
+    const {
+      accountStore,
+      applicationStore,
+    } = this.props;
+
+    const {
+      name,
+      email,
+      password,
+      passwordConfirmation,
+      locale,
+      view,
+      line,
+      sort,
+      theme,
+      encrypt,
+    } = this.state;
 
     const {
       installation,
@@ -54,10 +115,7 @@ class Profile extends Component {
 
     return (
       <div className="my-5 animated fadeIn">
-        <Form onSubmit={(event) => {
-          event.preventDefault();
-          accountStore.save();
-        }}>
+        <Form onSubmit={this.onFormSubmit.bind(this)}>
           <Row>
             <Col sm={6}>
               <Card>
@@ -69,8 +127,7 @@ class Profile extends Component {
                     <Label>
                       <FormattedMessage id="profile.name"/>
                     </Label>
-                    <Input placeholder="Name" value={name}
-                           onChange={(e) => profile.name = e.target.value}/>
+                    <Input placeholder="Name" value={name} onChange={this.onNameChange.bind(this)} />
                   </FormGroup>
 
                   <FormGroup>

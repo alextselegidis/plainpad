@@ -22,7 +22,7 @@ import {Button, Card, CardBody, CardHeader, Col, Input, Row, Table} from 'reacts
 import {inject, observer} from 'mobx-react';
 import {FormattedMessage} from 'react-intl';
 import UsersModal from './UsersModal';
-import {translate} from '../../i18n';
+import {translate} from '../../lang';
 import {Redirect} from 'react-router-dom';
 
 class Users extends Component {
