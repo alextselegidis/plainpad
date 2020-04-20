@@ -37,4 +37,6 @@ export default {
   updates: 'Updates',
   update: 'Update',
   newUpdatesAvailable: 'There are new updates available for download.',
+  updateSuccess: 'The updates were successfully installed.',
+  updateFailure: 'The updates could not be installed.'
 }
