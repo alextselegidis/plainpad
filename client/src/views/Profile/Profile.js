@@ -83,6 +83,10 @@ class Profile extends Component {
       online
     } = application;
 
+    const {
+      user
+    } = account;
+
     return (
       <div className="my-5 animated fadeIn">
         <Form onSubmit={(event) => {
@@ -262,8 +266,8 @@ class Profile extends Component {
                     </Input>
                   </FormGroup>
                   <FormGroup className="text-center py-4">
-                    <Button className="secondary" hidden={!online} size="lg" outline={true}
-                            onClick={() => account.invalidateCache()}>
+                    <Button hidden={!online} size="lg" color={user.theme === 'light' ? 'primary' : 'secondary'}
+                            outline={true} onClick={() => account.invalidateCache()}>
                       <i className="fa fa-eraser mr-2"/>
                       <FormattedMessage id="profile.invalidateCache"/>
                     </Button>
