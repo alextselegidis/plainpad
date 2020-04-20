@@ -38,41 +38,41 @@ class Settings extends Component {
 
   componentDidMount() {
     const {
-      settingsStore,
+      settings,
     } = this.props;
 
-    settingsStore.fetch()
+    settings.fetch()
       .then(() => {
         const {
-          settings
-        } = settingsStore;
+          encoded
+        } = settings;
 
-        if (settings) {
-          this.defaultLocale = settings.default_locale;
-          this.mailDriver = settings.mail_driver;
-          this.mailHost = settings.mail_host;
-          this.mailPort = settings.mail_port;
-          this.mailUsername = settings.mail_username;
-          this.mailPassword = settings.mail_password;
-          this.mailEncryption = settings.mail_encryption;
-          this.mailFromAddress = settings.mail_from_address;
-          this.mailFromName = settings.mail_from_name;
+        if (encoded) {
+          this.defaultLocale = encoded.default_locale;
+          this.mailDriver = encoded.mail_driver;
+          this.mailHost = encoded.mail_host;
+          this.mailPort = encoded.mail_port;
+          this.mailUsername = encoded.mail_username;
+          this.mailPassword = encoded.mail_password;
+          this.mailEncryption = encoded.mail_encryption;
+          this.mailFromAddress = encoded.mail_from_address;
+          this.mailFromName = encoded.mail_from_name;
         }
       });
   }
 
   render() {
     const {
-      settingsStore,
-      applicationStore
+      settings,
+      application
     } = this.props;
 
     const {
       online
-    } = applicationStore;
+    } = application;
 
     if (!online) {
-      applicationStore.warning(translate('layout.pageNotAvailableOffline'));
+      application.warning(translate('layout.pageNotAvailableOffline'));
 
       return <Redirect to="/notes"/>;
     }
@@ -91,13 +91,13 @@ class Settings extends Component {
 
     const {
       config
-    } = applicationStore;
+    } = application;
 
     return (
       <div className="my-5 animated fadeIn">
         <Form onSubmit={(event) => {
           event.preventDefault();
-          settingsStore.save({
+          settings.save({
             defaultLocale,
             mailDriver,
             mailHost,
@@ -154,7 +154,7 @@ class Settings extends Component {
                 </CardBody>
                 <CardFooter>
                   <Button type="button" color="primary" className="float-right"
-                          onClick={() => applicationStore.update()}>
+                          onClick={() => application.update()}>
                     <i className="fa fa-arrow-circle-up mr-2"/>
                     <FormattedMessage id="settings.update"/>
                   </Button>
@@ -259,6 +259,6 @@ decorate(Settings, {
   mailFromName: observable,
 });
 
-export default inject('settingsStore', 'applicationStore')(
+export default inject('settings', 'application')(
   observer(Settings)
 );

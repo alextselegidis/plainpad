@@ -25,7 +25,7 @@ import {FormattedMessage} from 'react-intl';
 class WelcomeMessage extends Component {
   render() {
     const {
-      notesStore
+      notes
     } = this.props;
 
     return (
@@ -39,7 +39,7 @@ class WelcomeMessage extends Component {
             <FormattedMessage id="notes.selectNoteOrCreate"/>
           </p>
 
-          <Button color="primary" size="lg" onClick={() => notesStore.add()}>
+          <Button color="primary" size="lg" onClick={() => notes.add()}>
             <i className="fa fa-plus mr-2"/>
             <FormattedMessage id="notes.newNote"/>
           </Button>
@@ -49,6 +49,6 @@ class WelcomeMessage extends Component {
   }
 }
 
-export default inject('notesStore')(
+export default inject('notes')(
   observer(WelcomeMessage)
 );

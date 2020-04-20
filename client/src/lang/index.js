@@ -19,7 +19,7 @@
 
 import enUS from './en-US';
 import deDE from './de-DE';
-import accountStore from '../stores/AccountStore';
+import account from '../stores/account';
 import {createIntl} from 'react-intl';
 
 const messages = {
@@ -58,7 +58,7 @@ function flatten(object) {
 
 function translate(id, values = {}) {
   if (!intl) {
-    const locale = accountStore.user ? accountStore.user.locale : 'en-US';
+    const locale = account.user ? account.user.locale : 'en-US';
 
     intl = createIntl({
       locale,

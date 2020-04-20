@@ -19,8 +19,8 @@
 
 import {decorate, observable} from 'mobx';
 import {translate} from '../lang';
-import applicationStore from './ApplicationStore';
-import notesStore from './NotesStore';
+import application from './application';
+import notes from './notes';
 import SessionsHttpClient from '../http/SessionsHttpClient';
 import UsersHttpClient from '../http/UsersHttpClient';
 import storage from '../storage';
@@ -41,7 +41,7 @@ class AccountStore {
 
     this.observeSessionExpiration();
 
-    notesStore.sync();
+    notes.sync();
   }
 
   async login(email, password) {
@@ -62,11 +62,11 @@ class AccountStore {
 
       localStorage.setItem('Plainpad.Account', JSON.stringify(account));
 
-      applicationStore.success(translate('account.successfullyLoggedIn'));
+      application.success(translate('account.successfullyLoggedIn'));
 
-      notesStore.list();
+      await notes.list();
     } catch (error) {
-      applicationStore.error(translate('account.failedToLogIn'));
+      application.error(translate('account.failedToLogIn'));
       console.error(error);
     }
   }
@@ -83,10 +83,10 @@ class AccountStore {
     try {
       await SessionsHttpClient.delete(this.session);
 
-      applicationStore.success(translate('account.successfullyLoggedOut'));
+      application.success(translate('account.successfullyLoggedOut'));
 
     } catch (error) {
-      applicationStore.error(translate('account.failedToLogOut'));
+      application.error(translate('account.failedToLogOut'));
       console.error(error);
     }
 
@@ -97,16 +97,16 @@ class AccountStore {
     try {
       await UsersHttpClient.recoverPassword(email);
       this.passwordRecovered = true;
-      applicationStore.success(translate('account.successfullyRecoveredPassword'));
+      application.success(translate('account.successfullyRecoveredPassword'));
     } catch (error) {
-      applicationStore.error(translate('account.failedToRecoverPassword'));
+      application.error(translate('account.failedToRecoverPassword'));
       console.error(error);
     }
   }
 
   async save(profile) {
     if (profile.password && profile.password !== profile.passwordConfirmation) {
-      applicationStore.error(translate('account.passwordsMismatch'));
+      application.error(translate('account.passwordsMismatch'));
       return;
     }
 
@@ -121,7 +121,7 @@ class AccountStore {
 
     localStorage.setItem('Plainpad.Account', JSON.stringify(account));
 
-    applicationStore.success(translate('account.saveSuccess'));
+    application.success(translate('account.saveSuccess'));
 
     try {
       await UsersHttpClient.update(this.user);
@@ -132,11 +132,11 @@ class AccountStore {
         return;
       }
 
-      applicationStore.error(translate('account.saveFailure'));
+      application.error(translate('account.saveFailure'));
       console.error(error);
     }
 
-    notesStore.list();
+    notes.list();
 
     if (reload) {
       window.location.reload();
@@ -151,9 +151,9 @@ class AccountStore {
     await storage.table('notes').clear();
     await storage.table('sync').clear();
 
-    applicationStore.success(translate('account.invalidateSuccess'));
+    application.success(translate('account.invalidateSuccess'));
 
-    notesStore.list();
+    notes.list();
   }
 
   observeSessionExpiration() {
@@ -165,7 +165,7 @@ class AccountStore {
     const current = new Date();
 
     if (current > expires) {
-      applicationStore.warning(translate('account.sessionExpired'));
+      application.warning(translate('account.sessionExpired'));
       this.logout();
       return;
     }

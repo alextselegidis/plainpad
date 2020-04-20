@@ -37,24 +37,24 @@ const defaultProps = {};
 class NoteHeader extends Component {
   render() {
     const {
-      accountStore,
-      notesStore,
-      applicationStore,
+      account,
+      notes,
+      application,
       onLogout
     } = this.props;
 
     const {
       saving
-    } = notesStore;
+    } = notes;
 
     const {
       user
-    } = accountStore;
+    } = account;
 
     const {
       config,
       online
-    } = applicationStore;
+    } = application;
 
     return (
       <React.Fragment>
@@ -132,6 +132,6 @@ class NoteHeader extends Component {
 NoteHeader.propTypes = propTypes;
 NoteHeader.defaultProps = defaultProps;
 
-export default inject('accountStore', 'notesStore', 'applicationStore')(
+export default inject('account', 'notes', 'application')(
   observer(NoteHeader)
 );

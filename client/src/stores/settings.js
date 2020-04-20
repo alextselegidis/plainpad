@@ -19,24 +19,24 @@
 
 import {decorate, observable} from 'mobx';
 import SettingsHttpClient from '../http/SettingsHttpClient';
-import applicationStore from './ApplicationStore';
+import application from './application';
 import {translate} from '../lang';
 
 class SettingsStore {
-  settings = null;
+  encoded = null;
 
   async fetch() {
     try {
-      this.settings = await SettingsHttpClient.retrieve();
+      this.encoded = await SettingsHttpClient.retrieve();
     } catch (error) {
-      applicationStore.error(translate('settings.fetchFailure'));
+      application.error(translate('settings.fetchFailure'));
       console.error(error);
     }
   }
 
   async save(settings) {
     try {
-      this.settings = {
+      this.encoded = {
         default_locale: settings.defaultLocale,
         mail_driver: settings.mailDriver,
         mail_host: settings.mailHost,
@@ -48,18 +48,18 @@ class SettingsStore {
         mail_from_name: settings.mailFromName,
       };
 
-      await SettingsHttpClient.update(this.settings);
+      await SettingsHttpClient.update(this.encoded);
 
-      applicationStore.success(translate('settings.saveSuccess'));
+      application.success(translate('settings.saveSuccess'));
     } catch (error) {
-      applicationStore.error(translate('settings.saveFailure'));
+      application.error(translate('settings.saveFailure'));
       console.error(error);
     }
   }
 }
 
 decorate(SettingsStore, {
-  settings: observable,
+  encoded: observable,
 });
 
 export default new SettingsStore();

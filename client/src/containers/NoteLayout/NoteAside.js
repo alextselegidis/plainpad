@@ -27,7 +27,7 @@ class NoteAside extends Component {
   render() {
     const {
       session
-    } = this.props.accountStore;
+    } = this.props.account;
 
     if (!session) {
       return <div/>;
@@ -40,7 +40,7 @@ class NoteAside extends Component {
       updatedAt,
       pinned,
       saving,
-    } = this.props.notesStore;
+    } = this.props.notes;
 
     if (!id) {
       return <Col>
@@ -85,33 +85,33 @@ class NoteAside extends Component {
         <div className="mb-4 border-bottom" />
 
         <div className="mb-4">
-          <Button color="light" block className="m-auto" onClick={() => this.props.notesStore.pin()} hidden={pinned}>
+          <Button color="light" block className="m-auto" onClick={() => this.props.notes.pin()} hidden={pinned}>
             <i className="fa fa-thumb-tack mr-2"/>
             <FormattedMessage id="notes.pin"/>
           </Button>
 
-          <Button color="light" block className="m-auto" onClick={() => this.props.notesStore.unpin()} hidden={!pinned}>
+          <Button color="light" block className="m-auto" onClick={() => this.props.notes.unpin()} hidden={!pinned}>
             <i className="fa fa-thumb-tack mr-2"/>
             <FormattedMessage id="notes.unpin"/>
           </Button>
         </div>
 
         <div className="mb-4">
-          <Button color="light" block className="m-auto" onClick={() => this.props.notesStore.download()}>
+          <Button color="light" block className="m-auto" onClick={() => this.props.notes.download()}>
             <i className="fa fa-cloud-download mr-2"/>
             <FormattedMessage id="notes.download"/>
           </Button>
         </div>
 
         <div className="mb-4" hidden={!navigator.canShare}>
-          <Button color="light" block className="m-auto" onClick={() => this.props.notesStore.share()}>
+          <Button color="light" block className="m-auto" onClick={() => this.props.notes.share()}>
             <i className="fa fa-share-alt mr-2"/>
             <FormattedMessage id="notes.share"/>
           </Button>
         </div>
 
         <div className="mb-4">
-          <Button color="danger" block className="m-auto" onClick={() => this.props.notesStore.delete()}>
+          <Button color="danger" block className="m-auto" onClick={() => this.props.notes.delete()}>
             <i className="fa fa-trash mr-2"/>
             <FormattedMessage id="notes.delete"/>
           </Button>
@@ -121,6 +121,6 @@ class NoteAside extends Component {
   }
 }
 
-export default inject('accountStore', 'notesStore')(
+export default inject('account', 'notes')(
   observer(NoteAside)
 );

@@ -8,29 +8,19 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {Provider} from 'mobx-react';
-import applicationStore from './stores/ApplicationStore';
-import accountStore from './stores/AccountStore';
-import notesStore from './stores/NotesStore';
-import usersStore from './stores/UsersStore';
-import settingsStore from './stores/SettingsStore';
 import {IntlProvider} from 'react-intl';
 import {messages} from './lang';
+import stores from './stores';
 
-applicationStore.initialize();
+stores.application.initialize();
 
-const locale = accountStore.user ? accountStore.user.locale : 'en-US';
+const locale = stores.account.user ? stores.account.user.locale : 'en-US';
 
 const Root = () => {
   return (
-    <Provider
-      applicationStore={applicationStore}
-      usersStore={usersStore}
-      settingsStore={settingsStore}
-      notesStore={notesStore}
-      accountStore={accountStore}
-    >
+    <Provider {...stores}>
       <IntlProvider locale={locale} messages={messages[locale]}>
-       <App/>
+        <App/>
       </IntlProvider>
     </Provider>
   );

@@ -40,12 +40,12 @@ class Profile extends Component {
     super(props);
 
     const {
-      accountStore
+      account
     } = props;
 
     const {
       user
-    } = accountStore;
+    } = account;
 
     if (user) {
       this.name = user.name;
@@ -61,8 +61,8 @@ class Profile extends Component {
 
   render() {
     const {
-      accountStore,
-      applicationStore,
+      account,
+      application,
     } = this.props;
 
     const {
@@ -81,13 +81,13 @@ class Profile extends Component {
     const {
       installation,
       online
-    } = applicationStore;
+    } = application;
 
     return (
       <div className="my-5 animated fadeIn">
         <Form onSubmit={(event) => {
           event.preventDefault();
-          accountStore.save({
+          account.save({
             name,
             email,
             password,
@@ -156,7 +156,7 @@ class Profile extends Component {
                     <FormattedMessage id="profile.youCanInstallPlainpad"/>
                   </p>
 
-                  <Button onClick={() => applicationStore.install()}>
+                  <Button onClick={() => application.install()}>
                     <i className="fa fa-cloud-download mr-2"/>
                     <FormattedMessage id="profile.install"/>
                   </Button>
@@ -263,7 +263,7 @@ class Profile extends Component {
                   </FormGroup>
                   <FormGroup className="text-center py-4">
                     <Button className="secondary" hidden={!online} size="lg" outline={true}
-                            onClick={() => accountStore.invalidateCache()}>
+                            onClick={() => account.invalidateCache()}>
                       <i className="fa fa-eraser mr-2"/>
                       <FormattedMessage id="profile.invalidateCache"/>
                     </Button>
@@ -297,6 +297,6 @@ decorate(Profile, {
   encrypt: observable,
 });
 
-export default inject('accountStore', 'applicationStore')(
+export default inject('account', 'application')(
   observer(Profile)
 );

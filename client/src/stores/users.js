@@ -19,7 +19,7 @@
 
 import {decorate, observable} from 'mobx';
 import UsersHttpClient from '../http/UsersHttpClient';
-import applicationStore from './ApplicationStore';
+import application from './application';
 import {translate} from '../lang';
 import Swal from 'sweetalert2';
 
@@ -29,7 +29,7 @@ class UsersStore {
 
   // List
   filter = '';
-  users = [];
+  userList = [];
 
   // Modal
   id = null;
@@ -62,9 +62,9 @@ class UsersStore {
 
   async list() {
     try {
-      this.users = await UsersHttpClient.list(this.filter);
+      this.userList = await UsersHttpClient.list(this.filter);
     } catch (error) {
-      applicationStore.error(translate('users.listFailure'));
+      application.error(translate('users.listFailure'));
       console.error(error);
     }
   }
@@ -72,7 +72,7 @@ class UsersStore {
   async save() {
     try {
       if (this.password && this.password !== this.passwordConfirmation) {
-        applicationStore.error(translate('users.passwordsMismatch'));
+        application.error(translate('users.passwordsMismatch'));
         return;
       }
 
@@ -86,11 +86,11 @@ class UsersStore {
 
       await UsersHttpClient[this.id ? 'update' : 'create'](user);
 
-      applicationStore.success(translate('users.saveSuccess'));
+      application.success(translate('users.saveSuccess'));
       this.list(this.filter);
       this.mode = 'list';
     } catch (error) {
-      applicationStore.error(translate('users.saveFailure'));
+      application.error(translate('users.saveFailure'));
       console.error(error);
     }
   }
@@ -112,11 +112,11 @@ class UsersStore {
 
       await UsersHttpClient.delete(user.id);
 
-      applicationStore.success(translate('users.deleteSuccess'));
+      application.success(translate('users.deleteSuccess'));
       this.list(this.filter);
       this.mode = 'list';
     } catch (error) {
-      applicationStore.error(translate('users.deleteFailure'));
+      application.error(translate('users.deleteFailure'));
       console.error(error);
     }
   }
@@ -125,7 +125,7 @@ class UsersStore {
 decorate(UsersStore, {
   mode: observable,
   filter: observable,
-  users: observable,
+  userList: observable,
   name: observable,
   email: observable,
   password: observable,

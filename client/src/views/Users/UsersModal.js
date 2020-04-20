@@ -25,12 +25,12 @@ import {translate} from '../../lang';
 
 class UsersModal extends Component {
   toggle() {
-    this.props.usersStore.mode = 'list';
+    this.props.users.mode = 'list';
   }
 
   render() {
     const {
-      usersStore
+      users
     } = this.props;
 
     const {
@@ -40,7 +40,7 @@ class UsersModal extends Component {
       password,
       passwordConfirmation,
       admin,
-    } = usersStore;
+    } = users;
 
     const isOpen = ['add', 'edit'].includes(mode);
 
@@ -52,7 +52,7 @@ class UsersModal extends Component {
       <Modal isOpen={isOpen} toggle={() => this.toggle()}>
         <Form onSubmit={(event) => {
           event.preventDefault();
-          usersStore.save();
+          users.save();
         }}>
           <ModalHeader toggle={() => this.toggle()}>
             <FormattedMessage id="users.user"/>
@@ -64,7 +64,7 @@ class UsersModal extends Component {
                 <FormattedMessage id="users.name"/>
               </Label>
               <Input placeholder="John Doe" value={name}
-                     onChange={(event) => usersStore.name = event.target.value}/>
+                     onChange={(event) => users.name = event.target.value}/>
             </FormGroup>
 
             <FormGroup>
@@ -72,7 +72,7 @@ class UsersModal extends Component {
                 <FormattedMessage id="users.email"/>
               </Label>
               <Input type="email" placeholder="info@example.org" value={email}
-                     onChange={(event) => usersStore.email = event.target.value}/>
+                     onChange={(event) => users.email = event.target.value}/>
             </FormGroup>
 
             <FormGroup>
@@ -80,7 +80,7 @@ class UsersModal extends Component {
                 <FormattedMessage id="users.password"/>
               </Label>
               <Input type="password" value={password} autoComplete="new-password"
-                     onChange={(event) => usersStore.password = event.target.value}/>
+                     onChange={(event) => users.password = event.target.value}/>
             </FormGroup>
 
             <FormGroup>
@@ -88,7 +88,7 @@ class UsersModal extends Component {
                 <FormattedMessage id="users.passwordConfirmation"/>
               </Label>
               <Input type="password" value={passwordConfirmation}
-                     onChange={(event) => usersStore.passwordConfirmation = event.target.value}/>
+                     onChange={(event) => users.passwordConfirmation = event.target.value}/>
             </FormGroup>
 
             <FormGroup>
@@ -96,7 +96,7 @@ class UsersModal extends Component {
                 <FormattedMessage id="users.role"/>
               </Label>
               <Input type="select" value={admin ? 'admin' : 'user'}
-                     onChange={(event) => usersStore.admin = event.target.value === 'admin'}>
+                     onChange={(event) => users.admin = event.target.value === 'admin'}>
                 <option value="user">
                   {translate('users.user')}
                 </option>
@@ -123,6 +123,6 @@ class UsersModal extends Component {
   }
 }
 
-export default inject('usersStore')(
+export default inject('users')(
   observer(UsersModal)
 );

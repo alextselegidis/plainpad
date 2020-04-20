@@ -17,7 +17,7 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>
 */
 
-import accountStore from '../stores/AccountStore';
+import account from '../stores/account';
 import OfflineError from './OfflineError';
 
 class HttpClient {
@@ -32,8 +32,8 @@ class HttpClient {
       'Content-Type': 'application/json'
     };
 
-    if (accountStore.session) {
-      headers.Authorization = `Bearer ${accountStore.session.token}`;
+    if (account.session) {
+      headers.Authorization = `Bearer ${account.session.token}`;
     }
 
     const init = {
@@ -84,12 +84,12 @@ class HttpClient {
   }
 
   static throwRequestFailed(response) {
-    if (response.status === 401 && accountStore && !accountStore.session) {
+    if (response.status === 401 && account && !account.session) {
       // The login request failed.
       return;
     }
 
-    if (response.status === 401 && accountStore && accountStore.session) {
+    if (response.status === 401 && account && account.session) {
       // The session has expired, the user has to log in again.
       localStorage.removeItem('Plainpad.Account');
       window.location.reload();

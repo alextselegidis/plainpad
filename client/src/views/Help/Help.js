@@ -24,12 +24,12 @@ import {inject, observer} from 'mobx-react';
 class Help extends Component {
   render() {
     const {
-      accountStore
+      account
     } = this.props;
 
     const {
       user
-    } = accountStore;
+    } = account;
 
     return (
       <div className="my-5 animated fadeIn">
@@ -195,6 +195,6 @@ class Help extends Component {
   }
 }
 
-export default inject('accountStore')(
+export default inject('account')(
   observer(Help)
 );

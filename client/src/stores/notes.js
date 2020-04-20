@@ -19,8 +19,8 @@
 
 import {decorate, observable} from 'mobx';
 import NotesHttpClient from '../http/NotesHttpClient';
-import applicationStore from './ApplicationStore';
-import accountStore from './AccountStore';
+import application from './application';
+import account from './account';
 import {translate} from '../lang';
 import Swal from 'sweetalert2'
 import moment from 'moment';
@@ -31,7 +31,7 @@ class NotesStore {
   saving = false;
   timeout = null;
   filter = '';
-  notes = [];
+  noteList = [];
   id = null;
   title = '';
   content = '';
@@ -49,7 +49,7 @@ class NotesStore {
 
     const filteredNotes = this.filterNotes(cachedNotes);
 
-    this.notes = this.sortNotes(filteredNotes);
+    this.noteList = this.sortNotes(filteredNotes);
 
     let notesGotChanged = false;
 
@@ -79,7 +79,7 @@ class NotesStore {
         return;
       }
 
-      applicationStore.error(translate('notes.listFailure'));
+      application.error(translate('notes.listFailure'));
       console.error(error);
     }
 
@@ -134,7 +134,7 @@ class NotesStore {
         return;
       }
 
-      applicationStore.error(translate('notes.fetchFailure'));
+      application.error(translate('notes.fetchFailure'));
       console.error(error);
     }
 
@@ -156,7 +156,7 @@ class NotesStore {
 
     const note = {
       id,
-      user_id: accountStore.user.id,
+      user_id: account.user.id,
       created_at: this.createdAt || moment().format('YYYY-MM-DD HH:mm:ss'),
       updated_at: moment().format('YYYY-MM-DD HH:mm:ss'),
       title: this.title,
@@ -189,7 +189,7 @@ class NotesStore {
         return;
       }
 
-      applicationStore.error(translate('notes.saveFailure'));
+      application.error(translate('notes.saveFailure'));
       console.error(error);
     }
 
@@ -216,7 +216,7 @@ class NotesStore {
       }
 
       await storage.table('notes').removeItem(this.id);
-      applicationStore.success(translate('notes.deleteSuccess'));
+      application.success(translate('notes.deleteSuccess'));
 
       window.location.href = `#/notes`;
       document.querySelector('.aside-toggler').click(); // Close the sidebar.
@@ -239,7 +239,7 @@ class NotesStore {
           return;
         }
 
-        applicationStore.error(translate('notes.deleteFailure'));
+        application.error(translate('notes.deleteFailure'));
         console.error(error);
       }
 
@@ -279,7 +279,7 @@ class NotesStore {
         return;
       }
 
-      applicationStore.error(translate('notes.pinFailure'));
+      application.error(translate('notes.pinFailure'));
       console.error(error);
     }
   }
@@ -299,7 +299,7 @@ class NotesStore {
         return;
       }
 
-      applicationStore.error(translate('notes.unpinFailure'));
+      application.error(translate('notes.unpinFailure'));
       console.error(error);
     }
   }
@@ -393,14 +393,14 @@ class NotesStore {
         files: [file],
       });
 
-      applicationStore.success(translate('notes.shareSuccess'));
+      application.success(translate('notes.shareSuccess'));
 
     } catch (error) {
       if (error instanceof OfflineError) {
         return;
       }
 
-      applicationStore.error(translate('notes.shareFailure'));
+      application.error(translate('notes.shareFailure'));
       console.error(error);
     }
   }
@@ -417,7 +417,7 @@ class NotesStore {
   sortNotes(notes) {
     let sortedNotes;
 
-    switch (accountStore.user.sort) {
+    switch (account.user.sort) {
       default:
       case 'modified':
         sortedNotes = notes.sort((a, b) => {
@@ -485,12 +485,12 @@ class NotesStore {
   }
 
   async sync() {
-    if (!navigator.onLine || !accountStore.user) {
+    if (!navigator.onLine || !account.user) {
       return;
     }
 
     if (this.syncErrors >= 10) {
-      applicationStore.warning(translate('notes.syncingGotDisabled'));
+      application.warning(translate('notes.syncingGotDisabled'));
       return;
     }
 
@@ -568,7 +568,7 @@ class NotesStore {
       }
     } catch (error) {
       this.syncErrors++;
-      applicationStore.error(translate('notes.syncFailure'));
+      application.error(translate('notes.syncFailure'));
       console.error(error);
     }
 
@@ -591,7 +591,7 @@ decorate(NotesStore, {
   saving: observable,
   filter: observable,
   sort: observable,
-  notes: observable,
+  noteList: observable,
   id: observable,
   title: observable,
   content: observable,

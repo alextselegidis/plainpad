@@ -41,12 +41,12 @@ class RecoverPassword extends Component {
 
   render() {
     const {
-      accountStore
+      account
     } = this.props;
 
     const {
       passwordRecovered
-    } = accountStore;
+    } = account;
 
     const {
       email,
@@ -66,7 +66,7 @@ class RecoverPassword extends Component {
                   <CardBody>
                     <Form onSubmit={(event) => {
                       event.preventDefault();
-                      accountStore.recoverPassword(email);
+                      account.recoverPassword(email);
                     }}>
                       <h1>Recover Password</h1>
                       <p className="text-muted">Recover your account password</p>
@@ -101,6 +101,6 @@ decorate(RecoverPassword, {
   email: observable,
 })
 
-export default inject('accountStore')(
+export default inject('account')(
   observer(RecoverPassword)
 );

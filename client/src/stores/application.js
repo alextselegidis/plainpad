@@ -21,8 +21,8 @@ import {decorate, observable} from 'mobx';
 import {Spinner} from 'spin.js';
 import toastr from 'toastr';
 import ApplicationHttpClient from '../http/ApplicationHttpClient';
-import accountStore from './AccountStore';
-import notesStore from './NotesStore';
+import account from './account';
+import notes from './notes';
 import OfflineError from '../http/OfflineError';
 import {translate} from '../lang';
 
@@ -118,8 +118,8 @@ class ApplicationStore {
     this.suppressSidebarOverlap();
     this.autoResizeEditor();
 
-    const account = JSON.parse(localStorage.getItem('Plainpad.Account'));
-    accountStore.load(account);
+    const plainpadAccount = JSON.parse(localStorage.getItem('Plainpad.Account'));
+    account.load(plainpadAccount);
 
     try {
       this.config = await ApplicationHttpClient.retrieve();
@@ -160,7 +160,7 @@ class ApplicationStore {
 
   observeNetworkStatus() {
     if (navigator.onLine && !this.online) {
-      notesStore.sync();
+      notes.sync();
     }
 
     this.online = navigator.onLine;
@@ -187,7 +187,7 @@ class ApplicationStore {
   }
 
   autoResizeEditor() {
-    window.addEventListener('resize', () => notesStore.resizeEditor());
+    window.addEventListener('resize', () => notes.resizeEditor());
   }
 }
 

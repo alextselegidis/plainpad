@@ -23,12 +23,12 @@ class Login extends Component {
 
   render() {
     const {
-      accountStore
+      account
     } = this.props;
 
     const {
       user,
-    } = accountStore;
+    } = account;
 
     const {
       email,
@@ -47,7 +47,7 @@ class Login extends Component {
                   <CardBody>
                     <Form onSubmit={(event) => {
                       event.preventDefault();
-                      this.props.accountStore.login(this.email, this.password);
+                      account.login(this.email, this.password);
                     }}>
                       <h1>Login</h1>
                       <p className="text-muted">Sign In to your account</p>
@@ -96,6 +96,6 @@ decorate(Login, {
   password: observable
 });
 
-export default inject('accountStore')(
+export default inject('account')(
   observer(Login)
 );

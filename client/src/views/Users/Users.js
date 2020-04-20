@@ -27,30 +27,30 @@ import {Redirect} from 'react-router-dom';
 
 class Users extends Component {
   componentDidMount() {
-    this.props.usersStore.list();
+    this.props.users.list();
   }
 
   render() {
     const {
-      applicationStore,
-      usersStore
+      application,
+      users
     } = this.props;
 
     const {
       online
-    } = applicationStore;
+    } = application;
 
     if (!online) {
-      applicationStore.warning(translate('layout.pageNotAvailableOffline'));
+      application.warning(translate('layout.pageNotAvailableOffline'));
       return <Redirect to="/notes" />;
     }
 
     const {
-      users,
+      userList,
       filter
-    } = usersStore;
+    } = users;
 
-    const rows = users.map((user) => {
+    const rows = userList.map((user) => {
       return <tr key={user.id}>
         <td>
           {user.name}
@@ -65,12 +65,12 @@ class Users extends Component {
         </td>
 
         <td>
-          <Button size="sm" color="light" className="d-xs-block d-sm-inline-block mb-2 mr-0 mr-sm-2 mb-sm-0" onClick={() => usersStore.edit(user)}>
+          <Button size="sm" color="light" className="d-xs-block d-sm-inline-block mb-2 mr-0 mr-sm-2 mb-sm-0" onClick={() => users.edit(user)}>
             <i className="fa fa-pencil mr-2"/>
             <FormattedMessage id="users.edit"/>
           </Button>
 
-          <Button size="sm" color="light" className="d-xs-block d-sm-inline-block" onClick={() => usersStore.delete(user)}>
+          <Button size="sm" color="light" className="d-xs-block d-sm-inline-block" onClick={() => users.delete(user)}>
             <i className="fa fa-trash mr-2"/>
             <FormattedMessage id="users.delete"/>
           </Button>
@@ -89,11 +89,11 @@ class Users extends Component {
               <CardBody>
                 <div className="overflow-auto mb-4">
                   <Input placeholder={translate('users.filterUsers')} className="d-inline-block w-50" value={filter} onChange={(event) => {
-                    usersStore.filter = event.target.value;
-                    setTimeout(() => usersStore.list(), 500);
+                    users.filter = event.target.value;
+                    setTimeout(() => users.list(), 500);
                   }}/>
 
-                  <Button className="float-right" color="success" onClick={() => usersStore.add()}>
+                  <Button className="float-right" color="success" onClick={() => users.add()}>
                     <i className="fa fa-plus mr-2"/>
                     <FormattedMessage id="users.add"/>
                   </Button>
@@ -131,6 +131,6 @@ class Users extends Component {
   }
 }
 
-export default inject('usersStore', 'applicationStore')(
+export default inject('users', 'application')(
   observer(Users)
 );

@@ -25,25 +25,25 @@ import WelcomeMessage from './WelcomeMessage';
 class Notes extends Component {
   componentDidMount() {
     const {
-      accountStore,
-      notesStore,
+      account,
+      notes,
       match
     } = this.props;
 
-    if (!accountStore.session) {
+    if (!account.session) {
       return;
     }
 
     const id = match.params.id;
 
     if (id) {
-      notesStore.select(id);
+      notes.select(id);
     }
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     const {
-      notesStore,
+      notes,
       match
     } = this.props;
 
@@ -51,25 +51,25 @@ class Notes extends Component {
     const previousId = prevProps.match.params.id;
 
     if (id && id !== previousId) {
-      notesStore.select(id);
+      notes.select(id);
     }
   }
 
   componentWillUnmount() {
-    this.props.notesStore.reset();
+    this.props.notes.reset();
   }
 
   render() {
     const {
-      accountStore,
-      notesStore
+      account,
+      notes
     } = this.props;
 
     const {
       id,
       saving,
       content,
-    } = notesStore;
+    } = notes;
 
     if (!id && !saving) {
       return <WelcomeMessage/>;
@@ -77,19 +77,19 @@ class Notes extends Component {
 
     const {
       user
-    } = accountStore;
+    } = account;
 
     return (
       <div className="animated fadeIn h-100">
         <Input
           className={`note-content h-100a w-100 ${user.line === 'full' ? 'full-line' : 'narrow-line'} border-0 rounded-0 shadow-none`}
-          type="textarea" value={content} onChange={(event) => notesStore.updateContent(event.target.value)}
+          type="textarea" value={content} onChange={(event) => notes.updateContent(event.target.value)}
         />
       </div>
     );
   }
 }
 
-export default inject('accountStore', 'notesStore')(
+export default inject('account', 'notes')(
   observer(Notes)
 );

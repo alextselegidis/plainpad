@@ -18,19 +18,19 @@
 */
 
 import localforage from 'localforage';
-import accountStore from './stores/AccountStore';
+import account from './stores/account';
 
 class Storage {
   tables = {};
 
   table(name) {
-    if (!accountStore.user) {
+    if (!account.user) {
       throw new Error('Cannot access the database without a connected user account.');
     }
 
     if (!this.tables[name]) {
       this.tables[name] = localforage.createInstance({
-        name: `Plainpad-${process.env.REACT_APP_VERSION}-${accountStore.user.id}`,
+        name: `Plainpad-${process.env.REACT_APP_VERSION}-${account.user.id}`,
         storeName: name
       });
     }
