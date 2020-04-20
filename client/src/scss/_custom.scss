@@ -40,7 +40,7 @@
 }
 
 .swal2-container{
-  font-family: 'Roboto Mono', 'Roboto', 'Helvetica', sans-serif;
+  font-family: $font-family-sans-serif;
 
   .swal2-backdrop-show {
     background: rgba(0, 0, 0, 0.2);
