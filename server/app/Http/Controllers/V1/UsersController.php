@@ -26,6 +26,7 @@ use App\Mail\PasswordRecovered;
 use App\Models\Note;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
@@ -189,6 +190,8 @@ class UsersController extends Controller
         if (!$user) {
             return response('', 404);
         }
+
+        App::setLocale($user->locale);
 
         $password = Str::random(32);
         $user->password = Hash::make($password);

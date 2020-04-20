@@ -103,4 +103,6 @@ $app->router->group([
 
 config(['app.version' => $version]);
 
+$app->setLocale('en-US');
+
 return $app;
