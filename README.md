@@ -1,7 +1,7 @@
 <h1 align="center">
     <br>
         <a href="https://alextselegidis.com/get/plainpad">
-            <img src="https://raw.githubusercontent.com/alextselegidis/plainpad/master/logo.png" alt="Plainpad" width="203">
+            <img src="https://raw.githubusercontent.com/alextselegidis/plainpad/master/logo.png" alt="Plainpad" width="200">
         </a>
         <br>
         Plainpad
