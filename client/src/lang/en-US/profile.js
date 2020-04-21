@@ -39,6 +39,8 @@ export default {
   dark: 'Dark',
   light: 'Light',
   save: 'Save',
+  saveSuccess: 'Profile saved successfully.',
+  saveFailure: 'Profile could not be saved.',
   fetchFailure: 'Profile could not be fetched.',
   application: 'Application',
   install: 'Install',
@@ -46,5 +48,6 @@ export default {
   invalidateCache: 'Invalidate Cache',
   encrypt: 'Encrypt',
   yes: 'Yes',
-  no: 'No'
+  no: 'No',
+  passwordsMismatch: 'The provided passwords mismatch, please try again.'
 }

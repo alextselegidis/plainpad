@@ -25,45 +25,29 @@ import {inject, observer} from 'mobx-react';
 import {decorate, observable} from 'mobx';
 
 class Profile extends Component {
-  name = '';
-  email = '';
-  password = '';
-  passwordConfirmation = '';
-  locale = 'en-US';
-  view = 'compact';
-  line = 'full';
-  sort = 'modified';
-  theme = 'light';
-  encrypt = '0';
-
-  constructor(props) {
-    super(props);
-
+  componentDidMount() {
     const {
-      account
-    } = props;
+      profile
+    } = this.props;
 
-    const {
-      user
-    } = account;
-
-    if (user) {
-      this.name = user.name;
-      this.email = user.email;
-      this.locale = user.locale;
-      this.view = user.view;
-      this.line = user.line;
-      this.sort = user.sort;
-      this.theme = user.theme;
-      this.encrypt = user.encrypt;
-    }
+    profile.load();
   }
 
   render() {
     const {
-      account,
       application,
+      account,
+      profile,
     } = this.props;
+
+    const {
+      installation,
+      online
+    } = application;
+
+    const {
+      user
+    } = account;
 
     const {
       name,
@@ -76,36 +60,16 @@ class Profile extends Component {
       sort,
       theme,
       encrypt,
-    } = this;
-
-    const {
-      installation,
-      online
-    } = application;
-
-    const {
-      user
-    } = account;
+    } = profile;
 
     return (
       <div className="my-5 animated fadeIn">
         <Form onSubmit={(event) => {
           event.preventDefault();
-          account.save({
-            name,
-            email,
-            password,
-            passwordConfirmation,
-            locale,
-            view,
-            line,
-            sort,
-            theme,
-            encrypt,
-          });
+          profile.save();
         }}>
           <Row>
-            <Col sm={6}>
+            <Col sm="6">
               <Card>
                 <CardHeader>
                   <FormattedMessage id="profile.profile"/>
@@ -116,7 +80,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.name"/>
                     </Label>
                     <Input placeholder="Name" value={name}
-                           onChange={(e) => this.name = e.target.value}/>
+                           onChange={(event) => profile.name = event.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -124,7 +88,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.email"/>
                     </Label>
                     <Input type="email" placeholder="username@example.org" value={email}
-                           onChange={(e) => this.email = e.target.value}/>
+                           onChange={(event) => profile.email = event.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -132,7 +96,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.password"/>
                     </Label>
                     <Input type="password" placeholder="" value={password} autoComplete="new-password"
-                           onChange={(e) => this.password = e.target.value}/>
+                           onChange={(event) => profile.password = event.target.value}/>
                   </FormGroup>
 
                   <FormGroup>
@@ -140,7 +104,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.passwordConfirmation"/>
                     </Label>
                     <Input type="password" placeholder="" value={passwordConfirmation}
-                           onChange={(e) => this.passwordConfirmation = e.target.value}/>
+                           onChange={(event) => profile.passwordConfirmation = event.target.value}/>
                   </FormGroup>
                 </CardBody>
                 <CardFooter>
@@ -168,7 +132,7 @@ class Profile extends Component {
               </Card>
             </Col>
 
-            <Col sm={6}>
+            <Col sm="6">
               <Card>
                 <CardHeader>
                   <FormattedMessage id="profile.settings"/>
@@ -179,7 +143,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.locale"/>
                     </Label>
                     <Input type="select" value={locale}
-                           onChange={(e) => this.locale = e.target.value}>
+                           onChange={(event) => profile.locale = event.target.value}>
                       <option value="en-US">
                         en-US
                       </option>
@@ -194,7 +158,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.view"/>
                     </Label>
                     <Input type="select" value={view}
-                           onChange={(e) => this.view = e.target.value}>
+                           onChange={(event) => profile.view = event.target.value}>
                       <option value="comfortable">
                         {translate('profile.comfortable')}
                       </option>
@@ -209,7 +173,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.line"/>
                     </Label>
                     <Input type="select" value={line}
-                           onChange={(e) => this.line = e.target.value}>
+                           onChange={(event) => profile.line = event.target.value}>
                       <option value="full">
                         {translate('profile.full')}
                       </option>
@@ -224,7 +188,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.sort"/>
                     </Label>
                     <Input type="select" value={sort}
-                           onChange={(e) => this.sort = e.target.value}>
+                           onChange={(event) => profile.sort = event.target.value}>
                       <option value="modified">
                         {translate('profile.lastModifiedFirst')}
                       </option>
@@ -242,7 +206,7 @@ class Profile extends Component {
                       <FormattedMessage id="profile.theme"/>
                     </Label>
                     <Input type="select" value={theme}
-                           onChange={(event) => this.theme = event.target.value}>
+                           onChange={(event) => profile.theme = event.target.value}>
                       <option value="light">
                         {translate('profile.light')}
                       </option>
@@ -255,8 +219,8 @@ class Profile extends Component {
                     <Label>
                       <FormattedMessage id="profile.encrypt"/>
                     </Label>
-                    <Input type="select" value={encrypt === true || encrypt === '1' ? '1' : '0'}
-                           onChange={(event) => this.encrypt = event.target.value}>
+                    <Input type="select" value={encrypt ? '1' : '0'}
+                           onChange={(event) => profile.encrypt = event.target.value === '1'}>
                       <option value="1">
                         {translate('profile.yes')}
                       </option>
@@ -267,7 +231,7 @@ class Profile extends Component {
                   </FormGroup>
                   <FormGroup className="text-center py-4">
                     <Button hidden={!online} size="lg" color={user.theme === 'light' ? 'primary' : 'secondary'}
-                            outline={true} onClick={() => account.invalidateCache()}>
+                            outline={true} onClick={() => profile.invalidateCache()}>
                       <i className="fa fa-eraser mr-2"/>
                       <FormattedMessage id="profile.invalidateCache"/>
                     </Button>
@@ -301,6 +265,6 @@ decorate(Profile, {
   encrypt: observable,
 });
 
-export default inject('account', 'application')(
+export default inject('account', 'application', 'profile')(
   observer(Profile)
 );

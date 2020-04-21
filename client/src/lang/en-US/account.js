@@ -24,9 +24,6 @@ export default {
   failedToLogOut: 'Something went wrong while logging you out, please try again.',
   successfullyRecoveredPassword: 'Your password has been successfully recovered! Check you emails for further instructions.',
   failedToRecoverPassword: 'Something went wrong while recovering your password, please try again.',
-  saveSuccess: 'Profile saved successfully.',
-  saveFailure: 'Profile could not be saved.',
-  passwordsMismatch: 'The provided passwords mismatch, please try again.',
   invalidateSuccess: 'Cache got reset successfully.',
   sessionExpired: 'Your session has expired, please log in again.',
 }

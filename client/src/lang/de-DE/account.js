@@ -24,9 +24,6 @@ export default {
   failedToLogOut: 'Etwas ist beim Ausloggen schief gelaufen, bitte versuchen Sie es noch einmal.',
   successfullyRecoveredPassword: 'Ihr Passwort wurde erfolgreich wiederhergestellt! Prüfen Sie Ihre E-Mails für weitere Anweisungen.',
   failedToRecoverPassword: 'Bei der Wiederherstellung Ihres Passworts ist etwas schief gelaufen, bitte versuchen Sie es erneut.',
-  saveSuccess: 'Profil erfolgreich gespeichert.',
-  saveFailure: 'Profil konnte nicht gespeichert werden.',
-  passwordsMismatch: 'Die angegebenen Passwörter stimmen nicht überein, bitte versuchen Sie es erneut.',
   invalidateSuccess: 'Cache wurde erfolgreich zurückgesetzt.',
   sessionExpired: 'Ihre Sitzung ist abgelaufen, bitte loggen Sie sich erneut ein.',
 }

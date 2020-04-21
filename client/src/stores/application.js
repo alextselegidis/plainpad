@@ -118,8 +118,8 @@ class ApplicationStore {
     this.suppressSidebarOverlap();
     this.autoResizeEditor();
 
-    const plainpadAccount = JSON.parse(localStorage.getItem('Plainpad.Account'));
-    account.load(plainpadAccount);
+    const localAccount = JSON.parse(localStorage.getItem('Plainpad.Account'));
+    account.load(localAccount);
 
     try {
       this.config = await ApplicationHttpClient.retrieve();

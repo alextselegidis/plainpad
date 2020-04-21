@@ -39,6 +39,8 @@ export default {
   dark: 'Dunkles',
   light: 'Helles',
   save: 'speichern',
+  saveSuccess: 'Profil erfolgreich gespeichert.',
+  saveFailure: 'Profil konnte nicht gespeichert werden.',
   fetchFailure: 'Profil konnte nicht abgerufen werden.',
   application: 'Applikation',
   install: 'installieren',
@@ -46,5 +48,6 @@ export default {
   invalidateCache: 'Cache invalidieren',
   encrypt: 'Verschlüsseln',
   yes: 'Ja',
-  no: 'Nein'
+  no: 'Nein',
+  passwordsMismatch: 'Die angegebenen Passwörter stimmen nicht überein, bitte versuchen Sie es erneut.'
 }

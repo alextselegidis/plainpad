@@ -23,8 +23,6 @@ import application from './application';
 import notes from './notes';
 import SessionsHttpClient from '../http/SessionsHttpClient';
 import UsersHttpClient from '../http/UsersHttpClient';
-import storage from '../storage';
-import OfflineError from '../http/OfflineError';
 
 class AccountStore {
   session = null;
@@ -104,60 +102,8 @@ class AccountStore {
     }
   }
 
-  async save(profile) {
-    if (profile.password && profile.password !== profile.passwordConfirmation) {
-      application.error(translate('account.passwordsMismatch'));
-      return;
-    }
-
-    const reload = profile.locale !== this.user.locale;
-
-    this.user = {...this.user, ...profile};
-
-    const account = {
-      session: this.session,
-      user: this.user
-    };
-
-    localStorage.setItem('Plainpad.Account', JSON.stringify(account));
-
-    application.success(translate('account.saveSuccess'));
-
-    try {
-      await UsersHttpClient.update(this.user);
-
-
-    } catch (error) {
-      if (error instanceof OfflineError) {
-        return;
-      }
-
-      application.error(translate('account.saveFailure'));
-      console.error(error);
-    }
-
-    notes.list();
-
-    if (reload) {
-      window.location.reload();
-    }
-  }
-
-  async invalidateCache() {
-    if (!navigator.onLine) {
-      return;
-    }
-
-    await storage.table('notes').clear();
-    await storage.table('sync').clear();
-
-    application.success(translate('account.invalidateSuccess'));
-
-    notes.list();
-  }
-
   observeSessionExpiration() {
-    if (!this.session || !navigator.onLine) {
+    if (!this.session || !navigator.onLine) {
       return;
     }
 
