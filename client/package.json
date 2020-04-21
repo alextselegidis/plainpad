@@ -36,7 +36,8 @@
     "simple-line-icons": "^2.4.1",
     "spin.js": "^4.1.0",
     "sweetalert2": "^9.8.2",
-    "toastr": "^2.1.4"
+    "toastr": "^2.1.4",
+    "uuid": "^7.0.3"
   },
   "devDependencies": {
     "react-scripts": "^3.0.1"

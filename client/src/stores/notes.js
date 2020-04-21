@@ -18,6 +18,7 @@
 */
 
 import {decorate, observable} from 'mobx';
+import { v4 as uuidv4 } from 'uuid';
 import NotesHttpClient from '../http/NotesHttpClient';
 import application from './application';
 import account from './account';
@@ -152,7 +153,7 @@ class NotesStore {
 
     const isNewNote = this.id === null;
 
-    let id = isNewNote ? `local-${this.uuid()}` : this.id;
+    let id = isNewNote ? `local-${uuidv4()}` : this.id;
 
     const note = {
       id,
@@ -577,13 +578,6 @@ class NotesStore {
     });
 
     setTimeout(() => this.sync(), 30000);
-  }
-
-  uuid() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
   }
 }
 
