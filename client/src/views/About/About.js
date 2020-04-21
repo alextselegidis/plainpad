@@ -19,7 +19,6 @@
 
 import React, {Component} from 'react';
 import {Button, Card, CardBody, CardHeader, Col, Row} from 'reactstrap';
-import {inject, observer} from 'mobx-react';
 
 class About extends Component {
   render() {
