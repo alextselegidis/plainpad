@@ -25,7 +25,11 @@ import {translate} from '../../lang';
 
 class UsersModal extends Component {
   toggle() {
-    this.props.users.mode = 'list';
+    const {
+      users
+    } = this.props;
+
+    users.mode = 'list';
   }
 
   render() {

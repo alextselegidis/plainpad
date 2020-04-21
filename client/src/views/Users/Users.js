@@ -27,7 +27,11 @@ import {Redirect} from 'react-router-dom';
 
 class Users extends Component {
   componentDidMount() {
-    this.props.users.list();
+    const {
+      users
+    } = this.props;
+
+    users.list();
   }
 
   render() {

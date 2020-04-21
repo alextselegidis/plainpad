@@ -39,7 +39,6 @@ class UsersStore {
   passwordConfirmation = '';
   admin = false;
 
-
   add() {
     this.mode = 'add';
     this.id = null;
