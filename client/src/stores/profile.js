@@ -81,31 +81,27 @@ class ProfileStore {
 
     account.user = {...account.user, ...profile};
 
-    const localAccount = {
-      session: account.session,
-      user: account.user
-    };
-
-    localStorage.setItem('Plainpad.Account', JSON.stringify(localAccount));
+    this.updateLocalAccount();
 
     application.success(translate('profile.saveSuccess'));
 
-    try {
-      await UsersHttpClient.update(account.user);
-    } catch (error) {
-      if (error instanceof OfflineError) {
-        return;
-      }
-
-      application.error(translate('profile.saveFailure'));
-      console.error(error);
-    }
+    await this.saveAccountUser();
 
     await notes.list();
 
     if (reload) {
       window.location.reload();
     }
+  }
+
+  async toggleTheme() {
+    account.user.theme = account.user.theme === 'light' ? 'dark' : 'light';
+
+    this.theme = account.user.theme;
+
+    this.updateLocalAccount();
+
+    await this.saveAccountUser();
   }
 
   async invalidateCache() {
@@ -119,6 +115,28 @@ class ProfileStore {
     application.success(translate('account.invalidateSuccess'));
 
     await notes.list();
+  }
+
+  updateLocalAccount() {
+    const localAccount = {
+      session: account.session,
+      user: account.user
+    };
+
+    localStorage.setItem('Plainpad.Account', JSON.stringify(localAccount));
+  }
+
+  async saveAccountUser() {
+    try {
+      await UsersHttpClient.update(account.user);
+    } catch (error) {
+      if (error instanceof OfflineError) {
+        return;
+      }
+
+      application.error(translate('profile.saveFailure'));
+      console.error(error);
+    }
   }
 }
 

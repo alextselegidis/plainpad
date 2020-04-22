@@ -7,6 +7,14 @@ body {
         background-color: $gray-900;
         border-bottom-color: $dark-gray;
 
+        .theme-toggler {
+          color: $white;
+          border: none;
+          font-size: 25px;
+          margin-top: 4px;
+          padding: 0;
+        }
+
         .navbar-brand-title {
           color: $white;
         }
@@ -50,7 +58,7 @@ body {
             &.active {
               color: $white !important;
               background: #171a1c;
-              border-right: 1px solid #5c6873;
+              border-right: 1px solid $dark-gray;
 
               .nav-icon {
                 color: #9e8db7;

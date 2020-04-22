@@ -40,6 +40,7 @@ class NoteHeader extends Component {
       account,
       notes,
       application,
+      profile,
       onLogout
     } = this.props;
 
@@ -122,6 +123,10 @@ class NoteHeader extends Component {
             </DropdownMenu>
           </UncontrolledDropdown>
         </Nav>
+        <i className={`${user.theme === 'light' ? 'cui-moon' : 'cui-sun'} icons
+          font-weight-bold rounded-circle theme-toggler`}
+          onClick={() => profile.toggleTheme()}
+        />
         <AppAsideToggler className={`aside-toggler d-md-down-none shadow-none ${saving ? 'saving' : ''}`}/>
         <AppAsideToggler className={`aside-toggler d-lg-none shadow-none ${saving ? 'saving' : ''}`} mobile />
       </React.Fragment>
@@ -132,6 +137,6 @@ class NoteHeader extends Component {
 NoteHeader.propTypes = propTypes;
 NoteHeader.defaultProps = defaultProps;
 
-export default inject('account', 'notes', 'application')(
+export default inject('account', 'notes', 'application', 'profile')(
   observer(NoteHeader)
 );

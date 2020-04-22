@@ -22,7 +22,6 @@ import {Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, In
 import {FormattedMessage} from 'react-intl';
 import {translate} from '../../lang';
 import {inject, observer} from 'mobx-react';
-import {decorate, observable} from 'mobx';
 
 class Profile extends Component {
   componentDidMount() {
@@ -251,19 +250,6 @@ class Profile extends Component {
     );
   }
 }
-
-decorate(Profile, {
-  name: observable,
-  email: observable,
-  password: observable,
-  passwordConfirmation: observable,
-  locale: observable,
-  view: observable,
-  line: observable,
-  sort: observable,
-  theme: observable,
-  encrypt: observable,
-});
 
 export default inject('account', 'application', 'profile')(
   observer(Profile)
