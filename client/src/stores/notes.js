@@ -340,6 +340,10 @@ class NotesStore {
       this.title = content.substring(0, 40).trim();
     }
 
+    if (!this.title) {
+      this.title = 'NO-TITLE';
+    }
+
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
