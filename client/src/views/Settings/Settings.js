@@ -165,7 +165,7 @@ class Settings extends Component {
                     <Label>
                       <FormattedMessage id="settings.password"/>
                     </Label>
-                    <Input type="password" value={mailPassword} placeholder="Password"
+                    <Input type="password" value={mailPassword} placeholder="Password" autoComplete="new-password"
                            onChange={(event) => settings.mailPassword = event.target.value}/>
                   </FormGroup>
 
