@@ -42,7 +42,7 @@ class SettingsController extends Controller
 
         foreach ($settings as $name => $value) {
             Setting::where('name', $name)->update([
-                'value' => $value
+                'value' => (string)$value
             ]);
         }
 

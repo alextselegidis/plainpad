@@ -21,18 +21,32 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\AutoUpdate\DownloadException;
+use App\Exceptions\AutoUpdate\ParserException;
 use App\Http\Controllers\Controller;
+use App\Services\AutoUpdateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
-use Monolog\Handler\StreamHandler;
-use VisualAppeal\AutoUpdate;
-use VisualAppeal\Exceptions\DownloadException;
-use VisualAppeal\Exceptions\ParserException;
 
 class ApplicationController extends Controller
 {
+    /**
+     * @var AutoUpdateService
+     */
+    private $autoUpdateService;
+
+    /**
+     * ApplicationController constructor.
+     *
+     * @param AutoUpdateService $autoUpdateService
+     */
+    public function __construct(AutoUpdateService $autoUpdateService)
+    {
+        $this->autoUpdateService = $autoUpdateService;
+    }
+
     public function retrieve()
     {
         $user = Auth::user();
@@ -40,14 +54,12 @@ class ApplicationController extends Controller
         $response = [];
 
         if ($user && $user->admin) {
-            $update = $this->getAutoUpdate();
-
             try {
-                if ($update->checkUpdate() && $update->newVersionAvailable()) {
-                    $response['updates'] = $update->getVersionsToUpdate();
+                if ($this->autoUpdateService->checkUpdate() && $this->autoUpdateService->newVersionAvailable()) {
+                    $response['updates'] = $this->autoUpdateService->getVersionsToUpdate();
                 }
             } catch (ParserException | DownloadException $e) {
-                $response['updates'] = '';
+                $response['updates'] = [];
                 $response['message'] = 'Failed to parse updates: ' . $e->getMessage();
             }
         }
@@ -68,35 +80,24 @@ class ApplicationController extends Controller
 
     public function update()
     {
-        $update = $this->getAutoUpdate();
-
-        if (!$update->checkUpdate() || !$update->newVersionAvailable()) {
+        if (!$this->autoUpdateService->checkUpdate() || !$this->autoUpdateService->newVersionAvailable()) {
             return response('', 404);
         }
 
-        $simulation = $update->update();
+        $simulation = $this->autoUpdateService->update();
 
         if (!$simulation) {
-            throw new \RuntimeException('The update simulation failed: ' . json_encode($update->getSimulationResults()));
+            throw new \RuntimeException('The update simulation failed: '
+                . json_encode($this->autoUpdateService->getSimulationResults()));
         }
 
-        $update->setOnAllUpdateFinishCallbacks(function () {
+        $this->autoUpdateService->setOnAllUpdateFinishCallbacks(function () {
             Artisan::call('migrate');
             Artisan::call('cleanup');
         });
 
-        $update->update(false);
+        $this->autoUpdateService->update(false);
 
         return response('', 200);
-    }
-
-    private function getAutoUpdate()
-    {
-        $update = new AutoUpdate(base_path('storage/updates/'), base_path(), 60);
-        $update->setCurrentVersion(config('app.version'));
-        $update->setUpdateUrl(env('APP_REPOSITORY'));
-        $update->setSslVerifyHost(false);
-        $update->addLogHandler(new StreamHandler(base_path('storage/logs/update-' . date('Y-m-d') . '.log')));
-        return $update;
     }
 }

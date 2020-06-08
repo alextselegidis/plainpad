@@ -71,7 +71,8 @@ class UsersController extends Controller
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'email' => 'string|email|max:255',
-            'password' => 'string',
+            'password' => 'string|nullable',
+            'locale' => 'string',
             'view' => 'string',
             'line' => 'string',
             'sort' => 'string',
