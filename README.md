@@ -61,7 +61,7 @@ GitHub [alextselegidis](https://github.com/alextselegidis) &nbsp;&middot;&nbsp;
 Twitter [@alextselegidis](https://twitter.com/AlexTselegidis)
 
 ###### More Projects On Github
-###### ⇾ [**Easy!Appointments** Open Source Appointment Scheduler](https://github.com/alextselegidis/easyappointments)
-###### ⇾ [**Questionful** Web Questionnaires Made Easy](https://github.com/alextselegidis/questionful)
-###### ⇾ [**Integravy** Service Orchestration At Your Fingertips](https://github.com/alextselegidis/integravy)
+###### ⇾ [Easy!Appointments &middot; Open Source Appointment Scheduler](https://github.com/alextselegidis/easyappointments)
+###### ⇾ [Questionful &middot; Web Questionnaires Made Easy](https://github.com/alextselegidis/questionful)
+###### ⇾ [Integravy &middot; Service Orchestration At Your Fingertips](https://github.com/alextselegidis/integravy)
  
