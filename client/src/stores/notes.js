@@ -44,7 +44,7 @@ class NotesStore {
   async list() {
     const cachedNotes = [];
 
-    await storage.table('notes').iterate((value, key) => {
+    await storage.table('notes').iterate((value) => {
       cachedNotes.push(value);
     });
 
@@ -74,14 +74,11 @@ class NotesStore {
           notesGotChanged = true;
         }
       }
-
     } catch (error) {
-      if (error instanceof OfflineError) {
-        return;
+      if (!(error instanceof OfflineError)) {
+        application.error(translate('notes.listFailure'));
+        console.error(error);
       }
-
-      application.error(translate('notes.listFailure'));
-      console.error(error);
     }
 
     if (notesGotChanged) {
@@ -131,12 +128,10 @@ class NotesStore {
         this.resizeEditor();
       }
     } catch (error) {
-      if (error instanceof OfflineError) {
-        return;
+      if (!(error instanceof OfflineError)) {
+        application.error(translate('notes.fetchFailure'));
+        console.error(error);
       }
-
-      application.error(translate('notes.fetchFailure'));
-      console.error(error);
     }
 
     const textarea = document.querySelector('.note-content');
@@ -186,12 +181,10 @@ class NotesStore {
 
       await storage.table('notes').setItem(response.id, response);
     } catch (error) {
-      if (error instanceof OfflineError) {
-        return;
+      if (!(error instanceof OfflineError)) {
+        application.error(translate('notes.saveFailure'));
+        console.error(error);
       }
-
-      application.error(translate('notes.saveFailure'));
-      console.error(error);
     }
 
     this.list();
@@ -236,12 +229,10 @@ class NotesStore {
       try {
         await NotesHttpClient.delete(this.id);
       } catch (error) {
-        if (error instanceof OfflineError) {
-          return;
+        if (!(error instanceof OfflineError)) {
+          application.error(translate('notes.deleteFailure'));
+          console.error(error);
         }
-
-        application.error(translate('notes.deleteFailure'));
-        console.error(error);
       }
 
       this.list();
@@ -274,14 +265,12 @@ class NotesStore {
       await storage.table('notes').setItem(this.id, cache);
 
       await NotesHttpClient.pinned(this.id, this.pinned);
-      this.list();
+      await this.list();
     } catch (error) {
-      if (error instanceof OfflineError) {
-        return;
+      if (!(error instanceof OfflineError)) {
+        application.error(translate('notes.pinFailure'));
+        console.error(error);
       }
-
-      application.error(translate('notes.pinFailure'));
-      console.error(error);
     }
   }
 
@@ -296,12 +285,10 @@ class NotesStore {
       await NotesHttpClient.pinned(this.id, this.pinned);
       this.list();
     } catch (error) {
-      if (error instanceof OfflineError) {
-        return;
+      if (!(error instanceof OfflineError)) {
+        application.error(translate('notes.unpinFailure'));
+        console.error(error);
       }
-
-      application.error(translate('notes.unpinFailure'));
-      console.error(error);
     }
   }
 
@@ -319,8 +306,7 @@ class NotesStore {
     if (noteContent.clientHeight < noteContent.scrollHeight) {
       noteContent.style.height = (noteContent.scrollHeight + 500) + 'px';
       if (noteContent.clientHeight < noteContent.scrollHeight) {
-        noteContent.style.height =
-          (noteContent.scrollHeight * 2 - noteContent.clientHeight + 500) + 'px';
+        noteContent.style.height = (noteContent.scrollHeight * 2 - noteContent.clientHeight + 500) + 'px';
       }
       window.scrollTo(0, scrollTop);
     }
@@ -401,12 +387,10 @@ class NotesStore {
       application.success(translate('notes.shareSuccess'));
 
     } catch (error) {
-      if (error instanceof OfflineError) {
-        return;
+      if (!(error instanceof OfflineError)) {
+        application.error(translate('notes.shareFailure'));
+        console.error(error);
       }
-
-      application.error(translate('notes.shareFailure'));
-      console.error(error);
     }
   }
 

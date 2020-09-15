@@ -126,6 +126,7 @@ class ApplicationStore {
     } catch (error) {
       if (error instanceof OfflineError) {
         this.online = false;
+        await notes.list();
         return;
       }
 
