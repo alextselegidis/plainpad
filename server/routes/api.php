@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\V1\ApplicationController;
+use App\Http\Controllers\V1\NotesController;
+use App\Http\Controllers\V1\SessionsController;
+use App\Http\Controllers\V1\SettingsController;
+use App\Http\Controllers\V1\UsersController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,48 +20,47 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'prefix' => 'v1',
-    'namespace' => 'V1',
 ], function () {
     // Application
-    Route::get('', 'ApplicationController@retrieve');
-    Route::post('', 'ApplicationController@install');
+    Route::get('', [ApplicationController::class, 'retrieve']);
+    Route::post('', [ApplicationController::class, 'install']);
 
     // Sessions
-    Route::post('sessions', 'SessionsController@create');
-    Route::delete('sessions/{token}', 'SessionsController@delete');
+    Route::post('sessions', [SessionsController::class, 'create']);
+    Route::delete('sessions/{token}', [SessionsController::class, 'delete']);
 
     // Users
-    Route::post('users/recovery', 'UsersController@recoverPassword');
+    Route::post('users/recovery', [UsersController::class, 'recoverPassword']);
 
     Route::group([
         'middleware' => 'auth'
     ], function () {
         // Notes
-        Route::get('notes', 'NotesController@list');
-        Route::get('notes/{id}', 'NotesController@retrieve');
-        Route::post('notes', 'NotesController@create');
-        Route::put('notes/{id}', 'NotesController@update');
-        Route::delete('notes/{id}', 'NotesController@delete');
-        Route::patch('notes/{id}/pinned', 'NotesController@pinned');
+        Route::get('notes', [NotesController::class, 'list']);
+        Route::get('notes/{id}', [NotesController::class, 'retrieve']);
+        Route::post('notes', [NotesController::class, 'create']);
+        Route::put('notes/{id}', [NotesController::class, 'update']);
+        Route::delete('notes/{id}', [NotesController::class, 'delete']);
+        Route::patch('notes/{id}/pinned', [NotesController::class, 'pinned']);
 
         // Users
-        Route::get('users/{id}', 'UsersController@retrieve');
-        Route::put('users/{id}', 'UsersController@update');
+        Route::get('users/{id}', [UsersController::class, 'retrieve']);
+        Route::put('users/{id}', [UsersController::class, 'update']);
 
         Route::group([
             'middleware' => 'admin'
         ], function () {
             // Application
-            Route::put('', 'ApplicationController@update');
+            Route::put('', [ApplicationController::class, 'update']);
 
             // Settings
-            Route::get('settings', 'SettingsController@retrieve');
-            Route::put('settings', 'SettingsController@update');
+            Route::get('settings', [SettingsController::class, 'retrieve']);
+            Route::put('settings', [SettingsController::class, 'update']);
 
             // Users
-            Route::get('users', 'UsersController@list');
-            Route::post('users', 'UsersController@create');
-            Route::delete('users/{id}', 'UsersController@delete');
+            Route::get('users', [UsersController::class, 'list']);
+            Route::post('users', [UsersController::class, 'create']);
+            Route::delete('users/{id}', [UsersController::class, 'delete']);
         });
     });
 });
