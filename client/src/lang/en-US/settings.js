@@ -37,4 +37,5 @@ export default {
   updates: 'Updates',
   update: 'Update',
   newUpdatesAvailable: 'There are new updates available for download.',
+  beforeUpdatingMakeSure: 'Before updating make sure that the Plainpad installation directory is writable by the PHP process. In case the update ends with an error, you may have to manually run the "php artisan refresh" command from the terminal in order to finalize the process.',
 }

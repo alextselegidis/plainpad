@@ -112,6 +112,10 @@ class Settings extends Component {
                   <ul>
                     {config && config.updates ? config.updates.map((update) => <li key={update}>{update}</li>) : null}
                   </ul>
+
+                  <p>
+                    <FormattedMessage id="settings.beforeUpdatingMakeSure"/>
+                  </p>
                 </CardBody>
                 <CardFooter>
                   <Button type="button" color="primary" className="float-right"
