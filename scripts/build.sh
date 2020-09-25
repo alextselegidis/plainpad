@@ -13,8 +13,8 @@ rm -rf build/tests/
 rm -rf build/vendor/
 rm build/phpunit.xml
 cd build
-composer install --no-ansi --no-dev --no-interaction --no-progress --no-scripts --optimize-autoloader
-rm composer.json composer.lock
+composer install --no-ansi --no-interaction --no-progress --no-scripts --optimize-autoloader
+rm composer.lock
 cd ../
 
 echo "Bundle Client"
