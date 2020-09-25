@@ -35,6 +35,14 @@ class ApplicationHttpClient {
 
     return HttpClient.request(method, url, null);
   }
+
+  static refresh() {
+    const method = 'POST';
+
+    const url = 'refresh';
+
+    return HttpClient.request(method, url, null);
+  }
 }
 
 export default ApplicationHttpClient;

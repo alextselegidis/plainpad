@@ -151,6 +151,7 @@ class ApplicationStore {
   async update() {
     try {
       await ApplicationHttpClient.update();
+      await ApplicationHttpClient.refresh();
       this.success(translate('application.updateSuccess'));
       setTimeout(() => window.location.reload(), 3000);
     } catch (error) {
