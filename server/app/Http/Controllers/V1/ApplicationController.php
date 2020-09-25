@@ -29,6 +29,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use RuntimeException;
+use Throwable;
 
 class ApplicationController extends Controller
 {
@@ -87,17 +89,28 @@ class ApplicationController extends Controller
         $simulation = $this->autoUpdateService->update();
 
         if (!$simulation) {
-            throw new \RuntimeException('The update simulation failed: '
+            throw new RuntimeException('The update simulation failed: '
                 . json_encode($this->autoUpdateService->getSimulationResults()));
         }
 
-        $this->autoUpdateService->setOnAllUpdateFinishCallbacks(function () {
-            Artisan::call('migrate');
-            Artisan::call('cleanup');
-        });
-
         $this->autoUpdateService->update(false);
 
+        try {
+            return response('', 200);
+        } catch (Throwable $e) {
+            // Due to vendor changes, Laravel's response infrastructure may fail. Starting from the next request
+            // the framework will work correctly.
+            return null;
+        }
+    }
+
+    public function refresh()
+    {
+        Artisan::call('config:clear');
+        Artisan::call('migrate', [
+            '--force' => true
+        ]);
+        Artisan::call('cleanup');
         return response('', 200);
     }
 }

@@ -52,6 +52,7 @@ Route::group([
         ], function () {
             // Application
             Route::put('', [ApplicationController::class, 'update']);
+            Route::post('refresh', [ApplicationController::class, 'refresh']);
 
             // Settings
             Route::get('settings', [SettingsController::class, 'retrieve']);
