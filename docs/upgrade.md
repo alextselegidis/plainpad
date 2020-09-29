@@ -1,4 +1,4 @@
-## Upgrading 
+## Upgrade 
 
 The self hosted version supports an automated updates that will notify admin users whenever new packages are available 
 for download.
