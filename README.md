@@ -29,8 +29,10 @@
 Driven by simplicity and stability in mind, Plainpad offers great potential at no cost. Become the owner of 
 your data as Plainpad will nicely run on your own server. 
 
-[**UPDATE** Book the free Plainpad installation service now and have the project maintainer install Plainpad on your  
-server **for free!**](mailto:info@alextselegidis.com?subject=Plainpad+Installation+Service) 
+**IMPORTANT:** Book the free Plainpad installation service now and have the project maintainer install Plainpad on your  
+server **for free!**
+
+[Drop a message to info@alextselegidis.com](mailto:info@alextselegidis.com?subject=Plainpad%20Installation%20Service) 
 
 ## Setup
 
