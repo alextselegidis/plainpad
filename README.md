@@ -1,10 +1,10 @@
 <h1 align="center">
     <br>
-        <a href="https://alextselegidis.com/get/plainpad">
-            <img src="https://raw.githubusercontent.com/alextselegidis/plainpad/master/logo.png" alt="Plainpad" width="200">
-        </a>
-        <br>
-        Plainpad
+    <a href="https://alextselegidis.com/get/plainpad">
+        <img src="https://raw.githubusercontent.com/alextselegidis/plainpad/master/logo.png" alt="Plainpad" width="200">
+    </a>
+    <br>
+    Plainpad
     <br>
 </h1>
 
@@ -26,10 +26,11 @@
 
 ## About
 
-Motivated by simplicity and stability in mind, Plainpad offers great potential at no cost. Become the owner of 
-your data as Plainpad will nicely run on your server. 
+Driven by simplicity and stability in mind, Plainpad offers great potential at no cost. Become the owner of 
+your data as Plainpad will nicely run on your own server. 
 
-This project was built with React for the frontend and Lumen for the backend code. 
+[**UPDATE** Book the free Plainpad installation service now and have the project maintainer install Plainpad on your  
+server **for free!**](mailto:info@alextselegidis.com?subject=Plainpad+Installation+Service) 
 
 ## Setup
 
