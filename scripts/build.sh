@@ -13,7 +13,8 @@ rm -rf build/tests/
 rm -rf build/vendor/
 rm build/phpunit.xml
 cd build
-composer install --no-ansi --no-interaction --no-progress --no-scripts --optimize-autoloader
+composer install --no-ansi --no-dev --no-interaction --no-progress --no-scripts --optimize-autoloader
+composer dumpautoload
 rm composer.lock
 cd ../
 
@@ -28,4 +29,5 @@ cp README.md build/
 
 echo "Zip Build"
 cd build
+find . -name '. DS_Store' -type f -delete
 zip build.zip -r .
