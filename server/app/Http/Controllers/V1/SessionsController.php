@@ -49,7 +49,7 @@ class SessionsController extends Controller
 
         $session = new Session;
         $session->id = (string)Str::uuid();
-        $session->expires_at = (new \DateTime('+12 hours'))->format('Y-m-d H:i:s');
+        $session->expires_at = (new \DateTime('+' . config('session.lifetime') . ' minutes'))->format('Y-m-d H:i:s');
         $session->token = Str::random(60);
         $session->user_id = $user->id;
         $session->save();
