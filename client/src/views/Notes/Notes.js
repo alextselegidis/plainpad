@@ -19,7 +19,7 @@
 
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {Input} from 'reactstrap';
+import TextareaAutosize from 'react-textarea-autosize';
 import WelcomeMessage from './WelcomeMessage';
 
 class Notes extends Component {
@@ -81,8 +81,8 @@ class Notes extends Component {
 
     return (
       <div className="animated fadeIn h-100">
-        <Input
-          className={`note-content h-100a w-100 ${user.line === 'full' ? 'full-line' : 'narrow-line'} border-0 rounded-0 shadow-none`}
+        <TextareaAutosize
+          className={`note-content ${user.line === 'full' ? 'full-line' : 'narrow-line'} border-0 rounded-0 shadow-none`}
           type="textarea" value={content} onChange={(event) => notes.updateContent(event.target.value)}
           onFocus={(event) => event.target.value = event.target.value === 'New note ...' ? '' : event.target.value}
         />

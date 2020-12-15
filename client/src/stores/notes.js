@@ -18,7 +18,7 @@
 */
 
 import {decorate, observable} from 'mobx';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import NotesHttpClient from '../http/NotesHttpClient';
 import application from './application';
 import account from './account';
@@ -55,7 +55,14 @@ class NotesStore {
     let notesGotChanged = false;
 
     try {
-      const serverNotes = await NotesHttpClient.list();
+      const serverNotes = await NotesHttpClient.list(null, null, null, null, null, [
+        'id',
+        'created_at',
+        'updated_at',
+        'pinned',
+        'title',
+        'user_id'
+      ]);
 
       for (let serverNote of serverNotes) {
         const localNote = await storage.table('notes').getItem(serverNote.id);
@@ -70,7 +77,8 @@ class NotesStore {
         const serverChanged = moment(serverNote.updated_at);
 
         if (serverChanged.isAfter(localChanged)) {
-          storage.table('notes').setItem(serverNote.id, serverNote);
+          const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
+          storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
           notesGotChanged = true;
         }
       }
@@ -109,7 +117,6 @@ class NotesStore {
       this.pinned = localNote.pinned;
       this.createdAt = localNote.created_at;
       this.updatedAt = localNote.updated_at;
-      this.resizeEditor();
     }
 
     try {
@@ -125,7 +132,6 @@ class NotesStore {
         this.pinned = serverNote.pinned;
         this.createdAt = serverNote.created_at;
         this.updatedAt = serverNote.updated_at;
-        this.resizeEditor();
       }
     } catch (error) {
       if (!(error instanceof OfflineError)) {
@@ -292,32 +298,10 @@ class NotesStore {
     }
   }
 
-  resizeEditor() {
-    const noteContent = document.querySelector('.note-content');
-
-    if (!noteContent) {
-      return;
-    }
-
-    const scrollTop = window.scrollY;
-
-    noteContent.style.height = 'auto'; // Reset
-
-    if (noteContent.clientHeight < noteContent.scrollHeight) {
-      noteContent.style.height = (noteContent.scrollHeight + 500) + 'px';
-      if (noteContent.clientHeight < noteContent.scrollHeight) {
-        noteContent.style.height = (noteContent.scrollHeight * 2 - noteContent.clientHeight + 500) + 'px';
-      }
-      window.scrollTo(0, scrollTop);
-    }
-  }
-
   updateContent(content) {
     this.lockPage();
 
     this.content = content;
-
-    this.resizeEditor();
 
     if (content.includes("\n")) {
       const title = content.match(/^(.*)\n/)[1];
@@ -498,14 +482,22 @@ class NotesStore {
         localChanges[id] = localChange;
       });
 
-      const serverNotes = await NotesHttpClient.list();
+      const serverNotes = await NotesHttpClient.list(null, null, null, null, null, [
+        'id',
+        'created_at',
+        'updated_at',
+        'pinned',
+        'title',
+        'user_id'
+      ]);
 
       for (let serverNote of serverNotes) {
         const localNote = localNotes[serverNote.id];
         const localChange = localChanges[serverNote.id];
 
         if (!localNote && !localChange) {
-          await storage.table('notes').setItem(serverNote.id, serverNote);
+          const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
+          await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
           continue;
         }
 
@@ -525,7 +517,8 @@ class NotesStore {
         const serverChanged = moment(serverNote.updated_at);
 
         if (localChange && serverChanged.isAfter(localChanged)) {
-          await storage.table('notes').setItem(serverNote.id, serverNote);
+          const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
+          await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
           await storage.table('sync').removeItem(localChange.id);
         }
       }

@@ -201,7 +201,13 @@
 
 .note-content {
   font-family: 'Roboto Mono', Courier, monospace;
+  width: 100%;
   min-height: 100%;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+  overflow: hidden;
   resize: none;
   margin: auto;
   color: $gray-900 !important;

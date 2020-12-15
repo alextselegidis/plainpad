@@ -32,6 +32,7 @@
     "react-router-config": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "react-test-renderer": "^16.8.6",
+    "react-textarea-autosize": "^8.3.0",
     "reactstrap": "^8.0.0",
     "simple-line-icons": "^2.4.1",
     "spin.js": "^4.1.0",
