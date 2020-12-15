@@ -1,39 +1,54 @@
 <?php
 
-function requirements() {
-    $messages = [];
+error_reporting(E_ALL);
 
+ini_set('display_errors', true);
+
+$alerts = [
+    'danger' => [],
+    'warning' => [],
+    'info' => [],
+    'success' => [],
+];
+
+$installed = false;
+
+function alert($type, $message)
+{
+    global $alerts;
+
+    if (!array_key_exists($type, $alerts)) {
+        trigger_error('Invalid alert type provided: ' . $type);
+    }
+
+    $alerts[$type][] = $message;
+}
+
+function requirements()
+{
     if (file_exists(__DIR__ . '/../.env')) {
-        $messages[] = 'The application seems to be already configured, please remove the public/setup.php file.';
+        alert('warning', 'The application appears to be already configured (the environment file exists).');
     }
 
     if (!is_writable(__DIR__ . '/../')) {
-        $messages[] = 'The root directory of the application is not writable, please make sure that it has the right permissions: ' . realpath(__DIR__ . '/../');
+        alert('warning', 'The root directory of the application is not writable, please make sure that it has the right permissions: ' . realpath(__DIR__ . '/../'));
     }
 
     if (!isset($_SERVER['SCRIPT_FILENAME'])) {
-        $messages[] = 'The script filename server variable $_SERVER["SCRIPT_FILENAME"] is not set, please make sure the server is configured correctly.';
+        alert('warning', 'The script filename server variable $_SERVER["SCRIPT_FILENAME"] is not set, please make sure the server is configured correctly.');
     }
 
     if (!isset($_SERVER['PHP_SELF'])) {
-        $messages[] = 'The script filename server variable $_SERVER["PHP_SELF"] is not set, please make sure the server is configured correctly.';
+        alert('warning', 'The script filename server variable $_SERVER["PHP_SELF"] is not set, please make sure the server is configured correctly.');
     }
 
-    if (!function_exists('curl_init')) {
-        $messages[] = 'The cURL PHP extension is not present on the server, please install it and try again.';
+    if (!extension_loaded('curl')) {
+        alert('warning', 'The cURL PHP extension is not present on the server, please install it and try again.');
     }
 
-    return $messages;
-}
-
-function validate()
-{
-    if (file_exists(__DIR__ . '/../.env')) {
-        redirect();
-        return false;
+    if (!extension_loaded('zip')) {
+        alert('warning', 'The Zip PHP extension is not present on the server, please install it and try again.');
     }
-
-    return !empty($_POST);
 }
 
 function location()
@@ -43,9 +58,15 @@ function location()
 
 function environment()
 {
+    $path = __DIR__ . '/../.env';
+
+    if (file_exists($path)) {
+        return true;
+    }
+
     $env = file_get_contents(__DIR__ . '/../.env.example');
 
-    file_put_contents(__DIR__ . '/../.env', strtr($env, [
+    file_put_contents($path, strtr($env, [
         '{KEY}' => strtoupper(md5(time())),
         '{URL}' => location(),
         '{DB_HOST}' => $_POST['db_host'],
@@ -54,6 +75,12 @@ function environment()
         '{DB_PASSWORD}' => $_POST['db_password'],
     ]));
 
+    if (!file_exists($path)) {
+        alert('danger', 'The environment file could not be created.');
+        return false;
+    }
+
+    return true;
 }
 
 function migrations()
@@ -62,23 +89,42 @@ function migrations()
     curl_setopt($ch, CURLOPT_URL, location() . '/api.php/v1');
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec($ch);
+    curl_setopt($ch, CURLOPT_FAILONERROR, true);
+    curl_exec($ch);
+    if (curl_errno($ch)) {
+        alert('danger', 'The application migrations failed to execute: ' . curl_error($ch));
+        return false;
+    }
     curl_close($ch);
+    return true;
 }
 
-function redirect()
+function install()
 {
-    header('Location: ' . location());
+    if (!environment()) {
+        return false;
+    }
+
+    if (!migrations()) {
+        return false;
+    }
+
+    alert('success', 'The application was installed successfully, visit <a href="' . location() . '">'
+        . str_replace(['http://', 'https://'], '', location()) . '</a> and login with admin@example.org / 12345');
+
+    alert('info', 'You can now remove the setup.php file from the server.');
+
+    return true;
 }
 
-if (validate()) {
-    environment();
-    migrations();
-    redirect();
-    return;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $installed = install();
+}
+
+if (!$installed) {
+    requirements();
 }
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -88,6 +134,8 @@ if (validate()) {
     <meta name="description" content="">
     <meta name="author" content="Alex Tselegidis">
     <title>Installation · Plainpad</title>
+
+    <link rel="shortcut icon" href="favicon.ico">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -123,6 +171,10 @@ if (validate()) {
             padding-top: 40px;
             padding-bottom: 40px;
             font-family: 'Roboto Mono', 'Roboto', 'Helvetica', sans-serif;
+        }
+
+        .alert small {
+            word-break: break-all;
         }
 
         .form-install {
@@ -202,17 +254,21 @@ if (validate()) {
 
         .checkbox input {
             position: relative;
-            top: -2px;
+            top: 2px;
         }
 
         .btn-primary {
             background-color: #564b65;
             border-color: #564b65;
+            border-radius: 0;
         }
 
-        .btn-primary:hover {
-            background-color: #322b3b;
-            border-color: #322b3b;
+        .btn-primary:hover,
+        .btn-primary:active,
+        .btn-primary:focus {
+            background-color: #322b3b !important;
+            border-color: #322b3b !important;
+            box-shadow: none;
         }
 
         /* Fallback for Edge
@@ -246,53 +302,63 @@ if (validate()) {
         <img class="mb-4" src="logo.png" alt="Plainpad Logo" width="72" height="72">
 
         <h1 class="h3 mb-3 font-weight-normal">
-            Installation
+            Plainpad
         </h1>
 
         <p class="text-muted">
-            Welcome to the Installation Page
+            Welcome To The Installation Page
         </p>
     </div>
 
-    <?php foreach(requirements() as $message): ?>
-        <div class="alert alert-warning">
-            <?= $message ?>
-        </div>
+    <?php foreach ($alerts as $type => $messages): ?>
+        <?php foreach ($messages as $message): ?>
+            <div class="alert alert-<?= $type ?>">
+                <small>
+                    <?= $message ?>
+                </small>
+            </div>
+        <?php endforeach ?>
     <?php endforeach ?>
 
-    <h5 class="mb-4">Database</h5>
+    <div <?= $installed ? 'hidden' : '' ?>>
+        <h5 class="mb-4">Database</h5>
 
-    <div class="form-label-group">
-        <input name="db_host" id="db-host" class="form-control" placeholder="localhost" required autofocus>
-        <label for="db-host">Host</label>
+        <div class="form-label-group">
+            <input name="db_host" id="db-host" class="form-control" placeholder="localhost" required autofocus
+                   value="<?= $_POST['db_host'] ?? '' ?>">
+            <label for="db-host">Host</label>
+        </div>
+
+        <div class="form-label-group">
+            <input name="db_name" id="db-name" class="form-control" placeholder="plainpad" required
+                   value="<?= $_POST['db_name'] ?? '' ?>">
+            <label for="db-name">Name</label>
+        </div>
+
+        <div class="form-label-group">
+            <input name="db_username" id="db-username" class="form-control" placeholder="root" required
+                   autocomplete="new-username" value="<?= $_POST['db_username'] ?? '' ?>">
+            <label for="db-username">Username</label>
+        </div>
+
+        <div class="form-label-group">
+            <input name="db_password" id="db-password" class="form-control" type="password" placeholder="root" required
+                   autocomplete="new-password">
+            <label for="db-password">Password</label>
+        </div>
+
+        <div class="checkbox mb-4">
+            <small>
+                <label>
+                    <input type="checkbox" value="agree-to-terms" required> Plainpad is licensed under the
+                    <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank">GPL-3.0</a>
+                    license, by installing and using Plainpad I agree to the terms and conditions of this license.
+                </label>
+            </small>
+        </div>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Install</button>
     </div>
-
-    <div class="form-label-group">
-        <input name="db_name" id="db-name" class="form-control" placeholder="plainpad" required>
-        <label for="db-name">Name</label>
-    </div>
-
-    <div class="form-label-group">
-        <input name="db_username" id="db-username" class="form-control" placeholder="root" required
-               autocomplete="new-username">
-        <label for="db-username">Username</label>
-    </div>
-
-    <div class="form-label-group">
-        <input name="db_password" id="db-password" class="form-control" type="password" placeholder="root" required
-               autocomplete="new-password">
-        <label for="db-password">Password</label>
-    </div>
-
-    <div class="checkbox mb-4">
-        <small>
-            <input type="checkbox" value="agree-to-terms" required> Plainpad is licensed under the
-            <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank">GPL-3.0</a>
-            license, by installing and using Plainpad I agree to the terms and conditions of this license.
-        </small>
-    </div>
-
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Install</button>
 
     <p class="mt-4 mb-4 text-muted text-center">
         <small>
