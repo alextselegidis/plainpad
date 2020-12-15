@@ -38,6 +38,10 @@ class MailConfigServiceProvider extends ServiceProvider
                 return [$setting->name => $setting->value];
             });
 
+        if ($settings->isEmpty()) {
+            return;
+        }
+
         $config = [
             'driver' => $settings['mail_driver'],
             'host' => $settings['mail_host'],
