@@ -81,7 +81,7 @@ REACT_APP_BASE_URL=api.php
 REACT_APP_VERSION=v1.0.0
 ```
 
-Additionally make sure the package.json file has the following value set: 
+Additionally, make sure the package.json file has the following value set: 
 
 ```
 "proxy": "http://localhost:8000"
