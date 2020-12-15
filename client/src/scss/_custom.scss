@@ -220,6 +220,8 @@
 .sidebar {
   .sidebar-nav {
     .nav-link {
+      word-break: break-all;
+
       &.active {
         color: $primary !important;
         background: #f7f7f7;
