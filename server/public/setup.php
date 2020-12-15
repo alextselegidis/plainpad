@@ -66,11 +66,6 @@ function migrations()
     curl_close($ch);
 }
 
-function destroy()
-{
-    unlink($_SERVER['SCRIPT_FILENAME']);
-}
-
 function redirect()
 {
     header('Location: ' . location());
@@ -79,7 +74,6 @@ function redirect()
 if (validate()) {
     environment();
     migrations();
-    destroy();
     redirect();
     return;
 }
