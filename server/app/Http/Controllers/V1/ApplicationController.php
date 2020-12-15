@@ -69,13 +69,16 @@ class ApplicationController extends Controller
         return response()->json($response);
     }
 
-    public function install(Request $request)
+    public function install()
     {
         if (Schema::hasTable('migrations')) {
             return response('', 401);
         }
 
-        Artisan::call('migrate:fresh --seed');
+        Artisan::call('migrate:fresh', [
+            '--seed' => true,
+            '--force' => true
+        ]);
 
         return response('', 200);
     }
