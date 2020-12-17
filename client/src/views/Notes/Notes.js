@@ -80,11 +80,11 @@ class Notes extends Component {
     } = account;
 
     return (
-      <div className="animated fadeIn h-100">
+      <div className="animated fadeIn h-100 py-2">
         <TextareaAutosize
-          className={`note-content ${user.line === 'full' ? 'full-line' : 'narrow-line'} border-0 rounded-0 shadow-none`}
-          type="textarea" value={content} onChange={(event) => notes.updateContent(event.target.value)}
-          onFocus={(event) => event.target.value = event.target.value === 'New note ...' ? '' : event.target.value}
+          className={`note-content ${user.line === 'full' ? 'full-line' : 'narrow-line'}`}
+          value={content}
+          onChange={(event) => notes.updateContent(event.target.value)}
         />
       </div>
     );
