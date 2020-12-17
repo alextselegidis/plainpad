@@ -5,6 +5,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,6 +28,10 @@ class MailConfigServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        if (!File::exists(base_path('.env'))) {
+            return;
+        }
+
         if (!Schema::hasTable('settings')) {
             return;
         }
