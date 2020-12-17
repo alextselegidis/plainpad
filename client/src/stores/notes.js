@@ -51,47 +51,6 @@ class NotesStore {
     const filteredNotes = this.filterNotes(cachedNotes);
 
     this.noteList = this.sortNotes(filteredNotes);
-
-    let notesGotChanged = false;
-
-    try {
-      const serverNotes = await NotesHttpClient.list(null, null, null, null, null, [
-        'id',
-        'created_at',
-        'updated_at',
-        'pinned',
-        'title',
-        'user_id'
-      ]);
-
-      for (let serverNote of serverNotes) {
-        const localNote = await storage.table('notes').getItem(serverNote.id);
-
-        if (!localNote) {
-          storage.table('notes').setItem(serverNote.id, serverNote);
-          notesGotChanged = true;
-          continue;
-        }
-
-        const localChanged = moment(localNote.updated_at);
-        const serverChanged = moment(serverNote.updated_at);
-
-        if (serverChanged.isAfter(localChanged)) {
-          const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
-          storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
-          notesGotChanged = true;
-        }
-      }
-    } catch (error) {
-      if (!(error instanceof OfflineError)) {
-        application.error(translate('notes.listFailure'));
-        console.error(error);
-      }
-    }
-
-    if (notesGotChanged) {
-      this.list();
-    }
   }
 
   add() {
@@ -106,6 +65,11 @@ class NotesStore {
   }
 
   async select(id) {
+    const textarea = document.querySelector('.note-content');
+    const selectionStart = textarea ? textarea.selectionStart : 0;
+    const selectionEnd = textarea ? textarea.selectionEnd : 0;
+    const isSameNote = this.id === id;
+
     window.location.href = `#/notes/${id}`;
 
     const localNote = await storage.table('notes').getItem(id);
@@ -140,12 +104,17 @@ class NotesStore {
       }
     }
 
-    const textarea = document.querySelector('.note-content');
-
     if (textarea) {
-      textarea.selectionStart = 0;
-      textarea.selectionEnd = 0;
-      window.scrollTo(0, 0);
+      if (isSameNote) {
+        textarea.selectionStart = selectionStart;
+        textarea.selectionEnd = selectionEnd;
+      } else {
+        textarea.selectionStart = 0;
+        textarea.selectionEnd = 0;
+        window.scrollTo(0, 0);
+      }
+
+      textarea.focus();
     }
   }
 
@@ -155,6 +124,8 @@ class NotesStore {
     const isNewNote = this.id === null;
 
     let id = isNewNote ? `local-${uuidv4()}` : this.id;
+
+    const isLocalNote = id.includes('local');
 
     const note = {
       id,
@@ -169,7 +140,7 @@ class NotesStore {
     if (!navigator.onLine) {
       await storage.table('sync').setItem(id, {
         date: new Date(),
-        type: isNewNote ? 'create' : 'update'
+        type: isLocalNote ? 'create' : 'update'
       });
     }
 
@@ -528,16 +499,16 @@ class NotesStore {
         const localChange = localChanges[id];
         const serverNote = serverNotes.find((serverNote) => serverNote.id === id);
 
-        if (!serverNote) {
-          await storage.table('notes').removeItem(id);
-          await storage.table('sync').removeItem(id);
-          continue;
-        }
-
-        if (localChange && localChange.type === 'created') {
+        if (localChange && localChange.type === 'create') {
           requests.push(NotesHttpClient.create(localNote));
           await storage.table('sync').removeItem(id);
           await storage.table('notes').setItem(localNote.id, localNote);
+          continue;
+        }
+
+        if (!serverNote) {
+          await storage.table('notes').removeItem(id);
+          await storage.table('sync').removeItem(id);
           continue;
         }
 
