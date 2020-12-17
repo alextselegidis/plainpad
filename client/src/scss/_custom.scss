@@ -205,9 +205,9 @@
   min-height: 100%;
   border: none;
   border-radius: 0;
-  box-shadow: none;
-  outline: none;
-  overflow: hidden;
+  box-shadow: none !important;
+  outline: none !important;
+  overflow: hidden !important;
   resize: none;
   margin: auto;
   color: $gray-900 !important;
