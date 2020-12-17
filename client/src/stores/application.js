@@ -82,7 +82,7 @@ class ApplicationStore {
       newestOnTop: false,
       progressBar: false,
       positionClass: 'toast-bottom-right',
-      preventDuplicates: false,
+      preventDuplicates: true,
       onclick: null,
       showDuration: '30000',
       hideDuration: '1000',
