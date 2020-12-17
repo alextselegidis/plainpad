@@ -78,7 +78,7 @@ class Profile extends Component {
                     <Label>
                       <FormattedMessage id="profile.name"/>
                     </Label>
-                    <Input placeholder="Name" value={name}
+                    <Input value={name}
                            onChange={(event) => profile.name = event.target.value}/>
                   </FormGroup>
 
@@ -86,7 +86,7 @@ class Profile extends Component {
                     <Label>
                       <FormattedMessage id="profile.email"/>
                     </Label>
-                    <Input type="email" placeholder="username@example.org" value={email}
+                    <Input type="email" value={email}
                            onChange={(event) => profile.email = event.target.value}/>
                   </FormGroup>
 
@@ -94,7 +94,7 @@ class Profile extends Component {
                     <Label>
                       <FormattedMessage id="profile.password"/>
                     </Label>
-                    <Input type="password" placeholder="" value={password} autoComplete="new-password"
+                    <Input type="password" value={password} autoComplete="new-password"
                            onChange={(event) => profile.password = event.target.value}/>
                   </FormGroup>
 
@@ -102,7 +102,7 @@ class Profile extends Component {
                     <Label>
                       <FormattedMessage id="profile.passwordConfirmation"/>
                     </Label>
-                    <Input type="password" placeholder="" value={passwordConfirmation}
+                    <Input type="password" value={passwordConfirmation}
                            onChange={(event) => profile.passwordConfirmation = event.target.value}/>
                   </FormGroup>
                 </CardBody>

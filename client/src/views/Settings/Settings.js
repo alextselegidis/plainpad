@@ -145,7 +145,7 @@ class Settings extends Component {
                     <Label>
                       <FormattedMessage id="settings.host"/>
                     </Label>
-                    <Input placeholder="localhost" value={mailHost}
+                    <Input placeholder="smtp.example.org" value={mailHost}
                            onChange={(event) => settings.mailHost = event.target.value}/>
                   </FormGroup>
 

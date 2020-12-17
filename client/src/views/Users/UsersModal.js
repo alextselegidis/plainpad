@@ -67,7 +67,7 @@ class UsersModal extends Component {
               <Label>
                 <FormattedMessage id="users.name"/>
               </Label>
-              <Input placeholder="John Doe" value={name}
+              <Input value={name}
                      onChange={(event) => users.name = event.target.value}/>
             </FormGroup>
 
@@ -75,7 +75,7 @@ class UsersModal extends Component {
               <Label>
                 <FormattedMessage id="users.email"/>
               </Label>
-              <Input type="email" placeholder="info@example.org" value={email}
+              <Input type="email" value={email}
                      onChange={(event) => users.email = event.target.value}/>
             </FormGroup>
 
