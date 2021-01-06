@@ -65,6 +65,13 @@ class NotesStore {
   }
 
   async select(id) {
+    // Make sure unsaved changes are persisted before switching to the new note.
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      await this.save();
+      this.unlockPage();
+    }
+
     const textarea = document.querySelector('.note-content');
     const selectionStart = textarea ? textarea.selectionStart : 0;
     const selectionEnd = textarea ? textarea.selectionEnd : 0;
