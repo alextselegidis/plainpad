@@ -68,6 +68,7 @@ class NotesStore {
     // Make sure unsaved changes are persisted before switching to the new note.
     if (this.timeout) {
       clearTimeout(this.timeout);
+      this.timeout = null;
       await this.save();
       this.unlockPage();
     }
@@ -294,6 +295,7 @@ class NotesStore {
 
     if (this.timeout) {
       clearTimeout(this.timeout);
+      this.timeout = null;
     }
 
     this.timeout = setTimeout(() => {
@@ -307,6 +309,7 @@ class NotesStore {
 
     if (this.timeout) {
       clearTimeout(this.timeout);
+      this.timeout = null;
     }
 
     this.timeout = setTimeout(() => this.list(), 1000);
