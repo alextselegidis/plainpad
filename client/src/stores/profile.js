@@ -25,6 +25,7 @@ import UsersHttpClient from '../http/UsersHttpClient';
 import OfflineError from '../http/OfflineError';
 import notes from './notes';
 import storage from '../storage';
+import Swal from 'sweetalert2';
 
 class ProfileStore {
   name = '';
@@ -106,6 +107,19 @@ class ProfileStore {
 
   async invalidateCache() {
     if (!navigator.onLine) {
+      return;
+    }
+
+    const result = await Swal.fire({
+      text: translate('profile.invalidateCachePrompt'),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d94e5c',
+      confirmButtonText: translate('profile.invalidateCache'),
+      reverseButtons: true
+    });
+
+    if (!result.value) {
       return;
     }
 

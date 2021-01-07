@@ -49,5 +49,6 @@ export default {
   encrypt: 'Encrypt',
   yes: 'Yes',
   no: 'No',
-  passwordsMismatch: 'The provided passwords mismatch, please try again.'
+  passwordsMismatch: 'The provided passwords mismatch, please try again.',
+  invalidateCachePrompt: 'Are you sure that you want to invalidate the local cache? Not synchronized information will be lost.'
 }

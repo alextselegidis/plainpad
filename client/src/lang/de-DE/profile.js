@@ -49,5 +49,6 @@ export default {
   encrypt: 'Verschlüsseln',
   yes: 'Ja',
   no: 'Nein',
-  passwordsMismatch: 'Die angegebenen Passwörter stimmen nicht überein, bitte versuchen Sie es erneut.'
+  passwordsMismatch: 'Die angegebenen Passwörter stimmen nicht überein, bitte versuchen Sie es erneut.',
+  invalidateCachePrompt: 'Sind Sie sicher, dass Sie den lokalen Cache invalidieren wollen? Nicht synchronisierte Informationen werden verloren gehen.'
 }
