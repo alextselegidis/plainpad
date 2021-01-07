@@ -136,11 +136,7 @@ class NotesStore {
     }
 
     await storage.table('notes').removeItem(this.id);
-
-    application.success(translate('notes.deleteSuccess'));
-
     window.location.href = `#/notes`;
-
     document.querySelector('.aside-toggler').click(); // Close the sidebar.
 
     const isLocalNote = this.id.includes('local');
@@ -152,7 +148,6 @@ class NotesStore {
     }
 
     this.list();
-
     this.reset();
   }
 
