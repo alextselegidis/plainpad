@@ -30,8 +30,8 @@ import OfflineError from '../http/OfflineError';
 
 class NotesStore {
   saving = false;
-  timeout = null;
   filter = '';
+  filterTimeout = null;
   noteList = [];
   id = null;
   title = '';
@@ -42,21 +42,20 @@ class NotesStore {
   syncErrors = 0;
 
   async list() {
-    const cachedNotes = [];
+    const localNotes = [];
 
     await storage.table('notes').iterate((value) => {
-      cachedNotes.push(value);
+      localNotes.push(value);
     });
 
-    const filteredNotes = this.filterNotes(cachedNotes);
+    const filteredNotes = this.filterNotes(localNotes);
 
     this.noteList = this.sortNotes(filteredNotes);
   }
 
   add() {
-    this.saving = true;
     this.id = null;
-    this.title = this.filter || 'New note ...';
+    this.title = this.filter || 'New Note ...';
     this.content = this.title;
     this.pinned = false;
     this.createdAt = null;
@@ -71,154 +70,90 @@ class NotesStore {
       return;
     }
 
-    // Make sure unsaved changes are persisted before switching to the new note.
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-      this.save();
-      this.unlockPage();
+    const localNote = await storage.table('notes').getItem(id);
+
+    if (!localNote) {
+      application.warning('notes.notFoundOrNotSynced');
+      return;
     }
 
     window.location.href = `#/notes/${id}`;
 
-    const localNote = await storage.table('notes').getItem(id);
-
-    if (localNote) {
-      this.id = localNote.id;
-      this.title = localNote.title;
-      this.content = localNote.content;
-      this.pinned = localNote.pinned;
-      this.createdAt = localNote.created_at;
-      this.updatedAt = localNote.updated_at;
-    } else {
-      try {
-        const serverNote = await NotesHttpClient.retrieve(id);
-
-        const serverChanged = moment(serverNote.updated_at);
-        const localChanged = moment(localNote.updated_at);
-
-        if (serverChanged.isAfter(localChanged)) {
-          storage.table('notes').setItem(id, serverNote);
-          this.title = serverNote.title;
-          this.content = serverNote.content;
-          this.pinned = serverNote.pinned;
-          this.createdAt = serverNote.created_at;
-          this.updatedAt = serverNote.updated_at;
-        }
-      } catch (error) {
-        if (!(error instanceof OfflineError)) {
-          application.error(translate('notes.fetchFailure'));
-          console.error(error);
-        }
-      }
-    }
-
-    const textarea = document.querySelector('.note-content');
-
-    if (textarea) {
-      textarea.focus();
-    }
+    this.id = localNote.id;
+    this.title = localNote.title;
+    this.content = localNote.content;
+    this.pinned = localNote.pinned;
+    this.createdAt = localNote.created_at;
+    this.updatedAt = localNote.updated_at;
   }
 
   async save() {
-    this.saving = true;
+    let id = this.id;
 
-    const isNewNote = this.id === null;
+    const isNewNote = id === null;
 
-    let id = isNewNote ? `local-${uuidv4()}` : this.id;
+    if (isNewNote) {
+      id = `local-${uuidv4()}`;
+    }
 
     const isLocalNote = id.includes('local');
 
     const note = {
       id,
       user_id: account.user.id,
-      created_at: this.createdAt || moment().format('YYYY-MM-DD HH:mm:ss'),
-      updated_at: moment().format('YYYY-MM-DD HH:mm:ss'),
+      created_at: this.createdAt || moment().format(),
+      updated_at: moment().format(),
       title: this.title,
       content: this.content,
       pinned: this.pinned
     };
 
-    if (!navigator.onLine) {
-      await storage.table('sync').setItem(id, {
-        date: new Date(),
-        type: isLocalNote ? 'create' : 'update'
-      });
-    }
+    const localNote = await storage.table('notes').getItem(id);
 
-    const cache = await storage.table('notes').getItem(id);
-    await storage.table('notes').setItem(id, {...cache, ...note});
+    await storage.table('notes').setItem(id, {...localNote, ...note});
 
-    this.list();
+    await this.commitChange(id, isLocalNote ? 'create' : 'update');
 
-    try {
-      const response = await NotesHttpClient[isNewNote ? 'create' : 'update'](note);
-
-      if (isNewNote) {
-        storage.table('notes').removeItem(id);
-      }
-
-      id = response.id;
-
-      await storage.table('notes').setItem(response.id, response);
-    } catch (error) {
-      if (!(error instanceof OfflineError)) {
-        application.error(translate('notes.saveFailure'));
-        console.error(error);
-      }
-    }
-
-    this.list();
+    await this.list();
 
     if (isNewNote) {
-      await this.select(id);
+      window.location.href = `#/notes/${id}`;
     }
-
-    this.saving = false;
   }
 
-  delete() {
-    Swal.fire({
+  async delete() {
+    const result = await Swal.fire({
       text: translate('notes.deletePrompt'),
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d94e5c',
       confirmButtonText: translate('notes.delete'),
       reverseButtons: true
-    }).then(async (result) => {
-      if (!result.value) {
-        return;
-      }
-
-      await storage.table('notes').removeItem(this.id);
-      application.success(translate('notes.deleteSuccess'));
-
-      window.location.href = `#/notes`;
-      document.querySelector('.aside-toggler').click(); // Close the sidebar.
-
-      if (!navigator.onLine) {
-        await storage.table('sync').setItem(this.id, {
-          date: moment().toDate(),
-          type: 'delete'
-        });
-
-        this.list();
-
-        return;
-      }
-
-      try {
-        NotesHttpClient.delete(this.id);
-      } catch (error) {
-        if (!(error instanceof OfflineError)) {
-          application.error(translate('notes.deleteFailure'));
-          console.error(error);
-        }
-      }
-
-      this.list();
-      this.reset();
     });
+
+    if (!result.value) {
+      return;
+    }
+
+    await storage.table('notes').removeItem(this.id);
+
+    application.success(translate('notes.deleteSuccess'));
+
+    window.location.href = `#/notes`;
+
+    document.querySelector('.aside-toggler').click(); // Close the sidebar.
+
+    const isLocalNote = this.id.includes('local');
+
+    if (isLocalNote) {
+      await this.resolveChange(this.id);
+    } else {
+      await this.commitChange(this.id, 'delete');
+    }
+
+    this.list();
+
+    this.reset();
   }
 
   download() {
@@ -238,87 +173,63 @@ class NotesStore {
   }
 
   async pin() {
-    try {
-      this.pinned = true;
+    this.pinned = true;
 
-      const cache = await storage.table('notes').getItem(this.id);
-      cache.pinned = true;
-      await storage.table('notes').setItem(this.id, cache);
+    const localNote = await storage.table('notes').getItem(this.id);
+    localNote.pinned = true;
+    await storage.table('notes').setItem(this.id, localNote);
 
-      await NotesHttpClient.pinned(this.id, this.pinned);
-      await this.list();
-    } catch (error) {
-      if (!(error instanceof OfflineError)) {
-        application.error(translate('notes.pinFailure'));
-        console.error(error);
-      }
-    }
+    this.commitChange(this.id, 'update');
+
+    this.list();
   }
 
   async unpin() {
-    try {
-      this.pinned = false;
+    this.pinned = false;
 
-      const cache = await storage.table('notes').getItem(this.id);
-      cache.pinned = false;
-      await storage.table('notes').setItem(this.id, cache);
+    const localNote = await storage.table('notes').getItem(this.id);
+    localNote.pinned = false;
+    await storage.table('notes').setItem(this.id, localNote);
 
-      await NotesHttpClient.pinned(this.id, this.pinned);
-      this.list();
-    } catch (error) {
-      if (!(error instanceof OfflineError)) {
-        application.error(translate('notes.unpinFailure'));
-        console.error(error);
-      }
-    }
+    this.commitChange(this.id, 'update');
+
+    this.list();
   }
 
   updateContent(content) {
-    this.lockPage();
-
     this.content = content;
 
+    this.title = this.getTitleByContent(content);
+
+    this.save();
+  }
+
+  getTitleByContent(content) {
+    let title;
+
     if (content.includes("\n")) {
-      const title = content.match(/^(.*)\n/)[1];
-      this.title = title.substring(0, 40).trim();
+      const firstLine = content.match(/^(.*)\n/)[1];
+      title = firstLine.substring(0, 40).trim();
     } else {
-      this.title = content.substring(0, 40).trim();
+      title = content.substring(0, 40).trim();
     }
 
-    if (!this.title) {
-      this.title = 'NO-TITLE';
+    if (!title) {
+      title = 'NO-TITLE';
     }
 
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
-
-    this.timeout = setTimeout(() => {
-      this.save();
-      this.unlockPage();
-    }, 1000);
+    return title;
   }
 
   updateFilter(filter) {
     this.filter = filter;
 
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
+    if (this.filterTimeout) {
+      clearTimeout(this.filterTimeout);
+      this.filterTimeout = null;
     }
 
-    this.timeout = setTimeout(() => this.list(), 1000);
-  }
-
-  lockPage() {
-    window.onbeforeunload = function () {
-      return true;
-    };
-  }
-
-  unlockPage() {
-    window.onbeforeunload = null;
+    this.filterTimeout = setTimeout(() => this.list(), 1000);
   }
 
   reset() {
@@ -434,24 +345,32 @@ class NotesStore {
     });
   }
 
+  async commitChange(id, type) {
+    await storage.table('sync').setItem(id, {
+      date: moment().toDate(),
+      type
+    });
+  }
+
+  async resolveChange(id) {
+    await storage.table('sync').removeItem(id);
+  }
+
   async sync() {
     if (!navigator.onLine || !account.user) {
+      setTimeout(() => this.sync(), 30000);
       return;
     }
+
+    this.list();
 
     if (this.syncErrors >= 10) {
       application.warning(translate('notes.syncingGotDisabled'));
       return;
     }
 
-    const requests = [];
-
     try {
-      const localNotes = {};
-
-      await storage.table('notes').iterate((localNote, id) => {
-        localNotes[id] = localNote;
-      });
+      this.syncing = true;
 
       const localChanges = {};
 
@@ -459,7 +378,7 @@ class NotesStore {
         localChanges[id] = localChange;
       });
 
-      const serverNotes = await NotesHttpClient.list(null, null, null, null, null, [
+      let serverNotes = await NotesHttpClient.list(null, null, null, null, null, [
         'id',
         'created_at',
         'updated_at',
@@ -468,61 +387,77 @@ class NotesStore {
         'user_id'
       ]);
 
-      for (let serverNote of serverNotes) {
-        const localNote = localNotes[serverNote.id];
-        const localChange = localChanges[serverNote.id];
-
-        if (!localNote && !localChange) {
-          const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
-          await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
-          continue;
-        }
-
-        if (localChange && localChange.type === 'update') {
-          await storage.table('sync').removeItem(localChange.id);
-          requests.push(NotesHttpClient.update(localNote));
-          continue;
-        }
-
-        if (localChange && localChange.type === 'delete') {
-          requests.push(NotesHttpClient.delete(serverNote.id));
-          await storage.table('sync').removeItem(localChange.id);
-          await storage.table('notes').removeItem(localChange.id);
-        }
-
-        const localChanged = moment(localNote.updated_at);
-        const serverChanged = moment(serverNote.updated_at);
-
-        if (localChange && serverChanged.isAfter(localChanged)) {
-          const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
-          await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
-          await storage.table('sync').removeItem(localChange.id);
-        }
-      }
-
-      for (let id in localNotes) {
-        const localNote = localNotes[id];
+      // Run through the local changes and resolve any pending ones.
+      for (let id in localChanges) {
         const localChange = localChanges[id];
+        const localNote = await storage.table('notes').getItem(id);
         const serverNote = serverNotes.find((serverNote) => serverNote.id === id);
 
-        if (localChange && localChange.type === 'create') {
-          requests.push(NotesHttpClient.create(localNote));
-          await storage.table('sync').removeItem(id);
-          await storage.table('notes').setItem(localNote.id, localNote);
-          continue;
+        switch (localChange.type) {
+          case 'create':
+            if (!id.includes('local')) {
+              await this.resolveChange(id); // This local change is invalid.
+              continue;
+            }
+
+            if (!localNote) {
+              await this.resolveChange(id); // This local change does not match any local note.
+              continue;
+            }
+
+            const newServerNote = await NotesHttpClient.create(localNote);
+
+            await storage.table('notes').setItem(newServerNote.id, newServerNote);
+
+            if (this.id === localNote.id) {
+              await this.select(newServerNote.id);
+            }
+
+            await storage.table('notes').removeItem(id);
+            break;
+          case 'update':
+            // Update the server note as it got updated locally (this includes resolving update conflicts by using the
+            // latest update and discarding all previous updates).
+            if (!serverNote) {
+              // The note does not exist on the server and must therefore be removed from the local database.
+              await storage.table('notes').removeItem(id);
+              await this.resolveChange(id);
+              continue;
+            }
+
+            const localChanged = moment(localChange.date);
+            const serverChanged = moment(serverNote.updated_at);
+
+            if (serverChanged.isAfter(localChanged)) {
+              const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
+              await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
+            } else {
+              await NotesHttpClient.update(localNote);
+            }
+            break;
+          case 'delete':
+            // Remove the server note as it got removed locally.
+            if (serverNote) {
+              await NotesHttpClient.delete(serverNote.id);
+              serverNotes = serverNotes.filter((serverNote) => serverNote.id !== id);
+            }
+            break;
+          default:
+            // Invalid change type.
         }
 
-        if (!serverNote) {
-          await storage.table('notes').removeItem(id);
-          await storage.table('sync').removeItem(id);
-          continue;
-        }
+        await this.resolveChange(id);
+      }
 
-        const localChanged = moment(localNote.updated_at);
-        const serverChanged = moment(serverNote.updated_at);
+      // Add new notes that are not present in the local cache.
+      for (let serverNote of serverNotes) {
+        const localNote = await storage.table('notes').getItem(serverNote.id);
+        const localChange = await storage.table('sync').getItem(serverNote.id);
 
-        if (localChanged.isAfter(serverChanged)) {
-          requests.push(NotesHttpClient.update(localNote));
+        if (!localNote && !localChange) {
+          // Fetch the server note as it does not exist locally.
+          const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
+          await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
         }
       }
     } catch (error) {
@@ -531,10 +466,8 @@ class NotesStore {
       console.error(error);
     }
 
-    Promise.all(requests).then(() => {
-      this.list();
-    });
-
+    this.list();
+    this.syncing = false;
     setTimeout(() => this.sync(), 30000);
   }
 }

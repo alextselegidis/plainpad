@@ -39,7 +39,7 @@ class NoteAside extends Component {
       createdAt,
       updatedAt,
       pinned,
-      saving,
+      syncing,
     } = this.props.notes;
 
     if (!id) {
@@ -70,16 +70,6 @@ class NoteAside extends Component {
             <FormattedMessage id="notes.modified"/>
           </strong>
           {moment(updatedAt).format('MMM DD, YYYY')}
-        </p>
-
-        <p className="mb-4">
-          <Badge color="primary" hidden={!saving}>
-            <FormattedMessage id="notes.saving" />
-          </Badge>
-
-          <Badge color="light" hidden={saving}>
-            <FormattedMessage id="notes.saved" />
-          </Badge>
         </p>
 
         <div className="mb-4 border-bottom" />

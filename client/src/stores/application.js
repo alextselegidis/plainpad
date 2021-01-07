@@ -120,12 +120,13 @@ class ApplicationStore {
     const localAccount = JSON.parse(localStorage.getItem('Plainpad.Account'));
     account.load(localAccount);
 
+    notes.sync();
+
     try {
       this.config = await ApplicationHttpClient.retrieve();
     } catch (error) {
       if (error instanceof OfflineError) {
         this.online = false;
-        await notes.list();
         return;
       }
 
@@ -160,12 +161,7 @@ class ApplicationStore {
   }
 
   observeNetworkStatus() {
-    if (navigator.onLine && !this.online) {
-      notes.sync();
-    }
-
     this.online = navigator.onLine;
-
     setTimeout(() => this.observeNetworkStatus(), 1000);
   }
 

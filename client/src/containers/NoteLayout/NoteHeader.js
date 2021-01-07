@@ -45,7 +45,7 @@ class NoteHeader extends Component {
     } = this.props;
 
     const {
-      saving
+      syncing
     } = notes;
 
     const {
@@ -127,8 +127,8 @@ class NoteHeader extends Component {
           font-weight-bold rounded-circle theme-toggler`}
           onClick={() => profile.toggleTheme()}
         />
-        <AppAsideToggler className={`aside-toggler d-md-down-none shadow-none ${saving ? 'saving' : ''}`}/>
-        <AppAsideToggler className={`aside-toggler d-lg-none shadow-none ${saving ? 'saving' : ''}`} mobile />
+        <AppAsideToggler className={`aside-toggler d-md-down-none shadow-none ${syncing ? 'syncing' : ''}`}/>
+        <AppAsideToggler className={`aside-toggler d-lg-none shadow-none ${syncing ? 'syncing' : ''}`} mobile />
       </React.Fragment>
     );
   }

@@ -67,11 +67,10 @@ class Notes extends Component {
 
     const {
       id,
-      saving,
       content,
     } = notes;
 
-    if (!id && !saving) {
+    if (!id && !content) {
       return <WelcomeMessage/>;
     }
 

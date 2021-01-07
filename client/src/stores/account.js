@@ -39,7 +39,7 @@ class AccountStore {
 
     this.observeSessionExpiration();
 
-    notes.sync();
+    notes.list();
   }
 
   async login(email, password) {
