@@ -133,7 +133,6 @@ class Help extends Component {
                 <ul>
                   <li>Created Date</li>
                   <li>Updated Date</li>
-                  <li>Saving Status</li>
                   <li>Pin/Unpin</li>
                   <li>Download</li>
                   <li>Delete</li>
