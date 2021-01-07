@@ -74,6 +74,8 @@ class Note extends Model
     /**
      * Toggle the note title and content values.
      *
+     * Ensure every note can be decrypted before updating them in the database.
+     *
      * @param User $user
      * @param bool $previouslyEncrypted
      * @param bool $currentlyEncrypted
@@ -82,7 +84,7 @@ class Note extends Model
     {
         $notes = DB::table('notes')->where('user_id', $user->id)->get();
 
-        foreach ($notes as $note) {
+        foreach ($notes as &$note) {
             if ($previouslyEncrypted && !$currentlyEncrypted) {
                 $note->title = Crypt::decrypt($note->title);
                 $note->content = Crypt::decrypt($note->content);
@@ -92,7 +94,9 @@ class Note extends Model
             } else {
                 continue;
             }
+        }
 
+        foreach ($notes as $note) {
             DB::table('notes')->where('id', $note->id)->update([
                 'title' => $note->title,
                 'content' => $note->content
