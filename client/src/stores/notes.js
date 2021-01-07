@@ -29,7 +29,7 @@ import storage from '../storage';
 import OfflineError from '../http/OfflineError';
 
 class NotesStore {
-  saving = false;
+  syncing = false;
   filter = '';
   filterTimeout = null;
   noteList = [];
@@ -73,7 +73,7 @@ class NotesStore {
     const localNote = await storage.table('notes').getItem(id);
 
     if (!localNote) {
-      application.warning('notes.notFoundOrNotSynced');
+      application.warning(translate('notes.notFoundOrNotSynced'));
       return;
     }
 
@@ -234,6 +234,10 @@ class NotesStore {
     this.pinned = '';
     this.createdAt = null;
     this.updatedAt = null;
+  }
+
+  empty() {
+    this.noteList = [];
   }
 
   async share() {

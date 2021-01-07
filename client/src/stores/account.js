@@ -71,7 +71,8 @@ class AccountStore {
 
   async logout() {
     localStorage.removeItem('Plainpad.Account');
-
+    notes.reset();
+    notes.empty();
     this.user = null;
 
     if (!this.session) {
@@ -80,9 +81,7 @@ class AccountStore {
 
     try {
       await SessionsHttpClient.delete(this.session);
-
       application.success(translate('account.successfullyLoggedOut'));
-
     } catch (error) {
       application.error(translate('account.failedToLogOut'));
       console.error(error);
