@@ -65,18 +65,19 @@ class NotesStore {
   }
 
   async select(id) {
+    const isSameNote = this.id === id;
+
+    if (isSameNote) {
+      return;
+    }
+
     // Make sure unsaved changes are persisted before switching to the new note.
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
-      await this.save();
+      this.save();
       this.unlockPage();
     }
-
-    const textarea = document.querySelector('.note-content');
-    const selectionStart = textarea ? textarea.selectionStart : 0;
-    const selectionEnd = textarea ? textarea.selectionEnd : 0;
-    const isSameNote = this.id === id;
 
     window.location.href = `#/notes/${id}`;
 
@@ -89,39 +90,32 @@ class NotesStore {
       this.pinned = localNote.pinned;
       this.createdAt = localNote.created_at;
       this.updatedAt = localNote.updated_at;
+    } else {
+      try {
+        const serverNote = await NotesHttpClient.retrieve(id);
+
+        const serverChanged = moment(serverNote.updated_at);
+        const localChanged = moment(localNote.updated_at);
+
+        if (serverChanged.isAfter(localChanged)) {
+          storage.table('notes').setItem(id, serverNote);
+          this.title = serverNote.title;
+          this.content = serverNote.content;
+          this.pinned = serverNote.pinned;
+          this.createdAt = serverNote.created_at;
+          this.updatedAt = serverNote.updated_at;
+        }
+      } catch (error) {
+        if (!(error instanceof OfflineError)) {
+          application.error(translate('notes.fetchFailure'));
+          console.error(error);
+        }
+      }
     }
 
-    try {
-      const serverNote = await NotesHttpClient.retrieve(id);
-
-      const serverChanged = moment(serverNote.updated_at);
-      const localChanged = moment(localNote.updated_at);
-
-      if (serverChanged.isAfter(localChanged)) {
-        storage.table('notes').setItem(id, serverNote);
-        this.title = serverNote.title;
-        this.content = serverNote.content;
-        this.pinned = serverNote.pinned;
-        this.createdAt = serverNote.created_at;
-        this.updatedAt = serverNote.updated_at;
-      }
-    } catch (error) {
-      if (!(error instanceof OfflineError)) {
-        application.error(translate('notes.fetchFailure'));
-        console.error(error);
-      }
-    }
+    const textarea = document.querySelector('.note-content');
 
     if (textarea) {
-      if (isSameNote) {
-        textarea.selectionStart = selectionStart;
-        textarea.selectionEnd = selectionEnd;
-      } else {
-        textarea.selectionStart = 0;
-        textarea.selectionEnd = 0;
-        window.scrollTo(0, 0);
-      }
-
       textarea.focus();
     }
   }
@@ -154,6 +148,8 @@ class NotesStore {
 
     const cache = await storage.table('notes').getItem(id);
     await storage.table('notes').setItem(id, {...cache, ...note});
+
+    this.list();
 
     try {
       const response = await NotesHttpClient[isNewNote ? 'create' : 'update'](note);
@@ -212,7 +208,7 @@ class NotesStore {
       }
 
       try {
-        await NotesHttpClient.delete(this.id);
+        NotesHttpClient.delete(this.id);
       } catch (error) {
         if (!(error instanceof OfflineError)) {
           application.error(translate('notes.deleteFailure'));
