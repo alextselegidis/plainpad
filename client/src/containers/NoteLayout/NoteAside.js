@@ -21,7 +21,7 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import moment from 'moment';
 import {FormattedMessage} from 'react-intl';
-import {Badge, Button, Col} from 'reactstrap';
+import {Button, Col} from 'reactstrap';
 
 class NoteAside extends Component {
   render() {
@@ -39,7 +39,6 @@ class NoteAside extends Component {
       createdAt,
       updatedAt,
       pinned,
-      syncing,
     } = this.props.notes;
 
     if (!id) {
