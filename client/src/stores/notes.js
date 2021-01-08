@@ -53,14 +53,14 @@ class NotesStore {
     this.noteList = this.sortNotes(filteredNotes);
   }
 
-  add() {
+  async add() {
     this.id = null;
     this.title = this.filter || 'New Note ...';
     this.content = this.title;
     this.pinned = false;
     this.createdAt = null;
     this.updatedAt = null;
-    this.save();
+    await this.save();
   }
 
   async select(id) {
@@ -101,8 +101,8 @@ class NotesStore {
     const note = {
       id,
       user_id: account.user.id,
-      created_at: this.createdAt || moment().format(),
-      updated_at: moment().format(),
+      created_at: this.createdAt || moment.utc().format(),
+      updated_at: moment.utc().format(),
       title: this.title,
       content: this.content,
       pinned: this.pinned
@@ -147,7 +147,7 @@ class NotesStore {
       await this.commitChange(this.id, 'delete');
     }
 
-    this.list();
+    await this.list();
     this.reset();
   }
 
@@ -174,9 +174,9 @@ class NotesStore {
     localNote.pinned = true;
     await storage.table('notes').setItem(this.id, localNote);
 
-    this.commitChange(this.id, 'update');
+    await this.commitChange(this.id, 'update');
 
-    this.list();
+    await this.list();
   }
 
   async unpin() {
@@ -186,17 +186,17 @@ class NotesStore {
     localNote.pinned = false;
     await storage.table('notes').setItem(this.id, localNote);
 
-    this.commitChange(this.id, 'update');
+    await this.commitChange(this.id, 'update');
 
-    this.list();
+    await this.list();
   }
 
-  updateContent(content) {
+  async updateContent(content) {
     this.content = content;
 
     this.title = this.getTitleByContent(content);
 
-    this.save();
+    await this.save();
   }
 
   getTitleByContent(content) {
@@ -268,9 +268,7 @@ class NotesStore {
   filterNotes(notes) {
     return notes.filter((note) => {
       const regex = new RegExp(this.filter, 'i');
-
-      return note.title.match(regex)
-        || note.content.match(regex);
+      return note.title.match(regex) || note.content.match(regex);
     });
   }
 
@@ -281,14 +279,14 @@ class NotesStore {
       default:
       case 'modified':
         sortedNotes = notes.sort((a, b) => {
-          const aModified = (new Date(a.updated_at)).getTime();
-          const bModified = (new Date(b.updated_at)).getTime();
+          const aModified = moment(a.updated_at);
+          const bModified = moment(b.updated_at);
 
-          if (aModified > bModified) {
+          if (aModified.isAfter(bModified)) {
             return -1;
           }
 
-          if (aModified < bModified) {
+          if (aModified.isBefore(bModified)) {
             return 1;
           }
 
@@ -298,14 +296,14 @@ class NotesStore {
 
       case 'created':
         sortedNotes = notes.sort((a, b) => {
-          const aCreated = (new Date(a.created_at)).getTime();
-          const bCreated = (new Date(b.created_at)).getTime();
+          const aCreated = moment(a.created_at);
+          const bCreated = moment(b.created_at);
 
-          if (aCreated < bCreated) {
+          if (aCreated.isBefore(bCreated)) {
             return 1;
           }
 
-          if (aCreated > bCreated) {
+          if (aCreated.isAfter(bCreated)) {
             return -1;
           }
 
@@ -346,7 +344,7 @@ class NotesStore {
 
   async commitChange(id, type) {
     await storage.table('sync').setItem(id, {
-      date: moment().toDate(),
+      date: moment.utc().toDate(),
       type
     });
   }
@@ -361,7 +359,7 @@ class NotesStore {
       return;
     }
 
-    this.list();
+    await this.list();
 
     if (this.syncErrors >= 10) {
       application.warning(translate('notes.syncingGotDisabled'));
@@ -370,109 +368,163 @@ class NotesStore {
 
     try {
       this.syncing = true;
-
-      const localChanges = {};
-
-      await storage.table('sync').iterate((localChange, id) => {
-        localChanges[id] = localChange;
-      });
-
-      let serverNotes = await NotesHttpClient.list(null, null, null, null, null, [
-        'id',
-        'created_at',
-        'updated_at',
-        'pinned',
-        'title',
-        'user_id'
-      ]);
-
-      // Run through the local changes and resolve any pending ones.
-      for (let id in localChanges) {
-        const localChange = localChanges[id];
-        const localNote = await storage.table('notes').getItem(id);
-        const serverNote = serverNotes.find((serverNote) => serverNote.id === id);
-
-        switch (localChange.type) {
-          case 'create':
-            if (!id.includes('local')) {
-              await this.resolveChange(id); // This local change is invalid.
-              continue;
-            }
-
-            if (!localNote) {
-              await this.resolveChange(id); // This local change does not match any local note.
-              continue;
-            }
-
-            const newServerNote = await NotesHttpClient.create(localNote);
-
-            await storage.table('notes').setItem(newServerNote.id, newServerNote);
-
-            if (this.id === localNote.id) {
-              await this.select(newServerNote.id);
-            }
-
-            await storage.table('notes').removeItem(id);
-            break;
-          case 'update':
-            // Update the server note as it got updated locally (this includes resolving update conflicts by using the
-            // latest update and discarding all previous updates).
-            if (!serverNote) {
-              // The note does not exist on the server and must therefore be removed from the local database.
-              await storage.table('notes').removeItem(id);
-              await this.resolveChange(id);
-              continue;
-            }
-
-            const localChanged = moment(localChange.date);
-            const serverChanged = moment(serverNote.updated_at);
-
-            if (serverChanged.isAfter(localChanged)) {
-              const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
-              await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
-            } else {
-              await NotesHttpClient.update(localNote);
-            }
-            break;
-          case 'delete':
-            // Remove the server note as it got removed locally.
-            if (serverNote) {
-              await NotesHttpClient.delete(serverNote.id);
-              serverNotes = serverNotes.filter((serverNote) => serverNote.id !== id);
-            }
-            break;
-          default:
-            // Invalid change type.
-        }
-
-        await this.resolveChange(id);
-      }
-
-      // Add new notes that are not present in the local cache.
-      for (let serverNote of serverNotes) {
-        const localNote = await storage.table('notes').getItem(serverNote.id);
-        const localChange = await storage.table('sync').getItem(serverNote.id);
-
-        if (!localNote && !localChange) {
-          // Fetch the server note as it does not exist locally.
-          const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
-          await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
-        }
-      }
+      const serverNotes = await this.fetchServerNotes();
+      const syncedServerNotes = await this.syncLocalChanges(serverNotes);
+      await this.syncServerChanges(syncedServerNotes);
     } catch (error) {
       this.syncErrors++;
       application.error(translate('notes.syncFailure'));
       console.error(error);
     }
 
-    this.list();
+    await this.list();
     this.syncing = false;
     setTimeout(() => this.sync(), 30000);
+  }
+
+  async syncLocalChanges(serverNotes) {
+    const localChanges = {};
+
+    await storage.table('sync').iterate((localChange, id) => {
+      localChanges[id] = localChange;
+    });
+
+    // Run through the local changes and resolve any pending ones.
+    for (let id in localChanges) {
+      const localChange = localChanges[id];
+      const localNote = await storage.table('notes').getItem(id);
+      const serverNote = serverNotes.find((serverNote) => serverNote.id === id);
+
+      switch (localChange.type) {
+        case 'create':
+          serverNotes = await this.syncCreateChange(serverNotes, id, localNote);
+          break;
+        case 'update':
+          serverNotes = await this.syncUpdateChange(serverNotes, id, serverNote, localNote, localChange);
+          break;
+        case 'delete':
+          serverNotes = await this.syncDeleteChange(serverNotes, id, serverNote);
+          break;
+        default:
+        // Invalid change type, do not process anything.
+      }
+
+      await this.resolveChange(id);
+    }
+
+    return serverNotes;
+  }
+
+  async syncServerChanges(serverNotes) {
+    // Add new notes that are not present in the local cache.
+    for (let serverNote of serverNotes) {
+      const localNote = await storage.table('notes').getItem(serverNote.id);
+
+      // Import server note to the local database.
+      if (localNote) {
+        const localChanged = moment(localNote.updated_at);
+        const serverChanged = moment(serverNote.updated_at);
+
+        if (serverChanged.isAfter(localChanged)) {
+          const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
+          await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
+          if (this.id === serverNote.id) {
+            await this.select(this.id);
+          }
+        } else if (serverChanged.isBefore(localChanged)) {
+          await NotesHttpClient.update(localNote);
+        }
+      } else {
+        const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
+        await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
+      }
+    }
+  }
+
+  async fetchServerNotes() {
+    return await NotesHttpClient.list(null, null, null, null, null, [
+      'id',
+      'created_at',
+      'updated_at',
+      'pinned',
+      'title',
+      'user_id'
+    ]);
+  }
+
+  async syncCreateChange(serverNotes, id, localNote) {
+    if (!id.includes('local')) {
+      await this.resolveChange(id); // This local change is invalid.
+      return serverNotes;
+    }
+
+    if (!localNote) {
+      await this.resolveChange(id); // This local change does not match any local note.
+      return serverNotes;
+    }
+
+    const newServerNote = await NotesHttpClient.create(localNote);
+
+    await storage.table('notes').setItem(newServerNote.id, newServerNote);
+
+    if (this.id === localNote.id) {
+      await this.select(newServerNote.id);
+    }
+
+    await storage.table('notes').removeItem(id);
+
+    return [...serverNotes, newServerNote];
+  }
+
+  async syncUpdateChange(serverNotes, id, serverNote, localNote, localChange) {
+    // Update the server note as it got updated locally (this includes resolving update conflicts by using the
+    // latest update and discarding all previous updates).
+    if (!serverNote) {
+      // The note does not exist on the server and must therefore be removed from the local database.
+      await storage.table('notes').removeItem(id);
+      await this.resolveChange(id);
+      if (this.id === id) {
+        window.location.href = `#/notes`;
+        await this.reset();
+      }
+      return serverNotes;
+    }
+
+    const localChanged = moment(localChange.date);
+    const serverChanged = moment(serverNote.updated_at);
+
+    if (serverChanged.isAfter(localChanged)) {
+      const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
+      await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
+      if (this.id === serverNote.id) {
+        await this.select(this.id);
+      }
+    } else if (serverChanged.isBefore(localChanged)) {
+      await NotesHttpClient.update(localNote);
+      for (let index in serverNotes) {
+        if (serverNotes.hasOwnProperty(index) && serverNotes[index].id === localNote.id) {
+          serverNotes[index] = localNote;
+          break;
+        }
+      }
+    }
+
+    return serverNotes;
+  }
+
+  async syncDeleteChange(serverNotes, id, serverNote) {
+    // Remove the server note as it got removed locally.
+    if (serverNote) {
+      await NotesHttpClient.delete(serverNote.id);
+      serverNotes = serverNotes.filter((serverNote) => serverNote.id !== id);
+    }
+
+    return serverNotes;
   }
 }
 
 decorate(NotesStore, {
-  saving: observable,
+  syncing: observable,
   filter: observable,
   sort: observable,
   noteList: observable,
