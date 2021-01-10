@@ -32,6 +32,7 @@ class NotesStore {
   syncing = false;
   filter = '';
   filterTimeout = null;
+  saveTimeout = null;
   noteList = [];
   id = null;
   title = '';
@@ -191,12 +192,19 @@ class NotesStore {
     await this.list();
   }
 
-  async updateContent(content) {
+  updateContent(content) {
     this.content = content;
 
     this.title = this.getTitleByContent(content);
 
-    await this.save();
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+      this.saveTimeout = null;
+    }
+
+    this.saveTimeout = setTimeout(() => {
+      this.save();
+    }, 1000)
   }
 
   getTitleByContent(content) {
@@ -355,7 +363,7 @@ class NotesStore {
 
   async sync() {
     if (!navigator.onLine || !account.user) {
-      setTimeout(() => this.sync(), 30000);
+      setTimeout(() => this.sync(), 60000);
       return;
     }
 
@@ -379,7 +387,7 @@ class NotesStore {
 
     await this.list();
     this.syncing = false;
-    setTimeout(() => this.sync(), 30000);
+    setTimeout(() => this.sync(), 60000);
   }
 
   async syncLocalChanges(serverNotes) {
