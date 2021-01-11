@@ -86,6 +86,8 @@ class NotesStore {
     this.pinned = localNote.pinned;
     this.createdAt = localNote.created_at;
     this.updatedAt = localNote.updated_at;
+
+    window.scrollTo(0, 0);
   }
 
   async save() {
