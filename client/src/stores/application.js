@@ -120,8 +120,6 @@ class ApplicationStore {
     const localAccount = JSON.parse(localStorage.getItem('Plainpad.Account'));
     account.load(localAccount);
 
-    notes.sync();
-
     try {
       this.config = await ApplicationHttpClient.retrieve();
     } catch (error) {

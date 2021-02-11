@@ -39,7 +39,10 @@ class AccountStore {
 
     this.observeSessionExpiration();
 
-    notes.list();
+    if (this.user) {
+      notes.list();
+      notes.sync();
+    }
   }
 
   async login(email, password) {
@@ -63,6 +66,7 @@ class AccountStore {
       application.success(translate('account.successfullyLoggedIn'));
 
       await notes.list();
+      await notes.sync();
     } catch (error) {
       application.error(translate('account.failedToLogIn'));
       console.error(error);

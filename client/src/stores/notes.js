@@ -33,6 +33,7 @@ class NotesStore {
   filter = '';
   filterTimeout = null;
   saveTimeout = null;
+  syncTimeout = null;
   noteList = [];
   id = null;
   title = '';
@@ -64,10 +65,10 @@ class NotesStore {
     await this.save();
   }
 
-  async select(id) {
+  async select(id, force = false) {
     const isSameNote = this.id === id;
 
-    if (isSameNote) {
+    if (isSameNote && !force) {
       return;
     }
 
@@ -364,8 +365,14 @@ class NotesStore {
   }
 
   async sync() {
+    if (this.syncing) {
+      return;
+    }
+
+    clearTimeout(this.syncTimeout);
+
     if (!navigator.onLine || !account.user) {
-      setTimeout(() => this.sync(), 60000);
+      this.syncTimeout = setTimeout(() => this.sync(), 60000);
       return;
     }
 
@@ -389,7 +396,7 @@ class NotesStore {
 
     await this.list();
     this.syncing = false;
-    setTimeout(() => this.sync(), 60000);
+    this.syncTimeout = setTimeout(() => this.sync(), 60000);
   }
 
   async syncLocalChanges(serverNotes) {
@@ -439,7 +446,7 @@ class NotesStore {
           const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
           await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
           if (this.id === serverNote.id) {
-            await this.select(this.id);
+            await this.select(this.id, true);
           }
         } else if (serverChanged.isBefore(localChanged)) {
           await NotesHttpClient.update(localNote);
@@ -447,6 +454,9 @@ class NotesStore {
       } else {
         const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
         await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
+        if (this.id === serverNote.id) {
+          await this.select(this.id, true);
+        }
       }
     }
   }
