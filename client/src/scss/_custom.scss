@@ -141,16 +141,6 @@
 }
 
 .app-header {
-  .theme-toggler {
-    padding: 5px;
-    margin-left: 5px;
-    font-size: 16px;
-    border: 2px solid $primary;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-  }
-
   .navbar-toggler {
     outline: none;
     color: $primary;
@@ -159,6 +149,11 @@
   .fa,
   .navbar-toggler-icon {
     color: $primary;
+    cursor: pointer;
+
+    &.syncing {
+      animation: spin 2s infinite linear;
+    }
   }
 
   .sidebar-toggler .navbar-toggler-icon {
@@ -187,16 +182,16 @@
     }
   }
 
-  .aside-toggler.syncing {
-    .navbar-toggler-icon {
-      color: $primary;
-      animation: spin 2s infinite linear;
-
-      &:before {
-        content: "\f021";
-      }
-    }
-  }
+  //.aside-toggler.syncing {
+  //  .navbar-toggler-icon {
+  //    color: $primary;
+  //    animation: spin 2s infinite linear;
+  //
+  //    &:before {
+  //      content: "\f021";
+  //    }
+  //  }
+  //}
 }
 
 .note-content {

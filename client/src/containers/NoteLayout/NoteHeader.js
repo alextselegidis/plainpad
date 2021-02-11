@@ -19,7 +19,7 @@
 
 import React, {Component} from 'react';
 import {NavLink} from 'react-router-dom';
-import {DropdownItem, DropdownMenu, DropdownToggle, Nav, UncontrolledDropdown} from 'reactstrap';
+import {DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, UncontrolledDropdown} from 'reactstrap';
 import PropTypes from 'prop-types';
 
 import {AppAsideToggler, AppNavbarBrand, AppSidebarToggler} from '@coreui/react';
@@ -71,10 +71,22 @@ class NoteHeader extends Component {
         <AppSidebarToggler className="d-md-down-none" display="lg"/>
 
         <Nav className="ml-auto" navbar>
+          <NavItem>
+            <i className={`fa fa-refresh fa-2x rounded-circle ${syncing ? 'syncing' : ''}`}
+               onClick={() => notes.sync()}
+            />
+          </NavItem>
+
+          <NavItem>
+            <i className={`fa ${user.theme === 'light' ? 'fa-moon-o' : 'fa-sun-o'} fa-2x rounded-circle theme-toggler`}
+               onClick={() => profile.toggleTheme()}
+            />
+          </NavItem>
+
           <UncontrolledDropdown nav direction="down">
             <DropdownToggle nav className={config && config.updates && config.updates.length > 0 ? 'updates-available' : ''}>
-              <i className="fa fa-user-circle fa-2x font-weight-bold" hidden={config && config.updates && config.updates.length}/>
-              <i className="fa fa-arrow-circle-up fa-2x font-weight-bold" hidden={!config || !config.updates || !config.updates.length}/>
+              <i className="fa fa-user-circle fa-2x" hidden={config && config.updates && config.updates.length}/>
+              <i className="fa fa-arrow-circle-up fa-2x" hidden={!config || !config.updates || !config.updates.length}/>
             </DropdownToggle>
             <DropdownMenu right>
               <DropdownItem header tag="div" className="text-center bg-white">
@@ -123,10 +135,6 @@ class NoteHeader extends Component {
             </DropdownMenu>
           </UncontrolledDropdown>
         </Nav>
-        <i className={`${user.theme === 'light' ? 'cui-moon' : 'cui-sun'} icons
-          font-weight-bold rounded-circle theme-toggler`}
-          onClick={() => profile.toggleTheme()}
-        />
         <AppAsideToggler className={`aside-toggler d-md-down-none shadow-none ${syncing ? 'syncing' : ''}`}/>
         <AppAsideToggler className={`aside-toggler d-lg-none shadow-none ${syncing ? 'syncing' : ''}`} mobile />
       </React.Fragment>
