@@ -541,6 +541,11 @@ class NotesStore {
 
     return serverNotes;
   }
+
+  applyScrollFix(textarea, scrollY, height) {
+      textarea.style.height = (height + 250) + 'px';
+      window.scrollTo(0, scrollY);
+  }
 }
 
 decorate(NotesStore, {

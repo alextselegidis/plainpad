@@ -23,6 +23,9 @@ import TextareaAutosize from 'react-textarea-autosize';
 import WelcomeMessage from './WelcomeMessage';
 
 class Notes extends Component {
+  textarea = null;
+  scrollY = null;
+
   componentDidMount() {
     const {
       account,
@@ -81,9 +84,12 @@ class Notes extends Component {
     return (
       <div className="animated fadeIn h-100 py-2">
         <TextareaAutosize
+          ref={(tag) => this.textarea = tag}
           className={`note-content ${user.line === 'full' ? 'full-line' : 'narrow-line'}`}
           value={content}
+          onKeyDown={() => this.scrollY = window.scrollY}
           onChange={(event) => notes.updateContent(event.target.value)}
+          onHeightChange={(height) => notes.applyScrollFix(this.textarea, this.scrollY, height)}
         />
       </div>
     );
