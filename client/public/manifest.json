@@ -21,7 +21,8 @@
     {
       "src": "assets/img/icon-128x128.png",
       "sizes": "128x128",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "assets/img/icon-144x144.png",
