@@ -29,5 +29,5 @@ cp README.md build/
 
 echo "Zip Build"
 cd build
-find . -name '. DS_Store' -type f -delete
+find . -name '.DS_Store' -type f -delete
 zip build.zip -r .
