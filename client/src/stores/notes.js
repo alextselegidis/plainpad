@@ -65,10 +65,10 @@ class NotesStore {
     await this.save();
   }
 
-  async select(id, force = false) {
+  async select(id) {
     const isSameNote = this.id === id;
 
-    if (isSameNote && !force) {
+    if (isSameNote) {
       return;
     }
 
@@ -89,6 +89,21 @@ class NotesStore {
     this.updatedAt = localNote.updated_at;
 
     window.scrollTo(0, 0);
+  }
+
+  async refresh() {
+    const localNote = await storage.table('notes').getItem(this.id);
+
+    if (!localNote) {
+      application.warning(translate('notes.notFoundOrNotSynced'));
+      return;
+    }
+
+    this.title = localNote.title;
+    this.content = localNote.content;
+    this.pinned = localNote.pinned;
+    this.createdAt = localNote.created_at;
+    this.updatedAt = localNote.updated_at;
   }
 
   async save() {
@@ -446,7 +461,7 @@ class NotesStore {
           const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
           await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
           if (this.id === serverNote.id) {
-            await this.select(this.id, true);
+            await this.refresh();
           }
         } else if (serverChanged.isBefore(localChanged)) {
           await NotesHttpClient.update(localNote);
@@ -455,7 +470,7 @@ class NotesStore {
         const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
         await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
         if (this.id === serverNote.id) {
-          await this.select(this.id, true);
+          await this.refresh();
         }
       }
     }
