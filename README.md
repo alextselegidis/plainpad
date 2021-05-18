@@ -53,6 +53,7 @@ $ cd plainpad
 # Setup Project
 $ ./project setup
 
+# Run Build command to build .zip archive
 $ ./project build
 ```
 
