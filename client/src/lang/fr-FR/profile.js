@@ -21,7 +21,7 @@ export default {
   profile: 'Profile',
   settings: 'Réglages',
   name: 'Nom',
-  email: 'Email',
+  email: 'E-mail',
   password: 'Mot de passe',
   passwordConfirmation: 'Confirmation mot de passe',
   locale: 'Traduction',
