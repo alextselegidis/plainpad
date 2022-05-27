@@ -18,11 +18,12 @@
     "enzyme-adapter-react-16": "^1.14.0",
     "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",
+    "http-proxy-middleware": "^0.19.1",
     "localforage": "^1.7.3",
     "mobx": "^5.14.2",
     "mobx-react": "^6.1.4",
     "moment": "^2.24.0",
-    "node-sass": "^4.13.1",
+    "node-sass": "^4.14.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-app-polyfill": "^1.0.1",
@@ -75,6 +76,5 @@
     "node": ">=8.10",
     "npm": ">=6"
   },
-  "proxy": "http://localhost:8080",
   "homepage": "./"
 }
