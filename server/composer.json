@@ -8,11 +8,11 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.3",
+        "php": "^8.0",
         "ext-curl": "*",
         "ext-json": "*",
         "ext-zip": "*",
-        "composer/semver": "1.4.*",
+        "composer/semver": "^3.3",
         "desarrolla2/cache": "2.1.*",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
