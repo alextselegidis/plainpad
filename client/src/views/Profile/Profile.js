@@ -149,6 +149,12 @@ class Profile extends Component {
                       <option value="de-DE">
                         de-DE
                       </option>
+                      <option value="fr-FR">
+                        fr-FR
+                      </option>
+                      <option value="sv-SE">
+                        sv-SE
+                      </option>
                     </Input>
                   </FormGroup>
 

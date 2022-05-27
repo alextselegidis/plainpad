@@ -19,12 +19,16 @@
 
 import enUS from './en-US';
 import deDE from './de-DE';
+import frFR from './fr-FR';
+import svSE from './sv-SE';
 import account from '../stores/account';
 import {createIntl} from 'react-intl';
 
 const messages = {
   'en-US': flatten(enUS),
-  'de-DE': flatten(deDE)
+  'de-DE': flatten(deDE),
+  'fr-FR': flatten(frFR),
+  'sv-SE': flatten(svSE)
 };
 
 let intl = null;
