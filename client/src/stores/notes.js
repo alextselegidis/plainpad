@@ -531,9 +531,6 @@ class NotesStore {
     if (serverChanged.isAfter(localChanged)) {
       const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
       await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
-      if (this.id === serverNote.id) {
-        await this.select(this.id);
-      }
     } else if (serverChanged.isBefore(localChanged)) {
       await NotesHttpClient.update(localNote);
       for (let index in serverNotes) {
