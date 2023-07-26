@@ -1,4 +1,5 @@
 /.idea
 /build
-/docker/mysql
+/docker/mysql/*
+!/docker/mysql/.gitkeep
 .DS_Store
