@@ -30,4 +30,16 @@ cp README.md build/
 echo "Zip Build"
 cd build
 find . -name '.DS_Store' -type f -delete
-zip build.zip -r .
+zip -r build.zip . \
+    -x .git/**\* \
+    -x .idea/**\* \
+    -x tests/**\* \
+    -x .editorconfig \
+    -x .gitattributes \
+    -x .phpstorm.meta.php \
+    -x .prettierignore \
+    -x package-lock.json \
+    -x phpunit.xml \
+    -x _ide_helper.php \
+    -x vite.config.js \
+    -x \*.zip

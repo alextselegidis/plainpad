@@ -9,7 +9,7 @@
 </h1>
 
 <h4 align="center">
-    Plainpad is a self hosted note taking application.
+    Plainpad is a self-hosted note taking application.
 </h4>
 
 <h4 align="center">
@@ -50,8 +50,8 @@ $ git clone https://github.com/alextselegidis/plainpad.git
 # Go into the repository
 $ cd plainpad
 
-# Setup Project
-$ ./project setup
+# Start Docker 
+$ docker compose up -d
 ```
 
 Note: If you're using Linux Bash for Windows, [see this guide](https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/) or use `node` from the command prompt.

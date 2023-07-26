@@ -1,7 +1,0 @@
-#!/bin/bash
-
-COMMAND=$1
-
-shift
-
-./scripts/$COMMAND.sh $@
