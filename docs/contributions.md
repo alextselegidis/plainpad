@@ -5,7 +5,7 @@ evolution of the project and help in the creation of high quality features.
 
 ### Development 
 
-With collaboration mainly taking place on [GitHub](https://github.com/alextselegidis/plainpad), pull requests are
+With collaboration mainly taking place on [GitHub](https://github.com/alextselegidis/plainpad), pull requests
 are welcome. Please ensure that you follow the coding guidelines before submitting new code to the project.  
 
 ### Testing 

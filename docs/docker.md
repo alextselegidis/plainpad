@@ -1,10 +1,10 @@
 # Docker
 
 Run the development containers of Plainpad with Docker and Docker Compose utility. Docker allows you to compose 
-your application from micro-services, without worrying about inconsistencies between development and production 
+your application from microservices, without worrying about inconsistencies between development and production 
 environments and without locking into any platform or language. 
 
-Enter the `docker` directory and run `docker-compose up` to start the environment. 
+Run `docker-compose up -d` to start the environment. 
 
 You will need modify the root `.env` so that it matches the following example: 
 
@@ -33,7 +33,7 @@ APP_DEBUG=true
 # This URL is used by the console to properly generate URLs when using
 # the Artisan command line tool. You should set this to the root of
 # your application so that it is used when running Artisan tasks.
-APP_URL=http://localhost:8000/
+APP_URL=http://localhost
 
 # This URL is used by the auto update mechanism to resolve available updates
 # whenever available. Change this only if you have your own Plainpad repository
@@ -46,7 +46,7 @@ APP_REPOSITORY=https://cdn.alextselegidis.com/plainpad/updates/stable
 DB_CONNECTION=mysql
 
 # The database connection host, this defaults to "localhost" for most servers.
-DB_HOST=plainpad-database
+DB_HOST=mysql
 
 # The database connection port, this defaults to "3306" for most servers.
 DB_PORT=3306
@@ -55,38 +55,21 @@ DB_PORT=3306
 DB_DATABASE=plainpad
 
 # The database username for the connection.
-DB_USERNAME=root
+DB_USERNAME=user
 
 # The database password for the connection.
-DB_PASSWORD=root
+DB_PASSWORD=password
 
 ```
 
-Enter the server container with `docker exect -it plainpad-server bash` and run the seed the database with 
+Enter the server container with `docker exect -it plainpad-php-fpm-1 bash` and run the seed the database with 
 `php artisan migrate:fresh --seed`. 
 
-In the host machine the server is accessible from `http://localhost:8000` and the database from `localhost:8001`.  
+In the host machine the server is accessible from `http://localhost` and the database from `localhost:3306`.  
 
-You can remove the docker containers with `docker rm plainpad-server plainpad-database`. 
+You can remove the docker containers with `docker compose down --volumes`.
 
-You can remove the server image with `docker rmi plainpad-server:v1`.
-
-The client can be executed locally but needs to know of the server API URL, thus change the `client/.env` to match
-the following example: 
-
-```
-PORT=3000
-CHOKIDAR_USEPOLLING=true
-REACT_APP_BASE_URL=api.php
-REACT_APP_VERSION=v1.0.0
-```
-
-Additionally, make sure the package.json file has the following value set: 
-
-```
-"proxy": "http://localhost:8000"
-```
-
-You can then execute `npm start` to run the client in development mode. 
+You can then execute `npm start` from within the client directory and the php-fpm container to run the dev server in 
+development mode. 
 
 [Back](readme.md)

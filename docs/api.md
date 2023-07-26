@@ -2,7 +2,7 @@
 
 ## Introduction 
 
-Plainpad exposes a flexible REST API that will enables you to handle all the information of your installations through 
+Plainpad exposes a flexible REST API that will enable you to handle all the information of your installations through 
 HTTP requests. The API is using JSON as its data transaction format and features many best practices in order to make 
 the resources easily consumable. 
 
@@ -22,11 +22,11 @@ Header:
 
 
 The API honors the REST architecture which means that the client can use various HTTP verbs in order to perform various 
-operations on the available resources. For example you should use a GET request for fetching resources, a POST for 
-creating new and PUT for updating existing ones in the database. Finally a DELETE request will remove a resource from 
+operations on the available resources. For example, you should use a GET request for fetching resources, a POST for 
+creating new and PUT for updating existing ones in the database. Finally, a DELETE request will remove a resource from 
 the system. 
 
-GET requests accept some parameter helpers that enable the sort, search, pagination and minification of the responses 
+GET requests accept some parameter helpers that enable the sort, search, pagination and minification of the response 
 information. Take a look in the following examples: 
 
 ### Search
@@ -39,7 +39,7 @@ https://url/to/public/api.php/v1/notes?filter=keyword
 
 ### Sort 
 
-Sort the results in ascending or descending direction by providing the the respective sign and the property 
+Sort the results in ascending or descending direction by providing the respective sign and the property 
 name to be used for sorting. 
 
 ```
@@ -67,7 +67,7 @@ https://url/to/public/api.php/v1/notes?fields=id,book,hash,notes
 
 ### Expected Responses
  
-Most of the times the API will return the complete requested data in a JSON string but there are some cases that the 
+Most of the time the API will return the complete requested data in a JSON string but there are some cases that the 
 responses might not contain a message but always a proper HTTP status code. 
 
 ## Resources & URIs
