@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Reset Build Directory"
-rm -rf build/
+rm -rf build/ build.zip
 mkdir build/
 
 echo "Bundle Server"
@@ -43,3 +43,7 @@ zip -r build.zip . \
     -x _ide_helper.php \
     -x vite.config.js \
     -x \*.zip
+
+cd ..
+
+mv build/build.zip .

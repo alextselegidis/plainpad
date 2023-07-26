@@ -3,3 +3,4 @@
 /docker/mysql/*
 !/docker/mysql/.gitkeep
 .DS_Store
+*.zip
