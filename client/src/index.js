@@ -1,34 +1,84 @@
-import 'react-app-polyfill/ie9'; // For IE 9-11 support
-import 'react-app-polyfill/stable';
-// import 'react-app-polyfill/ie11'; // For IE 11 support
-import './polyfill'
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
-import {Provider} from 'mobx-react';
-import {IntlProvider} from 'react-intl';
-import {messages} from './lang';
-import stores from './stores';
+/*
+  Plainpad - Self Hosted Note Taking App
 
-stores.application.initialize();
+  Copyright (C) 2020 Alex Tselegidis - https://alextselegidis.com
 
-const locale = stores.account.user ? stores.account.user.locale : 'en-US';
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-const Root = () => {
-  return (
-    <Provider {...stores}>
-      <IntlProvider locale={locale} messages={messages[locale]}>
-        <App/>
-      </IntlProvider>
-    </Provider>
-  );
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>
+*/
+
+import enUS from './en-US';
+import deDE from './de-DE';
+import frFR from './fr-FR';
+import svSE from './sv-SE';
+import zhCN from './zh-CN';
+import account from '../stores/account';
+import {createIntl} from 'react-intl';
+
+const messages = {
+  'en-US': flatten(enUS),
+  'de-DE': flatten(deDE),
+  'fr-FR': flatten(frFR),
+  'sv-SE': flatten(svSE),
+  'zh-CN': flatten(zhCN)
 };
 
-ReactDOM.render(<Root/>, document.getElementById('root'));
+let intl = null;
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.register({});
+function flatten(object) {
+  const result = {};
+
+  for (let key in object) {
+    if (!object.hasOwnProperty(key)) {
+      continue;
+    }
+
+    if (typeof object[key] !== 'object' || object[key] === null) {
+      result[key] = object[key];
+      continue;
+    }
+
+    const flatObject = flatten(object[key]);
+
+    for (let childKey in flatObject) {
+      if (!flatObject.hasOwnProperty(childKey)) {
+        continue;
+      }
+
+      result[key + '.' + childKey] = flatObject[childKey];
+    }
+  }
+
+  return result;
+}
+
+function translate(id, values = {}) {
+  if (!intl) {
+    const locale = account.user ? account.user.locale : 'en-US';
+
+    intl = createIntl({
+      locale,
+      messages: messages[locale]
+    });
+  }
+
+  return intl.formatMessage({
+    id,
+    values
+  });
+}
+
+export {
+  messages,
+  translate
+}
