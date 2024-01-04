@@ -25,5 +25,5 @@ export default {
   successfullyRecoveredPassword: '您的密码已成功恢复！请检查您的电子邮件获得更多内容',
   failedToRecoverPassword: '恢复密码时出现错误，请重试',
   invalidateSuccess: '成功清除缓存',
-  sessionExpired: '您的会话已过期，请重新登录。,
+  sessionExpired: '您的会话已过期，请重新登录',
 }
