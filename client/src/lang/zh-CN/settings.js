@@ -17,20 +17,25 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>
 */
 
-import account from './account';
-import application from './application';
-import notes from './notes';
-import users from './users';
-import settings from './settings';
-import profile from './profile';
-import layout from './layout';
-
 export default {
-  account,
-  application,
-  notes,
-  users,
-  settings,
-  profile,
-  layout,
+  settings: '设置',
+  setting: 'Setting',
+  defaultLocale: '默认语言',
+  mail: '邮件配置',
+  driver: '协议',
+  host: 'SMTP地址',
+  port: '端口',
+  username: '用户名',
+  password: '密码',
+  encryption: '加密方式',
+  fromAddress: '发件邮箱',
+  fromName: '发件姓名',
+  save: '保存',
+  saveSuccess: '保存成功',
+  saveFailure: '保存失败',
+  fetchFailure: '无法获取设置',
+  updates: '更新',
+  update: 'Update',
+  newUpdatesAvailable: '有新版本',
+  beforeUpdatingMakeSure: '更新前，请确保Plainpad的安装目录可写。如果在更新后报错，则需要在终端手动运行“php artisan refresh”命令',
 }

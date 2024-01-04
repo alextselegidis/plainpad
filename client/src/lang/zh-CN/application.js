@@ -17,20 +17,7 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>
 */
 
-import account from './account';
-import application from './application';
-import notes from './notes';
-import users from './users';
-import settings from './settings';
-import profile from './profile';
-import layout from './layout';
-
 export default {
-  account,
-  application,
-  notes,
-  users,
-  settings,
-  profile,
-  layout,
+  updateSuccess: '更新成功',
+  updateFailure: '更新失败'
 }

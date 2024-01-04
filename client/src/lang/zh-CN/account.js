@@ -17,20 +17,13 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>
 */
 
-import account from './account';
-import application from './application';
-import notes from './notes';
-import users from './users';
-import settings from './settings';
-import profile from './profile';
-import layout from './layout';
-
 export default {
-  account,
-  application,
-  notes,
-  users,
-  settings,
-  profile,
-  layout,
+  successfullyLoggedIn: '登录成功',
+  failedToLogIn: '账号或密码错误，请重试',
+  successfullyLoggedOut: '您已成功登出账号',
+  failedToLogOut: '登出失败，请重试',
+  successfullyRecoveredPassword: '您的密码已成功恢复！请检查您的电子邮件获得更多内容',
+  failedToRecoverPassword: '恢复密码时出现错误，请重试',
+  invalidateSuccess: '成功清除缓存',
+  sessionExpired: '您的会话已过期，请重新登录。,
 }

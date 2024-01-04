@@ -17,20 +17,12 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>
 */
 
-import account from './account';
-import application from './application';
-import notes from './notes';
-import users from './users';
-import settings from './settings';
-import profile from './profile';
-import layout from './layout';
-
 export default {
-  account,
-  application,
-  notes,
-  users,
-  settings,
-  profile,
-  layout,
+  users: '用户',
+  settings: '设置',
+  profile: '个人信息',
+  about: '关于',
+  help: '帮助',
+  logout: '登出',
+  pageNotAvailableOffline: '您已离线，无法对此页面进行操作'
 }
