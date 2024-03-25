@@ -155,6 +155,9 @@ class Profile extends Component {
                       <option value="sv-SE">
                         sv-SE
                       </option>
+                      <option value="zh-CN">
+                        zh-CN
+                      </option>
                     </Input>
                   </FormGroup>
 
