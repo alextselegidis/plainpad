@@ -41,12 +41,12 @@ class UsersSeeder extends Seeder
             'updated_at' => date('Y-m-d H:i:s'),
             'name' => 'Admin',
             'email' => 'admin@example.org',
-            'password' => Hash::make('12345'),
+            'password' => Hash::make('12345678'),
             'locale' => 'en-US',
             'encrypt' => false,
             'admin' => true,
         ]);
 
-        echo 'Login with the default admin user (email: admin@example.org & password: 12345).' . PHP_EOL;
+        echo 'Login with the default admin user (email: admin@example.org & password: 12345678).' . PHP_EOL;
     }
 }
