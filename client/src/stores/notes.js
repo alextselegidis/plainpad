@@ -91,20 +91,22 @@ class NotesStore {
     window.scrollTo(0, 0);
   }
 
-  async refresh() {
-    const localNote = await storage.table('notes').getItem(this.id);
+  // TODO: Ensure that the following method is not required and then remove it
 
-    if (!localNote) {
-      application.warning(translate('notes.notFoundOrNotSynced'));
-      return;
-    }
-
-    this.title = localNote.title;
-    this.content = localNote.content;
-    this.pinned = localNote.pinned;
-    this.createdAt = localNote.created_at;
-    this.updatedAt = localNote.updated_at;
-  }
+  // async refresh() {
+  //   const localNote = await storage.table('notes').getItem(this.id);
+  //
+  //   if (!localNote) {
+  //     application.warning(translate('notes.notFoundOrNotSynced'));
+  //     return;
+  //   }
+  //
+  //   this.title = localNote.title;
+  //   this.content = localNote.content;
+  //   this.pinned = localNote.pinned;
+  //   this.createdAt = localNote.created_at;
+  //   this.updatedAt = localNote.updated_at;
+  // }
 
   async save() {
     let id = this.id;
@@ -461,7 +463,7 @@ class NotesStore {
           const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
           await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
           if (this.id === serverNote.id) {
-            await this.refresh();
+            // TODO: Add an icon that the currently selected note was changed on the server
           }
         } else if (serverChanged.isBefore(localChanged)) {
           await NotesHttpClient.update(localNote);
@@ -470,7 +472,7 @@ class NotesStore {
         const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
         await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
         if (this.id === serverNote.id) {
-          await this.refresh();
+          // TODO: Add an icon that the currently selected note was changed on the server
         }
       }
     }
