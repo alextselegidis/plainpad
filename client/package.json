@@ -39,7 +39,8 @@
     "spin.js": "^4.1.0",
     "sweetalert2": "^9.8.2",
     "toastr": "^2.1.4",
-    "uuid": "^7.0.3"
+    "uuid": "^7.0.3",
+    "workbox-webpack-plugin": "^7.1.0"
   },
   "devDependencies": {
     "react-scripts": "^5.0.1"
