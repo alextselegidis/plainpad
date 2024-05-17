@@ -21,6 +21,7 @@ import enUS from './en-US';
 import deDE from './de-DE';
 import frFR from './fr-FR';
 import svSE from './sv-SE';
+import zhCN from './zh-CN';
 import account from '../stores/account';
 import {createIntl} from 'react-intl';
 
@@ -28,7 +29,8 @@ const messages = {
   'en-US': flatten(enUS),
   'de-DE': flatten(deDE),
   'fr-FR': flatten(frFR),
-  'sv-SE': flatten(svSE)
+  'sv-SE': flatten(svSE),
+  'zh-CN': flatten(zhCN)
 };
 
 let intl = null;
