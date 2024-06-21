@@ -6,7 +6,7 @@ environments and without locking into any platform or language.
 
 Run `docker-compose up -d` to start the environment. 
 
-You will need modify the root `.env` so that it matches the following example: 
+You will need modify the server's `.env` so that it matches the following example: 
 
 ``` 
 # This value is the name of your application. This value is used when the
