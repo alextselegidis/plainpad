@@ -2,18 +2,18 @@
 
 echo "Reset Build Directory"
 
-rm -rf build/ build.zip
+rm -rf build/ build.zip || true
 mkdir build/
 
 echo "Bundle Server"
 
 cp -r server/** build/
 cp server/.env.example build/
-rm server/storage/**/*.log
-rm server/storage/framework/**/*.php
-rm -rf build/tests/
-rm -rf build/vendor/
-rm build/phpunit.xml
+rm server/storage/**/*.log || true
+rm server/storage/framework/**/*.php || true
+rm -rf build/tests/ || true
+rm -rf build/vendor/ || true
+rm build/phpunit.xml || true
 cd build
 composer install --no-ansi --no-dev --no-interaction --no-progress --no-scripts --optimize-autoloader
 composer dumpautoload
