@@ -1,6 +1,7 @@
-/.idea
-/build
-/docker/mysql/*
-!/docker/mysql/.gitkeep
+/.idea/
+/build/
+/docker/**
+!/docker/nginx/
+!/docker/php-fpm/
 .DS_Store
 *.zip
