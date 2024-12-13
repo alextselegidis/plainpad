@@ -60,7 +60,7 @@ class About extends Component {
                 </p>
 
                 <div className="mb-2">
-                  <a href="https://alextselegidis.com/get/plainpad" target="_blank" rel="noopener noreferrer">
+                  <a href="https://plainpad.org" target="_blank" rel="noopener noreferrer">
                     <Button className="btn-yahoo btn-brand d-block mb-4 d-sm-inline-block mb-sm-0 mr-sm-4">
                       <i className="fa fa-globe"/>
                       <span>Website</span>
