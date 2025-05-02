@@ -18,7 +18,7 @@
     "enzyme-adapter-react-16": "^1.14.0",
     "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",
-    "http-proxy-middleware": "^3.0.3",
+    "http-proxy-middleware": "^3.0.5",
     "localforage": "^1.7.3",
     "mobx": "^5.14.2",
     "mobx-react": "^6.1.4",
