@@ -3,7 +3,7 @@
 /*
   Plainpad - Self Hosted Note Taking App
 
-  Copyright (C) 2020 Alex Tselegidis - https://alextselegidis.com
+  Copyright (C) Alex Tselegidis - https://alextselegidis.com
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@
 */
 
 return [
-    'registration' => '×¢²á',
-    'registrationMessage' => '¸ÐÐ»ÄúÔÚ :url ÉÏ´´½¨ÕÊ»§£¬ÇëÊ¹ÓÃÄúµÄÆ¾¾ÝµÇÂ¼¡£',
-    'resetPassword' => 'ÖØÖÃÄúµÄÃÜÂë',
-    'resetPasswordMessage' => 'Ê¹ÓÃÒÔÏÂÃÜÂëµÇÂ¼ÄúµÄÕÊ»§£¬Çë¾¡¿ìµÇÂ¼ºó¸ü¸ÄÄúµÄÃÜÂë¡£',
-    'resetPasswordPreheader' => '´ËÓÊ¼þ°üº¬ÄúµÄÐÂÃÜÂë¡£ÇëÊ¹ÓÃËüµÇÂ¼²¢ÎªÄúµÄÕÊ»§ÉèÖÃÒ»¸öÐÂÃÜÂë¡£',
+    'registration' => '×¢ï¿½ï¿½',
+    'registrationMessage' => 'ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ :url ï¿½Ï´ï¿½ï¿½ï¿½ï¿½Ê»ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¾ï¿½Ýµï¿½Â¼ï¿½ï¿½',
+    'resetPassword' => 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',
+    'resetPasswordMessage' => 'Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ê»ï¿½ï¿½ï¿½ï¿½ë¾¡ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë¡£',
+    'resetPasswordPreheader' => 'ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë¡£ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½Ê»ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë¡£',
 ];
