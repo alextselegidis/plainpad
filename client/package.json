@@ -37,7 +37,7 @@
     "reactstrap": "^8.0.0",
     "simple-line-icons": "^2.4.1",
     "spin.js": "^4.1.0",
-    "sweetalert2": "^9.8.2",
+    "sweetalert2": "^10.0.0",
     "toastr": "^2.1.4",
     "uuid": "^7.0.3",
     "workbox-webpack-plugin": "^7.1.0"
