@@ -26,6 +26,50 @@ class Notes extends Component {
   textarea = null;
   scrollY = null;
 
+  constructor(props) {
+    super(props);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+  }
+
+  handleKeyDown(event) {
+    // preserve previous behavior
+    this.scrollY = window.scrollY;
+
+    // Handle Tab key: insert 4 spaces at cursor position or replace selection
+    if (event.key === 'Tab' || event.keyCode === 9) {
+      event.preventDefault();
+
+      const ta = this.textarea;
+      const { notes } = this.props;
+
+      if (!ta) {
+        return;
+      }
+
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const value = ta.value || '';
+      const insert = '    ';
+
+      const newValue = value.substring(0, start) + insert + value.substring(end);
+
+      // Update the store (which will update the textarea value)
+      notes.updateContent(newValue);
+
+      // Restore caret position after DOM update
+      setTimeout(() => {
+        try {
+          if (ta.setSelectionRange) {
+            const pos = start + insert.length;
+            ta.setSelectionRange(pos, pos);
+          }
+        } catch (e) {
+          // ignore if unable to set selection
+        }
+      }, 0);
+    }
+  }
+
   componentDidMount() {
     const {
       account,
@@ -93,7 +137,7 @@ class Notes extends Component {
           ref={(tag) => this.textarea = tag}
           className={`note-content ${user.line === 'full' ? 'full-line' : 'narrow-line'}`}
           value={content}
-          onKeyDown={() => this.scrollY = window.scrollY}
+          onKeyDown={this.handleKeyDown}
           onChange={(event) => notes.updateContent(event.target.value)}
           onHeightChange={(height) => notes.applyScrollFix(this.textarea, this.scrollY, height)}
         />
