@@ -4,7 +4,7 @@
 
 ### Added
 
-- Add support for PHP 8.2+ (#64)
+- Add support for PHP 8.2+ / upgrade to Laravel 12 (#64)
 - Make sure that the tab title has the note title (#105)
 - Add tab key press support (insert 4 spaces) (#63)
 - Add character count to note editor (-)
