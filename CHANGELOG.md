@@ -1,5 +1,12 @@
 # Release Notes 
 
+## [Unreleased]
+
+### Added
+
+- Add support for PHP 8.2+ (#64)
+
+
 ## [1.0.0] - 2024-12-13 
 
 This is the first release including the initial set of features for the app. Multiple

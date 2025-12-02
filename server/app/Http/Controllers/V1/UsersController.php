@@ -36,7 +36,7 @@ class UsersController extends Controller
 {
     public function create(Request $request)
     {
-        $this->validate($request, [
+        $request->validate( [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users|max:255',
             'password' => 'required|string',
@@ -67,7 +67,7 @@ class UsersController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $this->validate($request, [
+        $request->validate( [
             'name' => 'required|string|max:255',
             'email' => 'string|email|max:255',
             'password' => 'string|nullable',
@@ -181,7 +181,7 @@ class UsersController extends Controller
 
     public function recoverPassword(Request $request)
     {
-        $this->validate($request, [
+        $request->validate( [
             'email' => 'required|string|email',
         ]);
 

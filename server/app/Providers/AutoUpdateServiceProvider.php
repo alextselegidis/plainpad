@@ -10,10 +10,8 @@ class AutoUpdateServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->singleton(AutoUpdateService::class, function ($app) {
             $autoUpdateService = new AutoUpdateService(base_path('storage/updates/'), base_path(), 60);
@@ -27,10 +25,8 @@ class AutoUpdateServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         //
     }

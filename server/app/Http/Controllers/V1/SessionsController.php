@@ -32,7 +32,7 @@ class SessionsController extends Controller
 {
     public function create(Request $request)
     {
-        $this->validate($request, [
+        $request->validate( [
             'email' => 'required|email|string',
             'password' => 'required|string',
         ]);

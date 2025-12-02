@@ -34,7 +34,7 @@ class NotesController extends Controller
 {
     public function create(Request $request)
     {
-        $this->validate($request, [
+        $request->validate( [
             'title' => 'required|string',
             'content' => 'required|string',
             'pinned' => 'required|boolean'
@@ -53,7 +53,7 @@ class NotesController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $this->validate($request, [
+        $request->validate( [
             'title' => 'required|string',
             'content' => 'required|string',
             'pinned' => 'required|boolean'
@@ -157,7 +157,7 @@ class NotesController extends Controller
 
     public function pinned(Request $request, string $id)
     {
-        $this->validate($request, [
+        $request->validate( [
             'pinned' => 'required|boolean'
         ]);
 

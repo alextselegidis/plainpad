@@ -21,7 +21,7 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
@@ -36,22 +36,37 @@ class User extends Authenticatable
         'encrypt',
     ];
 
+    /**
+     * The attributes that should be guarded.
+     *
+     * @var array<int, string>
+     */
     protected $guarded = [
         'created_at',
         'updated_at'
     ];
 
-    protected $casts = [
-        'encrypt' => 'boolean',
-        'admin' => 'boolean'
-    ];
-
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'encrypt' => 'boolean',
+            'admin' => 'boolean',
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
 }
