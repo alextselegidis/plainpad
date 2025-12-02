@@ -59,7 +59,13 @@ class Notes extends Component {
   }
 
   componentWillUnmount() {
+    // Reset notes state
     this.props.notes.reset();
+
+    // Ensure we're in a browser environment before touching document
+    if (typeof document !== 'undefined' && document && document.title !== undefined) {
+      document.title = 'Plainpad';
+    }
   }
 
   render() {

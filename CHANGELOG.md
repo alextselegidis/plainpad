@@ -5,6 +5,7 @@
 ### Added
 
 - Add support for PHP 8.2+ (#64)
+- Make sure that the tab title has the note title (#105)
 
 
 ## [1.0.0] - 2024-12-13 

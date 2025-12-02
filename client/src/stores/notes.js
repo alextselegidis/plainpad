@@ -89,6 +89,13 @@ class NotesStore {
     this.updatedAt = localNote.updated_at;
 
     window.scrollTo(0, 0);
+
+    // Update browser title to first 40 chars of the title (with ellipsis if longer) plus " | Plainpad"
+    if (typeof document !== 'undefined' && document && document.title !== undefined) {
+      const rawTitle = this.title || '';
+      const display = rawTitle.length > 40 ? rawTitle.substring(0, 40) + '...' : rawTitle;
+      document.title = (display ? display + ' | ' : '') + 'Plainpad';
+    }
   }
 
   // TODO: Ensure that the following method is not required and then remove it
@@ -262,6 +269,11 @@ class NotesStore {
     this.pinned = '';
     this.createdAt = null;
     this.updatedAt = null;
+
+    // Reset browser title when notes reset
+    if (typeof document !== 'undefined' && document && document.title !== undefined) {
+      document.title = 'Plainpad';
+    }
   }
 
   empty() {
