@@ -8,6 +8,7 @@
 - Make sure that the tab title has the note title (#105)
 - Add tab key press support (insert 4 spaces) (#63)
 - Add character count to note editor (-)
+- Add right click custom context menu for the note editor (#53)
 
 
 ## [1.0.0] - 2024-12-13 

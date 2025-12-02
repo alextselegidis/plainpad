@@ -21,14 +21,47 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import TextareaAutosize from 'react-textarea-autosize';
 import WelcomeMessage from './WelcomeMessage';
+import NoteContextMenu from './NoteContextMenu';
 
 class Notes extends Component {
-  textarea = null;
   scrollY = null;
 
   constructor(props) {
     super(props);
+    this.textarea = React.createRef();
+    this.state = {
+      contextMenu: {
+        visible: false,
+        x: 0,
+        y: 0
+      }
+    };
+    this.allowNativeContextMenu = false;
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleContextMenu = this.handleContextMenu.bind(this);
+    this.hideContextMenu = this.hideContextMenu.bind(this);
+    this.handleShowNativeMenu = this.handleShowNativeMenu.bind(this);
+  }
+
+  handleShowNativeMenu() {
+    // Set flag to allow native context menu on next right-click
+    this.allowNativeContextMenu = true;
+
+    // Focus the textarea and trigger a programmatic right-click
+    if (this.textarea.current) {
+      const textareaElement = this.textarea.current;
+      textareaElement.focus();
+
+      // Trigger a native context menu event
+      const contextMenuEvent = new MouseEvent('contextmenu', {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        button: 2
+      });
+
+      textareaElement.dispatchEvent(contextMenuEvent);
+    }
   }
 
   handleKeyDown(event) {
@@ -39,7 +72,7 @@ class Notes extends Component {
     if (event.key === 'Tab' || event.keyCode === 9) {
       event.preventDefault();
 
-      const ta = this.textarea;
+      const ta = this.textarea.current;
       const { notes } = this.props;
 
       if (!ta) {
@@ -70,6 +103,35 @@ class Notes extends Component {
     }
   }
 
+  handleContextMenu(event) {
+    // Allow native context menu if flag is set
+    if (this.allowNativeContextMenu) {
+      this.allowNativeContextMenu = false;
+      return;
+    }
+
+    event.preventDefault();
+
+    this.setState({
+      contextMenu: {
+        visible: true,
+        x: event.clientX,
+        y: event.clientY
+      }
+    });
+  }
+
+  hideContextMenu() {
+    this.setState({
+      contextMenu: {
+        visible: false,
+        x: 0,
+        y: 0
+      }
+    });
+  }
+
+
   componentDidMount() {
     const {
       account,
@@ -86,6 +148,9 @@ class Notes extends Component {
     if (id) {
       notes.select(id);
     }
+
+    // Add click listener to hide context menu when clicking outside
+    document.addEventListener('click', this.hideContextMenu);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -110,6 +175,9 @@ class Notes extends Component {
     if (typeof document !== 'undefined' && document && document.title !== undefined) {
       document.title = 'Plainpad';
     }
+
+    // Clean up event listener
+    document.removeEventListener('click', this.hideContextMenu);
   }
 
   render() {
@@ -121,6 +189,7 @@ class Notes extends Component {
     const {
       id,
       content,
+      pinned
     } = notes;
 
     if (!id && !content) {
@@ -131,15 +200,30 @@ class Notes extends Component {
       user
     } = account;
 
+    const { contextMenu } = this.state;
+
     return (
       <div className="animated fadeIn h-100 py-2">
         <TextareaAutosize
-          ref={(tag) => this.textarea = tag}
+          ref={this.textarea}
           className={`note-content ${user.line === 'full' ? 'full-line' : 'narrow-line'}`}
           value={content}
           onKeyDown={this.handleKeyDown}
+          onContextMenu={this.handleContextMenu}
           onChange={(event) => notes.updateContent(event.target.value)}
-          onHeightChange={(height) => notes.applyScrollFix(this.textarea, this.scrollY, height)}
+          onHeightChange={(height) => notes.applyScrollFix(this.textarea.current, this.scrollY, height)}
+        />
+
+        <NoteContextMenu
+          visible={contextMenu.visible}
+          x={contextMenu.x}
+          y={contextMenu.y}
+          textareaRef={this.textarea}
+          notes={notes}
+          pinned={pinned}
+          onClose={this.hideContextMenu}
+          onContentUpdate={(newValue) => notes.updateContent(newValue)}
+          onShowNativeMenu={this.handleShowNativeMenu}
         />
       </div>
     );
