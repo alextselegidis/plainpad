@@ -34,9 +34,9 @@ class Notes extends Component {
         visible: false,
         x: 0,
         y: 0
-      }
+      },
+      disableCustomMenu: false
     };
-    this.allowNativeContextMenu = false;
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleContextMenu = this.handleContextMenu.bind(this);
     this.hideContextMenu = this.hideContextMenu.bind(this);
@@ -44,24 +44,13 @@ class Notes extends Component {
   }
 
   handleShowNativeMenu() {
-    // Set flag to allow native context menu on next right-click
-    this.allowNativeContextMenu = true;
-
-    // Focus the textarea and trigger a programmatic right-click
-    if (this.textarea.current) {
-      const textareaElement = this.textarea.current;
-      textareaElement.focus();
-
-      // Trigger a native context menu event
-      const contextMenuEvent = new MouseEvent('contextmenu', {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-        button: 2
-      });
-
-      textareaElement.dispatchEvent(contextMenuEvent);
-    }
+    // Disable custom menu and allow native menu on next right-click
+    this.setState({ disableCustomMenu: true }, () => {
+      // Focus the textarea
+      if (this.textarea.current) {
+        this.textarea.current.focus();
+      }
+    });
   }
 
   handleKeyDown(event) {
@@ -104,9 +93,12 @@ class Notes extends Component {
   }
 
   handleContextMenu(event) {
-    // Allow native context menu if flag is set
-    if (this.allowNativeContextMenu) {
-      this.allowNativeContextMenu = false;
+    // Allow native context menu if disabled flag is set
+    if (this.state.disableCustomMenu) {
+      // Re-enable custom menu after this event
+      setTimeout(() => {
+        this.setState({ disableCustomMenu: false });
+      }, 100);
       return;
     }
 

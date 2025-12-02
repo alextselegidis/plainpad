@@ -101,7 +101,7 @@ class NoteContextMenu extends Component {
   }
 
   handleShowOriginalMenu() {
-    const { textareaRef, onClose, onShowNativeMenu } = this.props;
+    const { onClose, onShowNativeMenu } = this.props;
     onClose();
     onShowNativeMenu();
   }
@@ -254,9 +254,10 @@ class NoteContextMenu extends Component {
           }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+          title="Right-click again to see the browser menu"
         >
           <i className="fa fa-ellipsis-h mr-2"></i>
-          Show Original Menu
+          Show Browser Menu
         </div>
       </div>
     );
