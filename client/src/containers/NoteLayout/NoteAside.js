@@ -39,6 +39,7 @@ class NoteAside extends Component {
       createdAt,
       updatedAt,
       pinned,
+      content,
     } = this.props.notes;
 
     if (!id) {
@@ -69,6 +70,16 @@ class NoteAside extends Component {
             <FormattedMessage id="notes.modified"/>
           </strong>
           {moment(updatedAt).format('MMM DD, YYYY')}
+        </p>
+
+        <div className="mb-4 border-bottom" />
+
+        {/* Characters count for the currently displayed note */}
+        <p className="mb-4">
+          <strong className="mr-2">
+            <FormattedMessage id="notes.characters" />
+          </strong>
+          {content ? content.length : 0}
         </p>
 
         <div className="mb-4 border-bottom" />

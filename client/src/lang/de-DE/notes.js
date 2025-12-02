@@ -38,6 +38,7 @@ export default {
   add: 'hinzufügen',
   created: 'Erstellt',
   modified: 'Angepasst',
+  characters: 'Zeichen',
   selectNote: 'Notiz Auswählen',
   selectNoteInformation: 'Diese Anzeige zeigt nützliche Informationen und Aktionen an, sobald Sie eine Notiz aus der Notizliste auswählen.',
   welcome: 'Willkommen!',

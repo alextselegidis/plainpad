@@ -38,6 +38,7 @@ export default {
   add: 'Lägg till',
   created: 'Skapad',
   modified: 'Ändrad',
+  characters: 'Tecken',
   selectNote: 'Välj en anteckning',
   selectNoteInformation: 'Panelen kommer att visa användbar information och alternativ när du valt en anteckning från listan.',
   welcome: 'Välkommen!',

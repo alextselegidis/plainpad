@@ -38,6 +38,7 @@ export default {
   add: '添加',
   created: '创建于',
   modified: '修改于',
+  characters: '字符',
   selectNote: '选择笔记',
   selectNoteInformation: '从注释列表中选择注释后，此面板将显示有用的信息和操作',
   welcome: '欢迎使用!',

@@ -38,6 +38,7 @@ export default {
   add: 'Add',
   created: 'Created',
   modified: 'Modified',
+  characters: 'Characters',
   selectNote: 'Select A Note',
   selectNoteInformation: 'This panel will display useful information and actions once you select a note from the note list.',
   welcome: 'Welcome!',

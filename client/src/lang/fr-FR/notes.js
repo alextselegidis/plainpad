@@ -38,6 +38,7 @@ export default {
   add: 'Ajouter',
   created: 'Créé',
   modified: 'Modifié',
+  characters: 'Caractères',
   selectNote: 'Sélectionnez une note',
   selectNoteInformation: 'Ce panneau affichera des informations et des actions utiles une fois que vous aurez sélectionné une note dans la liste des notes.',
   welcome: 'Bienvenu·e!',
