@@ -36,12 +36,29 @@ class NotesStore {
   syncTimeout = null;
   noteList = [];
   id = null;
-  title = '';
+  _title = '';
   content = '';
   pinned = false;
   createdAt = null;
   updatedAt = null;
   syncErrors = 0;
+
+  get title() {
+    return this._title;
+  }
+
+  set title(value) {
+    this._title = value;
+    this.updateDocumentTitle(value);
+  }
+
+  updateDocumentTitle(title) {
+    if (typeof document !== 'undefined' && document && document.title !== undefined) {
+      const rawTitle = title || '';
+      const display = rawTitle.length > 40 ? rawTitle.substring(0, 40) + '...' : rawTitle;
+      document.title = (display ? display + ' | ' : '') + 'Plainpad';
+    }
+  }
 
   async list() {
     const localNotes = [];
@@ -89,13 +106,6 @@ class NotesStore {
     this.updatedAt = localNote.updated_at;
 
     window.scrollTo(0, 0);
-
-    // Update browser title to first 40 chars of the title (with ellipsis if longer) plus " | Plainpad"
-    if (typeof document !== 'undefined' && document && document.title !== undefined) {
-      const rawTitle = this.title || '';
-      const display = rawTitle.length > 40 ? rawTitle.substring(0, 40) + '...' : rawTitle;
-      document.title = (display ? display + ' | ' : '') + 'Plainpad';
-    }
   }
 
   // TODO: Ensure that the following method is not required and then remove it
@@ -580,7 +590,7 @@ decorate(NotesStore, {
   sort: observable,
   noteList: observable,
   id: observable,
-  title: observable,
+  _title: observable,
   content: observable,
   pinned: observable,
   createdAt: observable,
