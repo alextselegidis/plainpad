@@ -392,7 +392,7 @@
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                         <tr>
                             <td class="content-block powered-by">
-                                Powered by <a href="https://alextselegidis.com/get/plainpad">Plainpad</a>
+                                Powered by <a href="https://plainpad.org">Plainpad</a>
                             </td>
                         </tr>
                     </table>

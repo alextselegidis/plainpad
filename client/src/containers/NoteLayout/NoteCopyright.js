@@ -30,7 +30,7 @@ class NoteCopyright extends React.Component {
           <Col>
             <small>
               <img src={appLogo} alt="App Logo" className="mr-2 mt-1 float-left d-inline-block"/>
-              <a href="https://alextselegidis.com/get/plainpad" target="_blank" rel="noopener noreferrer">Plainpad</a> {process.env.REACT_APP_VERSION} <br/>
+              <a href="https://plainpad.org" target="_blank" rel="noopener noreferrer">Plainpad</a> {process.env.REACT_APP_VERSION} <br/>
               Licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank" rel="noopener noreferrer">GPL-3.0</a>
             </small>
           </Col>

@@ -1,6 +1,6 @@
 <h1 align="center">
     <br>
-    <a href="https://alextselegidis.com/get/plainpad">
+    <a href="https://plainpad.org">
         <img src="https://raw.githubusercontent.com/alextselegidis/plainpad/master/logo.png" alt="Plainpad" width="200">
     </a>
     <br>
@@ -13,7 +13,7 @@
 </h4>
 
 <h4 align="center">
-    <a href="https://alextselegidis.com/get/plainpad">alextselegidis.com/get/plainpad</a>
+    <a href="https://plainpad.org</a>
 </h4>
 
 <p align="center">
