@@ -35,13 +35,9 @@
 Driven by simplicity and stability in mind, Plainpad offers great potential at no cost. Become the owner of 
 your data as Plainpad will nicely run on your own server. 
 
-**IMPORTANT: Book the free Plainpad Installation Service now and have the project maintainer install Plainpad on your 
-own server for free!** [[Drop a message to info@alextselegidis.com]](mailto:info@alextselegidis.com?subject=Plainpad%20Installation%20Service&body=I%20would%20like%20to%20book%20the%20Plainpad%20Installation%20Service.) 
-
 ## Setup
 
-To clone and run this application, you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) 
-(which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
+To clone and run this application, you'll need Docker installed on your computer. From your command line:
 
 ```bash
 # Clone this repository
@@ -54,8 +50,7 @@ $ cd plainpad
 $ docker compose up -d
 ```
 
-Note: If you're using Linux Bash for Windows, [see this guide](https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/) or use `node` from the command prompt.
-
+Note: the current setup works with Windows and WSL & Docker.
 
 ## License 
 
