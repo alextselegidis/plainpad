@@ -109,8 +109,8 @@ class NotesController extends Controller
         $filter = $request->input('filter');
         $sort = $request->input('sort') ?? 'title';
         $direction = $request->input('direction') ?? 'asc';
-        $page = $request->input('page') ?? 1;
-        $length = $request->input('length') ?? 1000;
+        $page = $request->input('page');
+        $length = $request->input('length');
         $fields = $request->input('fields') ? array_intersect($defaultFields, explode(',', $request->input('fields'))) : $defaultFields;
 
         $user = Auth::user();
@@ -123,19 +123,23 @@ class NotesController extends Controller
                     return true;
                 }
 
-                return stripos($note->title, $filter) !== false || stripos($note->content, $filter);
+                return stripos($note->title, $filter) !== false || stripos($note->content, $filter) !== false;
             })
             ->map(function($note) {
                 return $note->id;
             });
 
-        $notes = Note::whereIn('id', $occurrences)
+        $query = Note::whereIn('id', $occurrences)
             ->where('user_id', $user->id)
             ->select(...$fields)
-            ->orderBy($sort, $direction)
-            ->limit($length)
-            ->offset(($page - 1) * $length)
-            ->get();
+            ->orderBy($sort, $direction);
+
+        if ($length) {
+            $query->limit($length);
+            $query->offset((($page ?? 1) - 1) * $length);
+        }
+
+        $notes = $query->get();
 
         return response()->json($notes);
     }
