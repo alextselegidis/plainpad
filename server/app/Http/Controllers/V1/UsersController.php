@@ -195,18 +195,17 @@ class UsersController extends Controller
 
         $user = User::where('email', $request->input('email'))->first();
 
-        if (!$user) {
-            return response('', 404);
+        if ($user) {
+            App::setLocale($user->locale);
+
+            $password = Str::random(32);
+            $user->password = Hash::make($password);
+            $user->save();
+
+            Mail::to($user)->send(new PasswordRecovered($password));
         }
 
-        App::setLocale($user->locale);
-
-        $password = Str::random(32);
-        $user->password = Hash::make($password);
-        $user->save();
-
-        Mail::to($user)->send(new PasswordRecovered($password));
-
+        // Always return 200 regardless of whether the email exists, to prevent account enumeration.
         return response('', 200);
     }
 }

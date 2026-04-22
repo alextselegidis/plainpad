@@ -30,7 +30,7 @@ Route::group([
     Route::delete('sessions/{token}', [SessionsController::class, 'delete']);
 
     // Users
-    Route::post('users/recovery', [UsersController::class, 'recoverPassword']);
+    Route::post('users/recovery', [UsersController::class, 'recoverPassword'])->middleware('throttle:5,15');
 
     Route::group([
         'middleware' => 'auth'
