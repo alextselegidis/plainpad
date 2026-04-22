@@ -86,7 +86,9 @@ class UsersController extends Controller
             return response('', 401);
         }
 
-        if (!$user->admin && $user->id !== $id) {
+        $authUser = Auth::user();
+
+        if (!$authUser->admin && $authUser->id !== $user->id) {
             return response('', 401);
         }
 
@@ -101,7 +103,11 @@ class UsersController extends Controller
         $user->sort = $request->input('sort') ?? $user->sort;
         $user->theme = $request->input('theme') ?? $user->theme;
         $user->encrypt = $request->input('encrypt') ?? $user->encrypt;
-        $user->admin = $request->input('admin');
+
+        if ($authUser->admin) {
+            $user->admin = (bool)$request->input('admin');
+        }
+
         $user->save();
 
         Auth::user()->encrypt = $user->encrypt;
@@ -172,7 +178,9 @@ class UsersController extends Controller
             return response('', 404);
         }
 
-        if (!$user->admin && $user->id !== $id) {
+        $authUser = Auth::user();
+
+        if (!$authUser->admin && $authUser->id !== $user->id) {
             return response('', 401);
         }
 

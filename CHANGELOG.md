@@ -1,5 +1,11 @@
 # Release Notes 
 
+## [Unreleased]
+
+### Security
+
+- Fix privilege-escalation vulnerability allowing any authenticated user to grant themselves admin (#138)
+
 ## [1.1.0] - 2026-02-03
 
 ### Added
