@@ -153,8 +153,8 @@ class UsersController extends Controller
         ];
 
         $filter = '%' . $request->input('filter') . '%';
-        $sort = $request->input('sort') ?? 'name';
-        $direction = $request->input('direction') ?? 'asc';
+        $sort = in_array($request->input('sort'), $defaultFields, true) ? $request->input('sort') : 'name';
+        $direction = strtolower($request->input('direction')) === 'desc' ? 'desc' : 'asc';
         $page = $request->input('page') ?? 1;
         $length = $request->input('length') ?? 1000;
         $fields = $request->input('fields') ? array_intersect($defaultFields, explode(',', $request->input('fields'))) : $defaultFields;

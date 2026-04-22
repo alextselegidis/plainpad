@@ -107,8 +107,8 @@ class NotesController extends Controller
         ];
 
         $filter = $request->input('filter');
-        $sort = $request->input('sort') ?? 'title';
-        $direction = $request->input('direction') ?? 'asc';
+        $sort = in_array($request->input('sort'), $defaultFields, true) ? $request->input('sort') : 'title';
+        $direction = strtolower($request->input('direction')) === 'desc' ? 'desc' : 'asc';
         $page = $request->input('page');
         $length = $request->input('length');
         $fields = $request->input('fields') ? array_intersect($defaultFields, explode(',', $request->input('fields'))) : $defaultFields;

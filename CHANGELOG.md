@@ -6,6 +6,7 @@
 
 - Fix privilege-escalation vulnerability allowing any authenticated user to grant themselves admin (#138)
 - Prevent account enumeration and unauthenticated account-lockout abuse on the password recovery endpoint
+- Whitelist sortable columns and sort direction on user and note list endpoints to prevent unsafe `ORDER BY` input
 
 ## [1.1.0] - 2026-02-03
 
