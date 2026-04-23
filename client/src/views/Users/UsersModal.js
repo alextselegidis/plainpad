@@ -67,7 +67,7 @@ class UsersModal extends Component {
               <Label>
                 <FormattedMessage id="users.name"/>
               </Label>
-              <Input value={name}
+              <Input value={name} required
                      onChange={(event) => users.name = event.target.value}/>
             </FormGroup>
 
@@ -75,7 +75,7 @@ class UsersModal extends Component {
               <Label>
                 <FormattedMessage id="users.email"/>
               </Label>
-              <Input type="email" value={email}
+              <Input type="email" value={email} required
                      onChange={(event) => users.email = event.target.value}/>
             </FormGroup>
 
@@ -83,7 +83,7 @@ class UsersModal extends Component {
               <Label>
                 <FormattedMessage id="users.password"/>
               </Label>
-              <Input type="password" value={password} autoComplete="new-password"
+              <Input type="password" value={password} autoComplete="new-password" required={mode === 'add'}
                      onChange={(event) => users.password = event.target.value}/>
             </FormGroup>
 
@@ -91,7 +91,7 @@ class UsersModal extends Component {
               <Label>
                 <FormattedMessage id="users.passwordConfirmation"/>
               </Label>
-              <Input type="password" value={passwordConfirmation}
+              <Input type="password" value={passwordConfirmation} required={mode === 'add' || !!password}
                      onChange={(event) => users.passwordConfirmation = event.target.value}/>
             </FormGroup>
 

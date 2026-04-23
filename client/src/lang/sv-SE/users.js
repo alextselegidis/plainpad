@@ -40,6 +40,10 @@ export default {
   search: 'Sök',
   emailAlreadyInUse: 'E-postadressen används redan, vänligen ange en annan e-postadress.',
   passwordsMismatch: 'Lösenorden matchar inte, vänligen försök igen.',
+  nameRequired: 'Namn krävs, vänligen ange ett värde.',
+  emailRequired: 'E-post krävs, vänligen ange ett värde.',
+  emailInvalid: 'E-postadressen är ogiltig, vänligen ange en giltig e-postadress.',
+  passwordRequired: 'Lösenord krävs för nya användare, vänligen ange ett värde.',
   listFailure: 'Det gick inte att visa användare, vänligen försök igen.',
   filterUsers: 'Filtrera användare',
 }

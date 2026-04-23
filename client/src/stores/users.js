@@ -70,6 +70,27 @@ class UsersStore {
 
   async save() {
     try {
+      if (!this.name || !this.name.trim()) {
+        application.error(translate('users.nameRequired'));
+        return;
+      }
+
+      if (!this.email || !this.email.trim()) {
+        application.error(translate('users.emailRequired'));
+        return;
+      }
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(this.email.trim())) {
+        application.error(translate('users.emailInvalid'));
+        return;
+      }
+
+      if (!this.id && !this.password) {
+        application.error(translate('users.passwordRequired'));
+        return;
+      }
+
       if (this.password && this.password !== this.passwordConfirmation) {
         application.error(translate('users.passwordsMismatch'));
         return;

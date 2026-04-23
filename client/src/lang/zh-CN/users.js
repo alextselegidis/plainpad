@@ -40,6 +40,10 @@ export default {
   search: '搜索',
   emailAlreadyInUse: '该邮箱已被使用，请更换其他邮箱',
   passwordsMismatch: '密码不匹配，请重试',
+  nameRequired: '请输入昵称',
+  emailRequired: '请输入邮箱',
+  emailInvalid: '邮箱格式无效，请输入有效的邮箱',
+  passwordRequired: '新用户必须设置密码，请输入密码',
   listFailure: '列出用户失败，请重试',
   filterUsers: '查找用户',
 }

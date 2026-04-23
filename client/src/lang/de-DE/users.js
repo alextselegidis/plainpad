@@ -40,6 +40,10 @@ export default {
   search: 'suchen',
   emailAlreadyInUse: 'Die E-Mail-Adresse ist bereits in Gebrauch, bitte verwenden Sie eine andere.',
   passwordsMismatch: 'Die Passwörter stimmen nicht überein, bitte versuchen Sie es erneut.',
+  nameRequired: 'Der Name ist erforderlich, bitte geben Sie einen Wert ein.',
+  emailRequired: 'Die E-Mail ist erforderlich, bitte geben Sie einen Wert ein.',
+  emailInvalid: 'Die E-Mail-Adresse ist ungültig, bitte geben Sie eine gültige E-Mail an.',
+  passwordRequired: 'Das Passwort ist für neue Benutzer erforderlich, bitte geben Sie einen Wert ein.',
   listFailure: 'Benutzer konnten nicht aufgelistet werden, bitte versuchen Sie es erneut.',
   filterUsers: 'Benutzer filtern',
 }

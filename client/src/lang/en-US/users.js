@@ -40,6 +40,10 @@ export default {
   search: 'Search',
   emailAlreadyInUse: 'The email address is already in use, please use another one.',
   passwordsMismatch: 'The passwords mismatch, please try again.',
+  nameRequired: 'The name is required, please provide a value.',
+  emailRequired: 'The email is required, please provide a value.',
+  emailInvalid: 'The email address is invalid, please provide a valid email.',
+  passwordRequired: 'The password is required for new users, please provide a value.',
   listFailure: 'Users could not be listed, please try again.',
   filterUsers: 'Filter Users',
 }
