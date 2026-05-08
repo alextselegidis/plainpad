@@ -58,6 +58,25 @@ $ docker compose up -d
 
 Note: the current setup works with Windows and WSL & Docker.
 
+## Demo Data
+
+A standalone seeder is available to populate the database with realistic
+sample notes (medical-student study notes). It is **not** wired into the
+default `DatabaseSeeder` and must be run manually:
+
+```bash
+# From the server directory (or inside the app container)
+$ php artisan db:seed --class=DemoSeeder
+```
+
+The seeder creates a dedicated demo user the first time it runs:
+
+- Email: `med.student@example.org`
+- Password: `12345678`
+
+Re-running the command refreshes the demo user's notes without producing
+duplicates.
+
 ## License 
 
 Code Licensed Under [GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html) | Content Under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
