@@ -1,5 +1,10 @@
 <?php
 
+if (file_exists(__DIR__ . '/../.env')) {
+    http_response_code(404);
+    exit;
+}
+
 error_reporting(E_ALL);
 
 ini_set('display_errors', true);
