@@ -19,27 +19,23 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>
 */
 
-namespace App\Mail;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
-
-class PasswordRecovered extends Mailable
+return new class extends Migration
 {
-    use Queueable, SerializesModels;
-
-    public $resetUrl;
-
-    public function __construct(string $resetUrl)
+    public function up(): void
     {
-        $this->subject = 'Plainpad - ' . __('account.resetPassword');
-
-        $this->resetUrl = $resetUrl;
+        Schema::create('password_resets', function (Blueprint $table) {
+            $table->string('email')->index();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
     }
 
-    public function build()
+    public function down(): void
     {
-        return $this->view('emails.account.password-recovered');
+        Schema::dropIfExists('password_resets');
     }
-}
+};

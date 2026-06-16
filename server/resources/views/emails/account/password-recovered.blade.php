@@ -378,9 +378,11 @@
                                             @lang('account.resetPasswordMessage')
                                         </p>
 
-                                        <h6>
-                                            {{$password}}
-                                        </h6>
+                                        <p>
+                                            <a href="{{$resetUrl}}">@lang('account.resetPasswordLink')</a>
+                                        </p>
+
+                                        <p>@lang('account.resetPasswordExpiry')</p>
                                     </td>
                                 </tr>
                             </table>

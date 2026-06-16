@@ -23,6 +23,8 @@ return [
     'registration' => 'Registrering',
     'registrationMessage' => 'Tack för att du skapat ett konto på :url, använd dina kontouppgifter för att logga in.',
     'resetPassword' => 'Återställ ditt lösenord',
-    'resetPasswordMessage' => 'Använd detta lösenord för att logga in på ditt kontot, vänligen byt lösenordet när du har loggat in första gången.',
-    'resetPasswordPreheader' => 'Detta e-postmeddelande innehåller ditt nya lösenord för Plainpad. Använd det för att logga in och sätta ett nytt lösenord för kontot.',
+    'resetPasswordMessage' => 'Klicka på länken nedan för att återställa ditt Plainpad-lösenord. Om du inte begärde en lösenordsåterställning kan du ignorera detta e-postmeddelande.',
+    'resetPasswordLink' => 'Återställ lösenord',
+    'resetPasswordExpiry' => 'Denna länk upphör att gälla om 60 minuter.',
+    'resetPasswordPreheader' => 'Klicka på länken i detta e-postmeddelande för att återställa ditt Plainpad-lösenord.',
 ];

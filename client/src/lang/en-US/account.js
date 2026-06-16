@@ -22,8 +22,11 @@ export default {
   failedToLogIn: 'Something went wrong while logging you in, please try again.',
   successfullyLoggedOut: 'You have been successfully logged out!',
   failedToLogOut: 'Something went wrong while logging you out, please try again.',
-  successfullyRecoveredPassword: 'Your password has been successfully recovered! Check you emails for further instructions.',
+  successfullyRecoveredPassword: 'Password recovery email sent! Check your inbox for a reset link.',
   failedToRecoverPassword: 'Something went wrong while recovering your password, please try again.',
+  successfullyResetPassword: 'Your password has been reset successfully! You can now log in.',
+  failedToResetPassword: 'Something went wrong while resetting your password. The link may have expired.',
+  passwordsDoNotMatch: 'Passwords do not match, please try again.',
   invalidateSuccess: 'Cache got reset successfully.',
   sessionExpired: 'Your session has expired, please log in again.',
 }

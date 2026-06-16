@@ -28,6 +28,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -189,7 +190,7 @@ class UsersController extends Controller
 
     public function recoverPassword(Request $request)
     {
-        $request->validate( [
+        $request->validate([
             'email' => 'required|string|email',
         ]);
 
@@ -198,14 +199,57 @@ class UsersController extends Controller
         if ($user) {
             App::setLocale($user->locale);
 
-            $password = Str::random(32);
-            $user->password = Hash::make($password);
-            $user->save();
+            $token = Str::random(64);
 
-            Mail::to($user)->send(new PasswordRecovered($password));
+            DB::table('password_resets')->upsert(
+                ['email' => $user->email, 'token' => Hash::make($token), 'created_at' => now()],
+                ['email'],
+                ['token', 'created_at']
+            );
+
+            $resetUrl = config('app.url') . '/#/reset-password?email=' . urlencode($user->email) . '&token=' . urlencode($token);
+
+            Mail::to($user)->send(new PasswordRecovered($resetUrl));
         }
 
         // Always return 200 regardless of whether the email exists, to prevent account enumeration.
+        return response('', 200);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'token' => 'required|string',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $record = DB::table('password_resets')
+            ->where('email', $request->input('email'))
+            ->first();
+
+        if (!$record || !Hash::check($request->input('token'), $record->token)) {
+            return response()->json(['message' => 'Invalid or expired reset token.'], 422);
+        }
+
+        $expireMinutes = config('auth.passwords.users.expire', 60);
+
+        if (now()->diffInMinutes($record->created_at) > $expireMinutes) {
+            DB::table('password_resets')->where('email', $request->input('email'))->delete();
+            return response()->json(['message' => 'Invalid or expired reset token.'], 422);
+        }
+
+        $user = User::where('email', $request->input('email'))->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Invalid or expired reset token.'], 422);
+        }
+
+        $user->password = Hash::make($request->input('password'));
+        $user->save();
+
+        DB::table('password_resets')->where('email', $request->input('email'))->delete();
+
         return response('', 200);
     }
 }

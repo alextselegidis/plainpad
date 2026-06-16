@@ -22,7 +22,9 @@
 return [
     'registration' => 'ע��',
     'registrationMessage' => '��л���� :url �ϴ����ʻ�����ʹ������ƾ�ݵ�¼��',
-    'resetPassword' => '������������',
-    'resetPasswordMessage' => 'ʹ�����������¼�����ʻ����뾡���¼������������롣',
-    'resetPasswordPreheader' => '���ʼ��������������롣��ʹ������¼��Ϊ�����ʻ�����һ�������롣',
+    'resetPassword' => '重置密码',
+    'resetPasswordMessage' => '点击以下链接重置您的 Plainpad 账户密码。如果您没有请求重置密码，可以忽略此邮件。',
+    'resetPasswordLink' => '重置密码',
+    'resetPasswordExpiry' => '此链接将在 60 分钟后失效。',
+    'resetPasswordPreheader' => '点击邮件中的链接重置您的 Plainpad 账户密码。',
 ];

@@ -28,6 +28,7 @@ class AccountStore {
   session = null;
   user = null;
   passwordRecovered = false;
+  passwordReset = false;
 
   load(account) {
     if (!account) {
@@ -105,6 +106,22 @@ class AccountStore {
     }
   }
 
+  async resetPassword(email, token, password, confirm) {
+    if (password !== confirm) {
+      application.error(translate('account.passwordsDoNotMatch'));
+      return;
+    }
+
+    try {
+      await UsersHttpClient.resetPassword(email, token, password);
+      this.passwordReset = true;
+      application.success(translate('account.successfullyResetPassword'));
+    } catch (error) {
+      application.error(translate('account.failedToResetPassword'));
+      console.error(error);
+    }
+  }
+
   observeSessionExpiration() {
     if (!this.session || !navigator.onLine) {
       return;
@@ -126,6 +143,7 @@ class AccountStore {
 decorate(AccountStore, {
   user: observable,
   passwordRecovered: observable,
+  passwordReset: observable,
   session: observable,
 });
 

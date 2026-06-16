@@ -31,6 +31,7 @@ Route::group([
 
     // Users
     Route::post('users/recovery', [UsersController::class, 'recoverPassword'])->middleware('throttle:5,15');
+    Route::post('users/reset-password', [UsersController::class, 'resetPassword'])->middleware('throttle:5,15');
 
     Route::group([
         'middleware' => 'auth'

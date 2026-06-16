@@ -97,6 +97,20 @@ class UsersHttpClient {
 
     return HttpClient.request(method, url, data);
   }
+
+  static resetPassword(email, token, password) {
+    const method = 'POST';
+
+    const url = 'users/reset-password';
+
+    const data = {
+      email,
+      token,
+      password
+    };
+
+    return HttpClient.request(method, url, data);
+  }
 }
 
 export default UsersHttpClient;

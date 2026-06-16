@@ -23,6 +23,8 @@ return [
     'registration' => 'Registration',
     'registrationMessage' => 'Thank you for creating an account at :url, use your credentials to login.',
     'resetPassword' => 'Reset Your Password',
-    'resetPasswordMessage' => 'Use the following password to log in to your account, please change your password as soon as you log in.',
-    'resetPasswordPreheader' => 'This mail contains your new Plainpad password. Use it to log in and set a new one for your Plainpad account.',
+    'resetPasswordMessage' => 'Click the link below to reset your Plainpad account password. If you did not request a password reset, you can ignore this email.',
+    'resetPasswordLink' => 'Reset Password',
+    'resetPasswordExpiry' => 'This link will expire in 60 minutes.',
+    'resetPasswordPreheader' => 'Click the link in this email to reset your Plainpad account password.',
 ];

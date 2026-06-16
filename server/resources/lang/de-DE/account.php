@@ -23,6 +23,8 @@ return [
     'registration' => 'Registrierung',
     'registrationMessage' => 'Vielen Dank, dass Sie ein Konto bei :url eingerichtet haben, benutzen Sie Ihre Zugangsdaten zum Einloggen.',
     'resetPassword' => 'Passwort zurücksetzen',
-    'resetPasswordMessage' => 'Verwenden Sie das folgende Passwort, um sich in Ihr Konto einzuloggen. Bitte ändern Sie Ihr Passwort, sobald Sie sich einloggen.',
-    'resetPasswordPreheader' => 'Diese Mail enthält Ihr neues Plainpad-Passwort. Verwenden Sie es, um sich einzuloggen und ein neues Passwort für Ihr Plainpad-Konto festzulegen.',
+    'resetPasswordMessage' => 'Klicken Sie auf den folgenden Link, um Ihr Plainpad-Passwort zurückzusetzen. Wenn Sie keine Passwortzurücksetzung beantragt haben, können Sie diese E-Mail ignorieren.',
+    'resetPasswordLink' => 'Passwort zurücksetzen',
+    'resetPasswordExpiry' => 'Dieser Link läuft in 60 Minuten ab.',
+    'resetPasswordPreheader' => 'Klicken Sie auf den Link in dieser E-Mail, um Ihr Plainpad-Passwort zurückzusetzen.',
 ];
