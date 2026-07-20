@@ -70,7 +70,7 @@ class UsersController extends Controller
     {
         $request->validate( [
             'name' => 'required|string|max:255',
-            'email' => 'string|email|max:255',
+            'email' => ['string', 'email', 'max:255', \Illuminate\Validation\Rule::unique('users')->ignore($id)],
             'password' => 'string|nullable',
             'locale' => 'string',
             'view' => 'string',
@@ -234,7 +234,12 @@ class UsersController extends Controller
 
         $expireMinutes = config('auth.passwords.users.expire', 60);
 
-        if (now()->diffInMinutes($record->created_at) > $expireMinutes) {
+        // Compare against an absolute expiry instant. Carbon 3 makes
+        // diffInMinutes() signed, so now()->diffInMinutes($created_at) is
+        // negative for a past timestamp and the expiry check never fires.
+        $expiresAt = \Illuminate\Support\Carbon::parse($record->created_at)->addMinutes($expireMinutes);
+
+        if (now()->greaterThan($expiresAt)) {
             DB::table('password_resets')->where('email', $request->input('email'))->delete();
             return response()->json(['message' => 'Invalid or expired reset token.'], 422);
         }

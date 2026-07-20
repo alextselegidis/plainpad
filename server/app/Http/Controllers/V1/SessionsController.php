@@ -25,6 +25,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Session;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -67,6 +68,11 @@ class SessionsController extends Controller
 
         if (!$session) {
             return response('', 404);
+        }
+
+        // Only allow a user to delete their own session.
+        if ($session->user_id !== Auth::user()->id) {
+            return response('', 403);
         }
 
         $session->delete();
