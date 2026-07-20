@@ -27,7 +27,6 @@ Route::group([
 
     // Sessions
     Route::post('sessions', [SessionsController::class, 'create']);
-    Route::delete('sessions/{token}', [SessionsController::class, 'delete']);
 
     // Users
     Route::post('users/recovery', [UsersController::class, 'recoverPassword'])->middleware('throttle:5,15');
@@ -36,6 +35,9 @@ Route::group([
     Route::group([
         'middleware' => 'auth'
     ], function () {
+        // Sessions
+        Route::delete('sessions/{token}', [SessionsController::class, 'delete']);
+
         // Notes
         Route::get('notes', [NotesController::class, 'list']);
         Route::get('notes/{id}', [NotesController::class, 'retrieve']);

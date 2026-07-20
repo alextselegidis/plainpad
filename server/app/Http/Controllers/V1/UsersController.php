@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class UsersController extends Controller
@@ -70,7 +71,7 @@ class UsersController extends Controller
     {
         $request->validate( [
             'name' => 'required|string|max:255',
-            'email' => 'string|email|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'password' => 'string|nullable',
             'locale' => 'string',
             'view' => 'string',
@@ -234,7 +235,7 @@ class UsersController extends Controller
 
         $expireMinutes = config('auth.passwords.users.expire', 60);
 
-        if (now()->diffInMinutes($record->created_at) > $expireMinutes) {
+        if (Carbon::parse($record->created_at)->lt(now()->subMinutes($expireMinutes))) {
             DB::table('password_resets')->where('email', $request->input('email'))->delete();
             return response()->json(['message' => 'Invalid or expired reset token.'], 422);
         }
