@@ -26,7 +26,7 @@ Route::group([
     Route::post('', [ApplicationController::class, 'install']);
 
     // Sessions
-    Route::post('sessions', [SessionsController::class, 'create']);
+    Route::post('sessions', [SessionsController::class, 'create'])->middleware('throttle:login');
 
     // Users
     Route::post('users/recovery', [UsersController::class, 'recoverPassword'])->middleware('throttle:5,15');

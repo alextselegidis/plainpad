@@ -21,6 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
 
+        // Activates the 'api' rate limiter defined in RouteServiceProvider. Without this the limiter is
+        // never attached to any route, leaving every API endpoint unthrottled.
+        $middleware->throttleApi();
+
         $middleware->alias([
             'admin' => \App\Http\Middleware\Admin::class,
         ]);
