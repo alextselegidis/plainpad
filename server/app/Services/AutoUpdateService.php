@@ -97,13 +97,6 @@ class AutoUpdateService
     private $onAllUpdateFinishCallbacks = [];
 
     /**
-     * If curl should verify the host certificate.
-     *
-     * @var bool
-     */
-    private $sslVerifyHost = false;
-
-    /**
      * Url to the update folder on the server.
      *
      * @var string
@@ -408,24 +401,6 @@ class AutoUpdateService
     }
 
     /**
-     * @return bool
-     */
-    public function getSslVerifyHost()
-    {
-        return $this->sslVerifyHost;
-    }
-
-    /**
-     * @param bool $sslVerifyHost
-     */
-    public function setSslVerifyHost($sslVerifyHost)
-    {
-        $this->sslVerifyHost = $sslVerifyHost;
-
-        return $this;
-    }
-
-    /**
      * Check for a new version
      *
      * @return int|bool
@@ -519,6 +494,16 @@ class AutoUpdateService
 
         // Check for latest version
         foreach ($versions as $version => $updateUrl) {
+            if (!$this->_isTrustedUpdateUrl($updateUrl)) {
+                $this->log->error(sprintf(
+                    'Ignoring update "%s" with untrusted download url "%s"',
+                    $version,
+                    $updateUrl
+                ));
+
+                continue;
+            }
+
             if (Comparator::greaterThan($version, $this->currentVersion)) {
                 if (Comparator::greaterThan($version, $this->latestVersion)) {
                     $this->latestVersion = $version;
@@ -573,6 +558,33 @@ class AutoUpdateService
     }
 
     /**
+     * Check if a download url advertised by the update manifest may be used.
+     *
+     * The manifest is fetched from a remote server, so the urls it contains are untrusted input. Only https urls on
+     * the same host as the configured update repository are accepted, otherwise a tampered manifest could point the
+     * download at an attacker controlled server.
+     *
+     * @param string $url
+     * @return boolean
+     */
+    protected function _isTrustedUpdateUrl($url)
+    {
+        if (!is_string($url) || !$this->_isValidUrl($url)) {
+            return false;
+        }
+
+        $update = parse_url($url);
+        $repository = parse_url($this->updateUrl);
+
+        if (empty($update['scheme']) || empty($update['host']) || empty($repository['host'])) {
+            return false;
+        }
+
+        return strtolower($update['scheme']) === 'https'
+            && strcasecmp($update['host'], $repository['host']) === 0;
+    }
+
+    /**
      * Download file via curl.
      *
      * @param string $url URL to file
@@ -583,8 +595,8 @@ class AutoUpdateService
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, $this->sslVerifyHost);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, $this->sslVerifyHost);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
         $update = curl_exec($curl);
 
         $error = false;

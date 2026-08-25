@@ -17,7 +17,6 @@ class AutoUpdateServiceProvider extends ServiceProvider
             $autoUpdateService = new AutoUpdateService(base_path('storage/updates/'), base_path(), 60);
             $autoUpdateService->setCurrentVersion(config('app.version'));
             $autoUpdateService->setUpdateUrl(env('APP_REPOSITORY'));
-            $autoUpdateService->setSslVerifyHost(false);
             $autoUpdateService->addLogHandler(new StreamHandler(base_path('storage/logs/update-' . date('Y-m-d') . '.log')));
             return $autoUpdateService;
         });
