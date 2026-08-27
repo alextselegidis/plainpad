@@ -20,7 +20,7 @@
 import React, { Component, Suspense } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import * as router from 'react-router-dom';
-import {Button,  Container, Input, InputGroup, InputGroupAddon, InputGroupText} from 'reactstrap';
+import {Button, Container, Input, InputGroup, InputGroupAddon, InputGroupText} from 'reactstrap';
 
 import {
   AppHeader,
@@ -35,11 +35,31 @@ import NoteAside from './NoteAside';
 import {inject, observer} from 'mobx-react';
 import {translate} from '../../lang';
 import NoteCopyright from './NoteCopyright';
+import QuickSearch from './QuickSearch';
 
 const NoteHeader = React.lazy(() => import('./NoteHeader'));
 
 class NoteLayout extends Component {
+  state = {quickSearch: false, filterFocused: false};
+
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>;
+
+  handleKeyDown = (event) => {
+    if (event.key.toLowerCase() === 'k' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      this.toggleQuickSearch();
+    }
+  };
+
+  toggleQuickSearch = () => this.setState((state) => ({quickSearch: !state.quickSearch}));
+
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown);
+  }
 
   onMainClick() {
     if (document.body.classList.contains('aside-menu-show')) {
@@ -107,7 +127,18 @@ class NoteLayout extends Component {
 
               <Input value={filter} className="filter rounded-0 border-0 shadow-none pl-2"
                      placeholder={translate('notes.filter').toUpperCase()}
+                     onFocus={() => this.setState({filterFocused: true})}
+                     onBlur={() => this.setState({filterFocused: false})}
                      onChange={(event) => notes.updateFilter(event.target.value)} />
+
+              <InputGroupAddon addonType="append" className="rounded-0 quick-search-trigger d-none d-md-flex"
+                               hidden={this.state.filterFocused || !!filter.length}
+                               onMouseDown={(event) => event.preventDefault()}
+                               onClick={this.toggleQuickSearch}>
+                <InputGroupText className="filter-addon-content rounded-0 border-0">
+                  <kbd>{navigator.platform.startsWith('Mac') ? '\u2318' : 'Ctrl'} + K</kbd>
+                </InputGroupText>
+              </InputGroupAddon>
 
               <InputGroupAddon addonType="prepend" className="rounded-0 clear-filter" hidden={!filter.length}
                                onClick={() => notes.updateFilter('')}>
@@ -130,6 +161,8 @@ class NoteLayout extends Component {
               <NoteCopyright />
             </AppSidebarFooter>
           </AppSidebar>
+          <QuickSearch isOpen={this.state.quickSearch} toggle={this.toggleQuickSearch} />
+
           <main className="main" onClick={this.onMainClick.bind(this)}>
             <Container fluid className="h-100">
               <Suspense fallback={this.loading()}>
