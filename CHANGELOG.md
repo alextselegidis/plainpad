@@ -1,5 +1,29 @@
 # Release Notes 
 
+## [Unreleased]
+
+### Added
+
+- Add quick search spotlight overlay triggered with Ctrl/Cmd + K
+- Offer to create a note from the quick search keyword when nothing matches
+- Remember the open state of the sidebar and aside menus between sessions
+- Add DemoSeeder for populating the database with realistic notes
+
+### Fixed
+
+- Enforce TLS verification and trusted origins in the auto update service
+- Rate limit login attempts on `POST /v1/sessions`
+- Fix password-reset expiry and related auth weaknesses
+- Fix account lockout via the token-based password reset flow
+- Block `setup.php` after install to prevent XSS via unescaped POST values
+
+### Changed
+
+- Start the CRA dev server automatically with the docker stack, skipping installs when the dependency folders
+  already exist
+- Raise the nginx `client_max_body_size` value
+
+
 ## [1.1.1] - 2026-04-23
 
 ### Fixed
