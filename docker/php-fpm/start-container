@@ -6,5 +6,8 @@ cd server && composer install && cd ..
 echo "➜ Install NPM Dependencies"
 cd client && npm install && cd ..
 
+echo "➜ Start The CRA Dev Server"
+(cd client && BROWSER=none npm start) &
+
 echo "➜ Listen To Incoming Requests"
 php-fpm
