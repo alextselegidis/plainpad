@@ -35,6 +35,7 @@ export default {
   filter: '搜索',
   keyword: '关键词',
   newNote: '新建笔记',
+  createNote: '创建笔记',
   add: '添加',
   created: '创建于',
   modified: '修改于',

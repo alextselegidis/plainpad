@@ -35,6 +35,7 @@ export default {
   filter: 'filtern',
   keyword: 'Stichwort',
   newNote: 'neue Notiz',
+  createNote: 'Notiz erstellen',
   add: 'hinzufügen',
   created: 'Erstellt',
   modified: 'Angepasst',

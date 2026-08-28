@@ -35,6 +35,7 @@ export default {
   filter: 'Filter',
   keyword: 'Keyword',
   newNote: 'New Note',
+  createNote: 'Create note',
   add: 'Add',
   created: 'Created',
   modified: 'Modified',

@@ -72,9 +72,9 @@ class NotesStore {
     this.noteList = this.sortNotes(filteredNotes);
   }
 
-  async add() {
+  async add(title = '') {
     this.id = null;
-    this.title = this.filter || 'New Note ...';
+    this.title = title || this.filter || 'New Note ...';
     this.content = this.title;
     this.pinned = false;
     this.createdAt = null;

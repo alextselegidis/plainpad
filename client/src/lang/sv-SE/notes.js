@@ -35,6 +35,7 @@ export default {
   filter: 'Filter',
   keyword: 'Nyckelord',
   newNote: 'Ny anteckning',
+  createNote: 'Skapa anteckning',
   add: 'Lägg till',
   created: 'Skapad',
   modified: 'Ändrad',

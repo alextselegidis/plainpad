@@ -67,19 +67,43 @@ class QuickSearch extends Component {
     notes.select(note.id);
   }
 
-  onKeyDown(event) {
+  // Offer a way out when the keyword matches nothing, without ever creating a note on its own.
+
+  creatable() {
+    return !!this.state.keyword.trim() && !this.matches().length;
+  }
+
+  // The trailing null is the create entry, so it navigates like any other result.
+
+  options() {
     const results = this.matches();
+
+    return this.creatable() ? [...results, null] : results;
+  }
+
+  create() {
+    this.props.toggle();
+    notes.add(this.state.keyword.trim());
+  }
+
+  onKeyDown(event) {
+    const options = this.options();
     const {active} = this.state;
 
     if (event.key === 'ArrowDown') {
       event.preventDefault();
-      this.setState({active: Math.min(active + 1, results.length - 1)});
+      this.setState({active: Math.min(active + 1, options.length - 1)});
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
       this.setState({active: Math.max(active - 1, 0)});
     } else if (event.key === 'Enter') {
       event.preventDefault();
-      this.select(results[active]);
+
+      if (options[active]) {
+        this.select(options[active]);
+      } else if (this.creatable()) {
+        this.create();
+      }
     }
   }
 
@@ -87,6 +111,7 @@ class QuickSearch extends Component {
     const {isOpen, toggle} = this.props;
     const {keyword, active} = this.state;
     const results = this.matches();
+    const creatable = this.creatable();
 
     return (
       <Modal isOpen={isOpen} toggle={toggle} className={`quick-search ${account.user && account.user.theme === 'dark' ? 'dark' : ''}`}
@@ -106,16 +131,27 @@ class QuickSearch extends Component {
                    onKeyDown={(event) => this.onKeyDown(event)} />
           </InputGroup>
 
-          <ListGroup flush hidden={!results.length}>
-            {results.map((note, index) => (
-              <ListGroupItem key={note.id} action active={index === active} tag="button"
-                             onMouseEnter={() => this.setState({active: index})}
-                             onClick={() => this.select(note)}>
-                {note.pinned ? <i className="fa fa-thumb-tack mr-2" /> : null}
-                {note.title}
-              </ListGroupItem>
-            ))}
-          </ListGroup>
+          {results.length || creatable ? (
+            <ListGroup flush>
+              {results.map((note, index) => (
+                <ListGroupItem key={note.id} action active={index === active} tag="button"
+                               onMouseEnter={() => this.setState({active: index})}
+                               onClick={() => this.select(note)}>
+                  {note.pinned ? <i className="fa fa-thumb-tack mr-2" /> : null}
+                  {note.title}
+                </ListGroupItem>
+              ))}
+
+              {creatable ? (
+                <ListGroupItem action active={active === results.length} tag="button"
+                               onMouseEnter={() => this.setState({active: results.length})}
+                               onClick={() => this.create()}>
+                  <i className="fa fa-plus mr-2" />
+                  {translate('notes.createNote')}: <strong>{keyword.trim()}</strong>
+                </ListGroupItem>
+              ) : null}
+            </ListGroup>
+          ) : null}
         </ModalBody>
       </Modal>
     );
