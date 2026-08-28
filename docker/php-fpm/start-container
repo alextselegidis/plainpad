@@ -1,10 +1,12 @@
 #!/bin/bash
 
+# Subshells keep a failing step from leaving the working directory behind.
+
 echo "➜ Install Composer Dependencies"
-cd server && composer install && cd ..
+(cd server && composer install)
 
 echo "➜ Install NPM Dependencies"
-cd client && npm install && cd ..
+(cd client && npm install)
 
 echo "➜ Start The CRA Dev Server"
 (cd client && BROWSER=none npm start) &
