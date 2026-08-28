@@ -50,7 +50,7 @@ class QuickSearch extends Component {
       .filter((note) => !needle || note.title.toLowerCase().includes(needle))
       .sort((a, b) => {
         if (!a.pinned !== !b.pinned) {
-          return a.pinned ? 1 : -1; // pinned notes go last
+          return a.pinned ? -1 : 1; // pinned notes go first
         }
 
         return a.updated_at < b.updated_at ? 1 : -1;
