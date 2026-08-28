@@ -53,12 +53,28 @@ class NoteLayout extends Component {
 
   toggleQuickSearch = () => this.setState((state) => ({quickSearch: !state.quickSearch}));
 
+  restoreMenuState = () => {
+    // AppSidebar always adds the class on mount, so the stored state must be applied afterwards.
+    document.body.classList.toggle('sidebar-lg-show', localStorage.getItem('Plainpad.Sidebar') !== 'closed');
+    document.body.classList.toggle('aside-menu-lg-show', localStorage.getItem('Plainpad.Aside') === 'open');
+
+    this.menuObserver = new MutationObserver(() => {
+      const {classList} = document.body;
+      localStorage.setItem('Plainpad.Sidebar', classList.contains('sidebar-lg-show') ? 'open' : 'closed');
+      localStorage.setItem('Plainpad.Aside', classList.contains('aside-menu-lg-show') ? 'open' : 'closed');
+    });
+
+    this.menuObserver.observe(document.body, {attributes: true, attributeFilter: ['class']});
+  };
+
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown);
+    this.restoreMenuState();
   }
 
   componentWillUnmount() {
     document.removeEventListener('keydown', this.handleKeyDown);
+    this.menuObserver.disconnect();
   }
 
   onMainClick() {
