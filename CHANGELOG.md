@@ -19,8 +19,7 @@
 
 ### Changed
 
-- Start the CRA dev server automatically with the docker stack, skipping installs when the dependency folders
-  already exist
+- Start the CRA dev server automatically with the docker stack, skipping installs when the dependency folders already exist
 - Raise the nginx `client_max_body_size` value
 
 
