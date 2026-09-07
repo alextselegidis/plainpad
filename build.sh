@@ -2,6 +2,11 @@
 
 set -e  # Exit on error
 
+# Re-run inside the dev container (has php, composer, node, zip) unless already there.
+if [[ ! -f /.dockerenv ]]; then
+    exec docker compose run --rm -T php-fpm bash build.sh "$@"
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
