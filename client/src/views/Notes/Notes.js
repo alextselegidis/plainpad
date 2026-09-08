@@ -53,6 +53,17 @@ class Notes extends Component {
     });
   }
 
+  componentDidUpdate() {
+    const {notes} = this.props;
+
+    // A different note was loaded, so drop the scroll offset of the previous one.
+    if (this.noteId !== notes.id) {
+      this.noteId = notes.id;
+      this.scrollY = 0;
+      window.scrollTo(0, 0);
+    }
+  }
+
   handleKeyDown(event) {
     // preserve previous behavior
     this.scrollY = window.scrollY;
