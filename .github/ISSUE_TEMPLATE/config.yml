@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or support
+    url: https://github.com/alextselegidis/plainpad/discussions
+    about: Ask usage questions and get help from the community.
+  - name: Security vulnerability
+    url: https://github.com/alextselegidis/plainpad/blob/main/.github/SECURITY.md
+    about: Please report security issues privately, do not open a public issue.
