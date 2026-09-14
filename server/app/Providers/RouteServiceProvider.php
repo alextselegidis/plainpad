@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -37,14 +38,20 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         // Login attempts are keyed on the target account first, so that credential stuffing cannot be
-        // spread across rotating source addresses. The IP limit is deliberately loose because instances
-        // behind a reverse proxy see every client as the proxy address.
+        // spread across rotating source addresses. The account key resolves through the same lookup the
+        // login uses, so accent/case variants of one email (utf8mb4_unicode_ci) share a single counter
+        // instead of each getting a fresh five attempts. The IP limit is deliberately loose because
+        // instances behind a reverse proxy see every client as the proxy address.
         RateLimiter::for('login', function (Request $request) {
-            $email = Str::lower((string)$request->input('email'));
+            $user = User::where('email', (string) $request->input('email'))->first();
+
+            $key = $user
+                ? 'login-user:'.$user->id
+                : 'login-email:'.Str::lower((string) $request->input('email'));
 
             return [
-                Limit::perMinutes(15, 5)->by('login-email:' . $email),
-                Limit::perMinutes(15, 50)->by('login-ip:' . $request->ip()),
+                Limit::perMinutes(15, 5)->by($key),
+                Limit::perMinutes(15, 50)->by('login-ip:'.$request->ip()),
             ];
         });
     }
