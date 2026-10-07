@@ -12,7 +12,7 @@
 ### Fixed
 
 - Enforce TLS verification and trusted origins in the auto update service
-- Rate limit login attempts on `POST /v1/sessions`
+- Rate limit login attempts on `POST /v1/sessions`, keyed on the matched account (GHSA-qg7c-2q9c-v7hg)
 - Fix password-reset expiry and related auth weaknesses
 - Fix account lockout via the token-based password reset flow
 - Invalidate the previous password reset token when a new one is requested (GHSA-wgcw-8jm6-f847)
