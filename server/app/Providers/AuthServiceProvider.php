@@ -6,7 +6,6 @@ use App\Models\Session;
 use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -28,16 +27,16 @@ class AuthServiceProvider extends ServiceProvider
 
         Auth::viaRequest('custom-token', function ($request) {
             $session = Session::where('token', $request->bearerToken())
-                ->where('expires_at', '>', DB::raw('NOW()'))
+                ->where('expires_at', '>', now())
                 ->first();
 
-            if (!$session) {
+            if (! $session) {
                 return null;
             }
 
             $user = User::find($session->user_id);
 
-            if (!$user) {
+            if (! $user) {
                 return null;
             }
 

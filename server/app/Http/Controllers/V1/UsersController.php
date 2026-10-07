@@ -27,19 +27,19 @@ use App\Models\Note;
 use App\Models\Session;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class UsersController extends Controller
 {
     public function create(Request $request)
     {
-        $request->validate( [
+        $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users|max:255',
             'password' => 'required|string',
@@ -52,7 +52,7 @@ class UsersController extends Controller
         ]);
 
         $user = new User;
-        $user->id = (string)Str::uuid();
+        $user->id = (string) Str::uuid();
         $user->name = $request->input('name');
         $user->email = $request->input('email');
         $user->password = Hash::make($request->input('password'));
@@ -70,9 +70,9 @@ class UsersController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $request->validate( [
+        $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$id,
             'password' => 'string|nullable',
             'locale' => 'string',
             'view' => 'string',
@@ -85,17 +85,17 @@ class UsersController extends Controller
 
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response('', 401);
         }
 
         $authUser = Auth::user();
 
-        if (!$authUser->admin && $authUser->id !== $user->id) {
+        if (! $authUser->admin && $authUser->id !== $user->id) {
             return response('', 401);
         }
 
-        Note::toggleEncryption($user, $user->encrypt, (bool)$request->input('encrypt'));
+        Note::toggleEncryption($user, $user->encrypt, (bool) $request->input('encrypt'));
 
         $user->name = $request->input('name');
         $user->email = $request->input('email');
@@ -108,7 +108,7 @@ class UsersController extends Controller
         $user->encrypt = $request->input('encrypt') ?? $user->encrypt;
 
         if ($authUser->admin) {
-            $user->admin = (bool)$request->input('admin');
+            $user->admin = (bool) $request->input('admin');
         }
 
         $user->save();
@@ -120,7 +120,6 @@ class UsersController extends Controller
 
         Auth::user()->encrypt = $user->encrypt;
 
-
         return response()->json($user, 200);
     }
 
@@ -128,7 +127,7 @@ class UsersController extends Controller
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response('', 404);
         }
 
@@ -140,7 +139,6 @@ class UsersController extends Controller
 
         return response('', 200);
     }
-
 
     public function list(Request $request)
     {
@@ -157,10 +155,10 @@ class UsersController extends Controller
             'theme',
             'encrypt',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
 
-        $filter = '%' . $request->input('filter') . '%';
+        $filter = '%'.$request->input('filter').'%';
         $sort = in_array($request->input('sort'), $defaultFields, true) ? $request->input('sort') : 'name';
         $direction = strtolower($request->input('direction')) === 'desc' ? 'desc' : 'asc';
         $page = $request->input('page') ?? 1;
@@ -182,13 +180,13 @@ class UsersController extends Controller
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response('', 404);
         }
 
         $authUser = Auth::user();
 
-        if (!$authUser->admin && $authUser->id !== $user->id) {
+        if (! $authUser->admin && $authUser->id !== $user->id) {
             return response('', 401);
         }
 
@@ -216,7 +214,7 @@ class UsersController extends Controller
                 );
             });
 
-            $resetUrl = config('app.url') . '/#/reset-password?email=' . urlencode($user->email) . '&token=' . urlencode($token);
+            $resetUrl = config('app.url').'/#/reset-password?email='.urlencode($user->email).'&token='.urlencode($token);
 
             Mail::to($user)->send(new PasswordRecovered($resetUrl));
         }
@@ -238,7 +236,7 @@ class UsersController extends Controller
             ->orderByDesc('created_at')
             ->first();
 
-        if (!$record || !Hash::check($request->input('token'), $record->token)) {
+        if (! $record || ! Hash::check($request->input('token'), $record->token)) {
             return response()->json(['message' => 'Invalid or expired reset token.'], 422);
         }
 
@@ -246,12 +244,13 @@ class UsersController extends Controller
 
         if (Carbon::parse($record->created_at)->lt(now()->subMinutes($expireMinutes))) {
             DB::table('password_resets')->where('email', $request->input('email'))->delete();
+
             return response()->json(['message' => 'Invalid or expired reset token.'], 422);
         }
 
         $user = User::where('email', $request->input('email'))->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Invalid or expired reset token.'], 422);
         }
 

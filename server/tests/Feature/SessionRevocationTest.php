@@ -20,7 +20,7 @@ class SessionRevocationTest extends TestCase
         parent::setUp();
 
         $this->user = new User;
-        $this->user->id = (string)Str::uuid();
+        $this->user->id = (string) Str::uuid();
         $this->user->name = 'Victim';
         $this->user->email = 'victim@example.com';
         $this->user->password = Hash::make('old-password');
@@ -40,7 +40,7 @@ class SessionRevocationTest extends TestCase
     {
         $this->app['auth']->forgetGuards();
 
-        return $this->withToken($token)->getJson('/v1/users/' . $this->user->id)->status() === 200;
+        return $this->withToken($token)->getJson('/v1/users/'.$this->user->id)->status() === 200;
     }
 
     public function test_password_change_revokes_other_sessions_but_keeps_the_current_one(): void
@@ -48,7 +48,7 @@ class SessionRevocationTest extends TestCase
         $stolen = $this->login();
         $current = $this->login();
 
-        $this->withToken($current)->putJson('/v1/users/' . $this->user->id, [
+        $this->withToken($current)->putJson('/v1/users/'.$this->user->id, [
             'name' => 'Victim',
             'email' => 'victim@example.com',
             'password' => 'new-password',
