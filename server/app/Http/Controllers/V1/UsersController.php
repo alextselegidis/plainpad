@@ -208,11 +208,13 @@ class UsersController extends Controller
 
             $token = Str::random(64);
 
-            DB::table('password_resets')->upsert(
-                ['email' => $user->email, 'token' => Hash::make($token), 'created_at' => now()],
-                ['email'],
-                ['token', 'created_at']
-            );
+            // Replace any previous token, a new request must invalidate older reset links.
+            DB::transaction(function () use ($user, $token) {
+                DB::table('password_resets')->where('email', $user->email)->delete();
+                DB::table('password_resets')->insert(
+                    ['email' => $user->email, 'token' => Hash::make($token), 'created_at' => now()]
+                );
+            });
 
             $resetUrl = config('app.url') . '/#/reset-password?email=' . urlencode($user->email) . '&token=' . urlencode($token);
 
@@ -233,6 +235,7 @@ class UsersController extends Controller
 
         $record = DB::table('password_resets')
             ->where('email', $request->input('email'))
+            ->orderByDesc('created_at')
             ->first();
 
         if (!$record || !Hash::check($request->input('token'), $record->token)) {
