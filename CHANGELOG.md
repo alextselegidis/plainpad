@@ -15,6 +15,7 @@
 - Rate limit login attempts on `POST /v1/sessions`
 - Fix password-reset expiry and related auth weaknesses
 - Fix account lockout via the token-based password reset flow
+- Revoke existing sessions on password change (except the current one) and on password reset (GHSA-fx8g-533q-jp2w)
 - Block `setup.php` after install to prevent XSS via unescaped POST values
 
 ### Changed

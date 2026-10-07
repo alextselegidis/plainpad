@@ -24,6 +24,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Mail\PasswordRecovered;
 use App\Models\Note;
+use App\Models\Session;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -111,6 +112,11 @@ class UsersController extends Controller
         }
 
         $user->save();
+
+        if ($request->input('password')) {
+            // Revoke every other session so a stolen token does not survive the password change.
+            Session::where('user_id', $user->id)->where('token', '!=', $request->bearerToken())->delete();
+        }
 
         Auth::user()->encrypt = $user->encrypt;
 
@@ -248,6 +254,8 @@ class UsersController extends Controller
 
         $user->password = Hash::make($request->input('password'));
         $user->save();
+
+        Session::where('user_id', $user->id)->delete();
 
         DB::table('password_resets')->where('email', $request->input('email'))->delete();
 
