@@ -89,14 +89,24 @@ class ApplicationController extends Controller
             return response('', 404);
         }
 
+        // Extracting thousands of files can outlast the default limits; a half applied update leaves old files behind.
+        set_time_limit(0);
+        ignore_user_abort(true);
+
         $simulation = $this->autoUpdateService->update();
 
-        if (!$simulation) {
-            throw new RuntimeException('The update simulation failed: '
+        // update() returns true on success and an error code (int) or false otherwise.
+        if ($simulation !== true) {
+            throw new RuntimeException('The update simulation failed (' . var_export($simulation, true) . '): '
                 . json_encode($this->autoUpdateService->getSimulationResults()));
         }
 
-        $this->autoUpdateService->update(false);
+        $result = $this->autoUpdateService->update(false);
+
+        if ($result !== true) {
+            throw new RuntimeException('The update failed (' . var_export($result, true) . '), see '
+                . 'storage/logs/update-*.log');
+        }
 
         try {
             return response('', 200);

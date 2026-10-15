@@ -841,6 +841,13 @@ class AutoUpdateService
                 continue;
             }
 
+            // The version file is written last, so an interrupted update does not report the new version while the
+            // rest of the files are still old (this would stop the update from being offered again).
+            if ($filename === 'config' . DIRECTORY_SEPARATOR . 'app.php') {
+                $versionFile = [$absoluteFilename, $contents];
+                continue;
+            }
+
             // Write to file
             if (file_exists($absoluteFilename)) {
                 if (!is_writable($absoluteFilename)) {
@@ -893,6 +900,12 @@ class AutoUpdateService
         }
 
         zip_close($zip);
+
+        if (isset($versionFile) && file_put_contents($versionFile[0], $versionFile[1]) === false) {
+            $this->log->error(sprintf('Could not write to file "%s"!', $versionFile[0]));
+
+            return false;
+        }
 
         $this->log->notice(sprintf('Update "%s" successfully installed', $version));
 
