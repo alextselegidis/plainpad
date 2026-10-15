@@ -18,10 +18,13 @@
 - Invalidate the previous password reset token when a new one is requested (GHSA-wgcw-8jm6-f847)
 - Revoke existing sessions on password change (except the current one) and on password reset (GHSA-fx8g-533q-jp2w)
 - Block `setup.php` after install to prevent XSS via unescaped POST values
+- Fail the auto update request when installing the update fails, instead of reporting success
+- Keep interrupted auto updates retryable and stop browsers from caching `index.html` after an update
 
 ### Changed
 
-- Start the CRA dev server automatically with the docker stack, skipping installs when the dependency folders already exist
+- Start the CRA dev server automatically with the docker stack, skipping installs when the dependency
+  folders already exist
 - Raise the nginx `client_max_body_size` value
 
 
