@@ -33,12 +33,19 @@ BUILD_DIR="${SCRIPT_DIR}/build"
 SERVER_DIR="${SCRIPT_DIR}/server"
 CLIENT_DIR="${SCRIPT_DIR}/client"
 
+VERSION=$(sed -n "s/.*'version' => env('APP_VERSION', '\\([^']*\\)').*/\\1/p" "${SERVER_DIR}/config/app.php")
+if [[ -z "${VERSION}" ]]; then
+    log_error "Could not read the version from server/config/app.php"
+    exit 1
+fi
+ZIP_FILE="${SCRIPT_DIR}/plainpad-${VERSION}.zip"
+
 # =====================================================
 # Step 1: Reset Build Directory
 # =====================================================
 log_info "Resetting build directory..."
 
-rm -rf "${BUILD_DIR}" "${SCRIPT_DIR}/build.zip" 2>/dev/null || true
+rm -rf "${BUILD_DIR}" "${ZIP_FILE}" 2>/dev/null || true
 mkdir -p "${BUILD_DIR}"
 
 # =====================================================
@@ -56,6 +63,7 @@ rm -f "${BUILD_DIR}"/storage/framework/**/*.php 2>/dev/null || true
 rm -rf "${BUILD_DIR}/tests" 2>/dev/null || true
 rm -rf "${BUILD_DIR}/vendor" 2>/dev/null || true
 rm -f "${BUILD_DIR}/phpunit.xml" 2>/dev/null || true
+rm -f "${BUILD_DIR}"/bootstrap/cache/*.php 2>/dev/null || true
 
 # Install production dependencies
 log_info "Installing Composer dependencies..."
@@ -155,11 +163,11 @@ zip -r build.zip . -x \
 
 cd "${SCRIPT_DIR}"
 
-mv "${BUILD_DIR}/build.zip" "${SCRIPT_DIR}/"
+mv "${BUILD_DIR}/build.zip" "${ZIP_FILE}"
 
 # =====================================================
 # Done
 # =====================================================
 log_info "Build completed successfully!"
-log_info "Output: ${SCRIPT_DIR}/build.zip"
+log_info "Output: ${ZIP_FILE}"
 
