@@ -106,6 +106,15 @@ class NotesController extends Controller
             'updated_at'
         ];
 
+        $request->validate([
+            'filter' => 'nullable|string',
+            'sort' => 'nullable|string',
+            'direction' => 'nullable|string',
+            'page' => 'nullable|integer|min:1',
+            'length' => 'nullable|integer|min:1',
+            'fields' => 'nullable|string',
+        ]);
+
         $filter = $request->input('filter');
         $sort = in_array($request->input('sort'), $defaultFields, true) ? $request->input('sort') : 'title';
         $direction = strtolower($request->input('direction')) === 'desc' ? 'desc' : 'asc';

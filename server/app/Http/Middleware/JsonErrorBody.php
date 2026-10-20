@@ -36,10 +36,13 @@ class JsonErrorBody
         $response = $next($request);
 
         if ($response->getStatusCode() >= 400 && $response->getContent() === '') {
+            $headers = $response->headers->all();
+            unset($headers['content-type']);
+
             return new JsonResponse(
                 ['message' => Response::$statusTexts[$response->getStatusCode()] ?? 'Error'],
                 $response->getStatusCode(),
-                $response->headers->all()
+                $headers
             );
         }
 

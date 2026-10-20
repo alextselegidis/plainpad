@@ -55,6 +55,16 @@
 - Answer every API error with JSON, also without an `Accept: application/json` header: invalid input is a 422 instead
   of a redirect to the app page, a failed login says why, and other errors no longer render HTML pages
 - Stop crashing (500) on login requests with a non string email
+- Validate the locale, view, line, sort and theme values, an invalid locale made every request of that user fail,
+  and the note and user list parameters
+- Do all password recovery work after the response, so its timing does not reveal registered emails
+- Refuse to install into a database that already contains tables, the installation dropped all of them
+- Send headers that stop other sites from framing the app (clickjacking), add `TRUSTED_PROXIES` for reverse
+  proxies and stop recommending `chmod 777` in the docs
+- Keep the app info request working when the update check cache directory is not writable
+- Refresh the sidebar without re-reading every note after a save, read the local notes once per sync, page the
+  first sync, keep the server copy of uploaded notes (no repeated uploads) and keep the local note cache across
+  releases
 - Lock the admin rows while demoting or deleting an admin, so two admins cannot remove each other at once
 - Wait for a running sync before removing the local notes on logout
 - Fetch all notes in one request on the first sync, it ran into the API rate limit with a few hundred notes

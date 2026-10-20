@@ -9,6 +9,11 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    /**
+     * Locales the client ships translations for, anything else must never reach App::setLocale().
+     */
+    public const LOCALES = ['en-US', 'de-DE', 'fr-FR', 'sv-SE', 'zh-CN'];
+
     use HasFactory, Notifiable;
 
     /**

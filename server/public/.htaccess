@@ -3,6 +3,12 @@
 </IfModule>
 
 <IfModule mod_headers.c>
+    # The app is logged in through localStorage, so another site must not be able to frame it (clickjacking).
+    Header always set X-Frame-Options "DENY"
+    Header always set Content-Security-Policy "frame-ancestors 'none'"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "same-origin"
+
     # Always revalidate the app shell so a reload after an update loads the new bundle.
     <Files "index.html">
         Header set Cache-Control "no-cache"

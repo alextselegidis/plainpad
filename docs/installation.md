@@ -36,8 +36,21 @@ installation form.
 Log in with the default account `admin@example.org` / `12345678` and change its email and password right away 
 from the profile page.
 
-Make sure the entire application directory is completely writable by the PHP process so that the auto update feature 
-works properly.  
+Make sure the entire application directory is owned by and writable for the PHP process user (never `chmod 777`) so 
+that the auto update feature works properly.  
+
+The included `.htaccess` (Apache) and `web.config` (IIS) stop other sites from embedding Plainpad in a frame. On nginx 
+add the same headers to the server block:
+
+```nginx
+add_header X-Frame-Options "DENY" always;
+add_header Content-Security-Policy "frame-ancestors 'none'" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header Referrer-Policy "same-origin" always;
+```
+
+Behind a reverse proxy, set `TRUSTED_PROXIES` in `.env` to the proxy address (comma separated for several, `*` to 
+trust any), so that the login rate limit sees the real client addresses instead of the proxy address.
 
 ### Useful Links 
 

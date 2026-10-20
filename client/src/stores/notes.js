@@ -73,6 +73,13 @@ class NotesStore {
     this.noteList = this.sortNotes(filteredNotes);
   }
 
+  // Refresh the sidebar after a change to a single note, without reading every note from IndexedDB like list().
+  updateListItem(note, remove = false) {
+    const others = this.noteList.filter((item) => item.id !== note.id);
+
+    this.noteList = this.sortNotes(remove ? others : [...others, ...this.filterNotes([note])]);
+  }
+
   async add(title = '') {
     this.id = null;
     this.title = title || this.filter || 'New Note ...';
@@ -153,7 +160,7 @@ class NotesStore {
 
     await this.commitChange(id, isLocalNote ? 'create' : 'update');
 
-    await this.list();
+    this.updateListItem({...localNote, ...note});
 
     if (isNewNote) {
       window.location.href = `#/notes/${id}`;
@@ -186,7 +193,7 @@ class NotesStore {
       await this.commitChange(this.id, 'delete');
     }
 
-    await this.list();
+    this.updateListItem({id: this.id}, true);
     this.reset();
   }
 
@@ -215,7 +222,7 @@ class NotesStore {
 
     await this.commitChange(this.id, 'update');
 
-    await this.list();
+    this.updateListItem(localNote);
   }
 
   async unpin() {
@@ -227,7 +234,7 @@ class NotesStore {
 
     await this.commitChange(this.id, 'update');
 
-    await this.list();
+    this.updateListItem(localNote);
   }
 
   updateContent(content) {
@@ -486,52 +493,61 @@ class NotesStore {
   }
 
   async syncServerChanges(serverNotes) {
+    // Read the local notes once, one IndexedDB read per note on every sync gets slow with thousands of notes.
+    const localNotes = {};
+
+    await storage.table('notes').iterate((note, id) => {
+      localNotes[id] = note;
+    });
+
+    const newer = (a, b) => Date.parse(a.updated_at) > Date.parse(b.updated_at);
+    const changedOnServer = serverNotes.filter((serverNote) => {
+      return !localNotes[serverNote.id] || newer(serverNote, localNotes[serverNote.id]);
+    });
+
     // A first sync (new device, cleared cache) needs the content of every note. One request per note runs into the
-    // API rate limit with a few hundred notes, so fetch everything in one list request when many notes are missing.
-    let missing = 0;
-
-    for (let serverNote of serverNotes) {
-      if (!await storage.table('notes').getItem(serverNote.id) && ++missing > 20) {
-        break;
-      }
-    }
-
+    // API rate limit with a few hundred notes, so read the full list page by page instead (one huge response could
+    // exceed the PHP memory limit with thousands of notes).
     const contents = {};
 
-    if (missing > 20) {
-      for (let note of await NotesHttpClient.list()) {
-        contents[note.id] = note;
+    if (changedOnServer.length > 20) {
+      for (let page = 1; ; page++) {
+        const notes = await NotesHttpClient.list(null, 'id', 'asc', page, 500);
+
+        notes.forEach((note) => contents[note.id] = note);
+
+        if (notes.length < 500) {
+          break;
+        }
       }
     }
 
-    const retrieve = (id) => contents[id] || NotesHttpClient.retrieve(id);
+    for (let serverNote of changedOnServer) {
+      const serverNoteWithContent = contents[serverNote.id] || await NotesHttpClient.retrieve(serverNote.id);
+      await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
+    }
 
-    // Add new notes that are not present in the local cache.
     for (let serverNote of serverNotes) {
-      const localNote = await storage.table('notes').getItem(serverNote.id);
+      const localNote = localNotes[serverNote.id];
 
-      // Import server note to the local database.
-      if (localNote) {
-        const localChanged = moment(localNote.updated_at);
-        const serverChanged = moment(serverNote.updated_at);
-
-        if (serverChanged.isAfter(localChanged)) {
-          const serverNoteWithContent = await retrieve(serverNote.id);
-          await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
-          if (this.id === serverNote.id) {
-            // TODO: Add an icon that the currently selected note was changed on the server
-          }
-        } else if (serverChanged.isBefore(localChanged)) {
-          await NotesHttpClient.update(localNote);
-        }
-      } else {
-        const serverNoteWithContent = await retrieve(serverNote.id);
-        await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
-        if (this.id === serverNote.id) {
-          // TODO: Add an icon that the currently selected note was changed on the server
-        }
+      if (localNote && newer(localNote, serverNote)) {
+        await this.uploadNote(localNote);
       }
     }
+  }
+
+  async uploadNote(localNote) {
+    const serverNote = await NotesHttpClient.update(localNote);
+
+    // Keep the server copy and its updated_at, otherwise the next sync sees the note as changed again (and uploads it
+    // on every sync when the device clock is ahead). Skipped when the note was edited in the meantime.
+    const currentNote = await storage.table('notes').getItem(localNote.id);
+
+    if (currentNote && currentNote.updated_at === localNote.updated_at) {
+      await storage.table('notes').setItem(serverNote.id, serverNote);
+    }
+
+    return serverNote;
   }
 
   async fetchServerNotes() {
@@ -590,10 +606,10 @@ class NotesStore {
       const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
       await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
     } else if (serverChanged.isBefore(localChanged)) {
-      await NotesHttpClient.update(localNote);
+      const uploadedNote = await this.uploadNote(localNote);
       for (let index in serverNotes) {
         if (serverNotes.hasOwnProperty(index) && serverNotes[index].id === localNote.id) {
-          serverNotes[index] = localNote;
+          serverNotes[index] = uploadedNote;
           break;
         }
       }

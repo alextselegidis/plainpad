@@ -45,7 +45,10 @@ class AuthServiceProvider extends ServiceProvider
                 return null;
             }
 
-            config(['app.locale' => $user->locale]);
+            // A locale stored before it was validated must not break every request of the user.
+            if (in_array($user->locale, User::LOCALES, true)) {
+                config(['app.locale' => $user->locale]);
+            }
 
             return $user;
         });

@@ -42,7 +42,8 @@ class Storage {
   }
 
   databaseName() {
-    return `Plainpad-${process.env.REACT_APP_VERSION}-${account.user.id}`;
+    // Not versioned: a new release must keep the cached notes and any changes that were not synced yet.
+    return `Plainpad-${account.user.id}`;
   }
 
   async drop() {

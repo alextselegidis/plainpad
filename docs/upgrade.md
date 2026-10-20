@@ -13,7 +13,7 @@ In addition, Plainpad requires the PHP Zip extension to be installed for the upd
 Steps:
 
 1. Make sure your server is running PHP v7.3+
-1. Make sure the entire Plainpad directory is writable 777 (the PHP process should be able to make changes to the file system).
+1. Make sure the entire Plainpad directory is owned by and writable for the PHP process user (e.g. `chown -R www-data:www-data plainpad`), never `chmod 777` it, other users on the server could then change the code.
 1. Go to the settings page and click the update button.
 1. An error will be displayed due to the laravel upgrade, that's fine this time.
 1. Finalize the upgrade by running "php artisan refresh" from the terminal.
@@ -29,7 +29,7 @@ If you are still facing errors with your installation, check the following place
 Steps: 
 
 1. Make sure your server is running PHP v7.3+ 
-1. Make sure the entire Plainpad directory is writable 777 (the PHP process should be able to make changes to the file system). 
+1. Make sure the entire Plainpad directory is owned by and writable for the PHP process user (e.g. `chown -R www-data:www-data plainpad`), never `chmod 777` it, other users on the server could then change the code. 
 1. Go to the settings page and click the update button.
 1. An error will be displayed due to the laravel upgrade, that's fine this time. 
 1. Finalize the upgrade by running "php artisan refresh" from the terminal.  
@@ -45,7 +45,7 @@ If you are still facing errors with your installation, check the following place
 Steps: 
 
 1. Make sure your server is running PHP v7.2+ 
-1. Make sure the entire Plainpad directory is writable 777 (the PHP process should be able to make changes to the file system). 
+1. Make sure the entire Plainpad directory is owned by and writable for the PHP process user (e.g. `chown -R www-data:www-data plainpad`), never `chmod 777` it, other users on the server could then change the code. 
 1. Go to the settings page and click the update button.
 
 #### Upgrading from `1.0.0-beta.1` to `1.0.0-beta.2`
@@ -53,7 +53,7 @@ Steps:
 Steps: 
 
 1. Make sure your server is running PHP v7.2+ 
-1. Make sure the entire Plainpad directory is writable 777 (the PHP process should be able to make changes to the file system). 
+1. Make sure the entire Plainpad directory is owned by and writable for the PHP process user (e.g. `chown -R www-data:www-data plainpad`), never `chmod 777` it, other users on the server could then change the code. 
 1. Go to the settings page and click the update button.
 
 #### Upgrading from `1.0.0-alpha.1` to `1.0.0-beta.1`
@@ -61,7 +61,7 @@ Steps:
 Steps: 
 
 1. Make sure your server is running PHP v7.2+ 
-1. Make sure the entire Plainpad directory is writable 777 (the PHP process should be able to make changes to the file system). 
+1. Make sure the entire Plainpad directory is owned by and writable for the PHP process user (e.g. `chown -R www-data:www-data plainpad`), never `chmod 777` it, other users on the server could then change the code. 
 1. Go to the settings page and click the update button.
 
 [Back](readme.md)

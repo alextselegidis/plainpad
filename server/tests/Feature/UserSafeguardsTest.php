@@ -89,4 +89,39 @@ class UserSafeguardsTest extends TestCase
         $this->withToken($token)->putJson('/v1/notes/'.$id, ['title' => 'NO-TITLE', 'content' => '', 'pinned' => false])
             ->assertStatus(200)->assertJsonPath('content', '');
     }
+
+    public function test_profile_values_outside_the_allowed_lists_are_rejected(): void
+    {
+        $user = $this->user('user@example.com', false);
+        $token = $this->token('user@example.com');
+
+        foreach (['locale' => '../../etc/passwd', 'theme' => 'pink', 'view' => 'x', 'line' => 'x', 'sort' => 'x'] as $field => $value) {
+            $this->update($token, $user, [$field => $value])->assertStatus(422);
+        }
+
+        $this->update($token, $user, ['locale' => 'de-DE', 'theme' => 'dark'])->assertStatus(200);
+    }
+
+    public function test_a_stored_invalid_locale_does_not_break_the_account(): void
+    {
+        $user = $this->user('user@example.com', false);
+        $user->locale = '../../etc/passwd';
+        $user->save();
+
+        $this->app['auth']->forgetGuards();
+        $this->withToken($this->token('user@example.com'))->getJson('/v1/notes')->assertStatus(200);
+    }
+
+    public function test_malformed_list_parameters_are_rejected(): void
+    {
+        $this->user('admin@example.com', true);
+        $token = $this->token('admin@example.com');
+
+        foreach (['notes', 'users'] as $resource) {
+            foreach (['page=x&length=1', 'length=-5', 'direction[]=a', 'fields[]=id', 'filter[]=a'] as $query) {
+                $this->app['auth']->forgetGuards();
+                $this->withToken($token)->getJson("/v1/$resource?$query")->assertStatus(422);
+            }
+        }
+    }
 }

@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Throwable;
 
 use function Illuminate\Support\defer;
@@ -46,10 +47,11 @@ class UsersController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users|max:255',
             'password' => 'required|string|min:8',
-            'view' => 'string',
-            'line' => 'string',
-            'sort' => 'string',
-            'theme' => 'string',
+            'locale' => ['string', Rule::in(User::LOCALES)],
+            'view' => 'string|in:comfortable,compact',
+            'line' => 'string|in:full,narrow',
+            'sort' => 'string|in:modified,created,alphabetical',
+            'theme' => 'string|in:light,dark',
             'encrypt' => 'boolean',
             'admin' => 'required|boolean',
         ]);
@@ -78,11 +80,11 @@ class UsersController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
             'password' => 'string|nullable|min:8',
             'current_password' => 'string|nullable',
-            'locale' => 'string',
-            'view' => 'string',
-            'line' => 'string',
-            'sort' => 'string',
-            'theme' => 'string',
+            'locale' => ['string', Rule::in(User::LOCALES)],
+            'view' => 'string|in:comfortable,compact',
+            'line' => 'string|in:full,narrow',
+            'sort' => 'string|in:modified,created,alphabetical',
+            'theme' => 'string|in:light,dark',
             'encrypt' => 'boolean',
             'admin' => 'boolean',
         ]);
@@ -202,6 +204,15 @@ class UsersController extends Controller
             'updated_at',
         ];
 
+        $request->validate([
+            'filter' => 'nullable|string',
+            'sort' => 'nullable|string',
+            'direction' => 'nullable|string',
+            'page' => 'nullable|integer|min:1',
+            'length' => 'nullable|integer|min:1',
+            'fields' => 'nullable|string',
+        ]);
+
         $filter = '%'.$request->input('filter').'%';
         $sort = in_array($request->input('sort'), $defaultFields, true) ? $request->input('sort') : 'name';
         $direction = strtolower($request->input('direction')) === 'desc' ? 'desc' : 'asc';
@@ -246,23 +257,25 @@ class UsersController extends Controller
         $user = User::where('email', $request->input('email'))->first();
 
         if ($user) {
-            App::setLocale($user->locale);
-
-            $token = Str::random(64);
-
-            // Replace any previous token, a new request must invalidate older reset links.
-            DB::transaction(function () use ($user, $token) {
-                DB::table('password_resets')->where('email', $user->email)->delete();
-                DB::table('password_resets')->insert(
-                    ['email' => $user->email, 'token' => Hash::make($token), 'created_at' => now()]
-                );
-            });
-
-            $resetUrl = config('app.url').'/#/reset-password?email='.urlencode($user->email).'&token='.urlencode($token);
-
-            // Sent after the response, so neither a mail error (500) nor the send time reveals that the email exists.
-            defer(function () use ($user, $resetUrl) {
+            // Everything runs after the response, so neither its time (token hash, mail) nor a mail error (500) reveals
+            // that the email exists.
+            defer(function () use ($user) {
                 try {
+                    App::setLocale(in_array($user->locale, User::LOCALES, true) ? $user->locale : 'en-US');
+
+                    $token = Str::random(64);
+
+                    // Replace any previous token, a new request must invalidate older reset links.
+                    DB::transaction(function () use ($user, $token) {
+                        DB::table('password_resets')->where('email', $user->email)->delete();
+                        DB::table('password_resets')->insert(
+                            ['email' => $user->email, 'token' => Hash::make($token), 'created_at' => now()]
+                        );
+                    });
+
+                    $resetUrl = config('app.url').'/#/reset-password?email='.urlencode($user->email)
+                        .'&token='.urlencode($token);
+
                     Mail::to($user)->send(new PasswordRecovered($resetUrl));
                 } catch (Throwable $e) {
                     report($e);

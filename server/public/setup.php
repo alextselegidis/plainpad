@@ -116,8 +116,9 @@ function migrations()
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
         $kernel->bootstrap();
 
-        if (Illuminate\Support\Facades\Schema::hasTable('migrations')) {
-            alert('danger', 'The database already contains a Plainpad installation, please use an empty database.');
+        // migrate:fresh drops every table, never run it on a database that already holds data (of any app).
+        if (Illuminate\Support\Facades\Schema::getTables()) {
+            alert('danger', 'The database is not empty, please use an empty database for Plainpad.');
             return false;
         }
 

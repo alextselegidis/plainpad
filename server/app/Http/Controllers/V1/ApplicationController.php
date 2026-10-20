@@ -71,7 +71,8 @@ class ApplicationController extends Controller
 
     public function install()
     {
-        if (Schema::hasTable('migrations')) {
+        // migrate:fresh drops every table, never run it on a database that already holds data (of any app).
+        if (Schema::getTables()) {
             return response('', 401);
         }
 
