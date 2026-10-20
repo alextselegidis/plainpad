@@ -50,5 +50,8 @@ export default {
   yes: 'Ja',
   no: 'Nej',
   passwordsMismatch: 'Lösenorden matchar inte, vänligen försök igen.',
-  invalidateCachePrompt: 'Är du säker på att du vill rensa den lokala cachen? Ej synkad information kommmer att försvinna!'
+  invalidateCachePrompt: 'Är du säker på att du vill rensa den lokala cachen? Ej synkad information kommmer att försvinna!',
+  currentPassword: 'Nuvarande lösenord',
+  currentPasswordHint: 'Krävs för att ändra e-post eller lösenord',
+  currentPasswordRequired: 'Ange ditt nuvarande lösenord för att ändra e-post eller lösenord.',
 }

@@ -42,6 +42,7 @@ class NotesStore {
   createdAt = null;
   updatedAt = null;
   syncErrors = 0;
+  syncPromise = null;
 
   get title() {
     return this._title;
@@ -316,10 +317,19 @@ class NotesStore {
   }
 
   filterNotes(notes) {
+    // Plain substring match, the search text may contain characters like "(" that break a RegExp.
+    const filter = this.filter.toLowerCase();
+
     return notes.filter((note) => {
-      const regex = new RegExp(this.filter, 'i');
-      return note.title.match(regex) || note.content.match(regex);
+      return note.title.toLowerCase().includes(filter) || note.content.toLowerCase().includes(filter);
     });
+  }
+
+  sortByDateDescending(notes, field) {
+    // Parsed once per note, parsing inside the comparator costs n log n parses on every list refresh.
+    const times = new Map(notes.map((note) => [note, Date.parse(note[field]) || 0]));
+
+    return notes.sort((a, b) => times.get(b) - times.get(a));
   }
 
   sortNotes(notes) {
@@ -328,37 +338,11 @@ class NotesStore {
     switch (account.user.sort) {
       default:
       case 'modified':
-        sortedNotes = notes.sort((a, b) => {
-          const aModified = moment(a.updated_at);
-          const bModified = moment(b.updated_at);
-
-          if (aModified.isAfter(bModified)) {
-            return -1;
-          }
-
-          if (aModified.isBefore(bModified)) {
-            return 1;
-          }
-
-          return 0;
-        });
+        sortedNotes = this.sortByDateDescending(notes, 'updated_at');
         break;
 
       case 'created':
-        sortedNotes = notes.sort((a, b) => {
-          const aCreated = moment(a.created_at);
-          const bCreated = moment(b.created_at);
-
-          if (aCreated.isBefore(bCreated)) {
-            return 1;
-          }
-
-          if (aCreated.isAfter(bCreated)) {
-            return -1;
-          }
-
-          return 0;
-        });
+        sortedNotes = this.sortByDateDescending(notes, 'created_at');
         break;
 
       case 'alphabetical':
@@ -393,6 +377,13 @@ class NotesStore {
   }
 
   async commitChange(id, type) {
+    const pendingChange = await storage.table('sync').getItem(id);
+
+    // A note that never reached the server must stay a "create", or the sync drops it as missing on the server.
+    if (type === 'update' && pendingChange && pendingChange.type === 'create') {
+      type = 'create';
+    }
+
     await storage.table('sync').setItem(id, {
       date: moment.utc().toDate(),
       type
@@ -403,11 +394,18 @@ class NotesStore {
     await storage.table('sync').removeItem(id);
   }
 
-  async sync() {
-    if (this.syncing) {
-      return;
+  // Shared by every caller, so that e.g. logout can wait for a sync that is already running.
+  sync() {
+    if (!this.syncPromise) {
+      this.syncPromise = this.runSync().finally(() => {
+        this.syncPromise = null;
+      });
     }
 
+    return this.syncPromise;
+  }
+
+  async runSync() {
     clearTimeout(this.syncTimeout);
 
     if (!navigator.onLine || !account.user) {
@@ -417,25 +415,33 @@ class NotesStore {
 
     await this.list();
 
-    if (this.syncErrors >= 10) {
-      application.warning(translate('notes.syncingGotDisabled'));
-      return;
-    }
-
     try {
       this.syncing = true;
       const serverNotes = await this.fetchServerNotes();
-      const syncedServerNotes = await this.syncLocalChanges(serverNotes);
+      const [syncedServerNotes, failedChanges] = await this.syncLocalChanges(serverNotes);
       await this.syncServerChanges(syncedServerNotes);
+
+      if (failedChanges) {
+        throw new Error(`${failedChanges} local change(s) failed to sync.`);
+      }
+
+      this.syncErrors = 0;
     } catch (error) {
       this.syncErrors++;
-      application.error(translate('notes.syncFailure'));
       console.error(error);
+
+      if (this.syncErrors < 10) {
+        application.error(translate('notes.syncFailure'));
+      } else if (this.syncErrors === 10) {
+        application.warning(translate('notes.syncingGotDisabled'));
+      }
     }
 
     await this.list();
     this.syncing = false;
-    this.syncTimeout = setTimeout(() => this.sync(), 60000);
+
+    // Keep retrying after repeated failures, just less often, so the pending changes are not stuck until a reload.
+    this.syncTimeout = setTimeout(() => this.sync(), this.syncErrors >= 10 ? 600000 : 60000);
   }
 
   async syncLocalChanges(serverNotes) {
@@ -445,33 +451,61 @@ class NotesStore {
       localChanges[id] = localChange;
     });
 
-    // Run through the local changes and resolve any pending ones.
+    let failedChanges = 0;
+
+    // Run through the local changes and resolve any pending ones. A failing change stays pending for the next sync
+    // without blocking the others.
     for (let id in localChanges) {
       const localChange = localChanges[id];
       const localNote = await storage.table('notes').getItem(id);
       const serverNote = serverNotes.find((serverNote) => serverNote.id === id);
 
-      switch (localChange.type) {
-        case 'create':
-          serverNotes = await this.syncCreateChange(serverNotes, id, localNote);
-          break;
-        case 'update':
-          serverNotes = await this.syncUpdateChange(serverNotes, id, serverNote, localNote, localChange);
-          break;
-        case 'delete':
-          serverNotes = await this.syncDeleteChange(serverNotes, id, serverNote);
-          break;
-        default:
-        // Invalid change type, do not process anything.
-      }
+      try {
+        switch (localChange.type) {
+          case 'create':
+            serverNotes = await this.syncCreateChange(serverNotes, id, localNote);
+            break;
+          case 'update':
+            serverNotes = await this.syncUpdateChange(serverNotes, id, serverNote, localNote, localChange);
+            break;
+          case 'delete':
+            serverNotes = await this.syncDeleteChange(serverNotes, id, serverNote);
+            break;
+          default:
+          // Invalid change type, do not process anything.
+        }
 
-      await this.resolveChange(id);
+        await this.resolveChange(id);
+      } catch (error) {
+        failedChanges++;
+        console.error(error);
+      }
     }
 
-    return serverNotes;
+    return [serverNotes, failedChanges];
   }
 
   async syncServerChanges(serverNotes) {
+    // A first sync (new device, cleared cache) needs the content of every note. One request per note runs into the
+    // API rate limit with a few hundred notes, so fetch everything in one list request when many notes are missing.
+    let missing = 0;
+
+    for (let serverNote of serverNotes) {
+      if (!await storage.table('notes').getItem(serverNote.id) && ++missing > 20) {
+        break;
+      }
+    }
+
+    const contents = {};
+
+    if (missing > 20) {
+      for (let note of await NotesHttpClient.list()) {
+        contents[note.id] = note;
+      }
+    }
+
+    const retrieve = (id) => contents[id] || NotesHttpClient.retrieve(id);
+
     // Add new notes that are not present in the local cache.
     for (let serverNote of serverNotes) {
       const localNote = await storage.table('notes').getItem(serverNote.id);
@@ -482,7 +516,7 @@ class NotesStore {
         const serverChanged = moment(serverNote.updated_at);
 
         if (serverChanged.isAfter(localChanged)) {
-          const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
+          const serverNoteWithContent = await retrieve(serverNote.id);
           await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
           if (this.id === serverNote.id) {
             // TODO: Add an icon that the currently selected note was changed on the server
@@ -491,7 +525,7 @@ class NotesStore {
           await NotesHttpClient.update(localNote);
         }
       } else {
-        const serverNoteWithContent = await NotesHttpClient.retrieve(serverNote.id);
+        const serverNoteWithContent = await retrieve(serverNote.id);
         await storage.table('notes').setItem(serverNote.id, serverNoteWithContent);
         if (this.id === serverNote.id) {
           // TODO: Add an icon that the currently selected note was changed on the server
@@ -588,7 +622,7 @@ decorate(NotesStore, {
   syncing: observable,
   filter: observable,
   sort: observable,
-  noteList: observable,
+  noteList: observable.ref, // Replaced as a whole on every refresh, deep observables of all notes are not needed.
   id: observable,
   _title: observable,
   content: observable,

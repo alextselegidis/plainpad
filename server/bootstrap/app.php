@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
+            \App\Http\Middleware\JsonErrorBody::class,
         ]);
 
         // Activates the 'api' rate limiter defined in RouteServiceProvider. Without this the limiter is
@@ -37,7 +38,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn () => abort(401, 'Unauthenticated'));
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // API only app: answer with JSON even when the client does not send "Accept: application/json", otherwise
+        // validation errors redirect to the app page and other errors render HTML error pages.
+        $exceptions->shouldRenderJsonWhen(fn () => true);
     })
     ->withProviders([
         \App\Providers\AppServiceProvider::class,

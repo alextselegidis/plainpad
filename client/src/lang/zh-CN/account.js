@@ -26,4 +26,7 @@ export default {
   failedToRecoverPassword: '恢复密码时出现错误，请重试',
   invalidateSuccess: '成功清除缓存',
   sessionExpired: '您的会话已过期，请重新登录',
+  successfullyResetPassword: '您的密码已成功重置！现在可以登录了',
+  failedToResetPassword: '重置密码时出现错误，链接可能已过期',
+  passwordsDoNotMatch: '两次输入的密码不一致，请重试',
 }

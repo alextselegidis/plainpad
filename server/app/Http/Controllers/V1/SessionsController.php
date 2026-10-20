@@ -44,9 +44,15 @@ class SessionsController extends Controller
 
         $user = User::where('email', $email)->first();
 
-        if (!$user || !Hash::check($password, $user->password)) {
-            return response('', 401);
+        // Hash against a dummy value for unknown emails too, so the response time does not reveal which emails exist.
+        $hash = $user ? $user->password : '$2y$10$p7YkG7QvHUsbk9KN8DGZ4uMiVgREcOGZ96X7dckVVVNOoQYRtlofW';
+
+        if (!Hash::check($password, $hash) || !$user) {
+            return response()->json(['message' => 'Invalid email or password.'], 401);
         }
+
+        // Expired sessions are never used again, drop them so the table does not grow with every login.
+        Session::where('user_id', $user->id)->where('expires_at', '<=', now())->delete();
 
         $session = new Session;
         $session->id = (string)Str::uuid();

@@ -84,11 +84,6 @@ class HttpClient {
   }
 
   static throwRequestFailed(response) {
-    if (response.status === 401 && account && !account.session) {
-      // The login request failed.
-      return;
-    }
-
     if (response.status === 401 && account && account.session) {
       // The session has expired, the user has to log in again.
       localStorage.removeItem('Plainpad.Account');

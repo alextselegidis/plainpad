@@ -5,3 +5,4 @@
 !/docker/php-fpm/
 .DS_Store
 *.zip
+*.zip.sig

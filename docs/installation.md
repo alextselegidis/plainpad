@@ -9,7 +9,7 @@ familiar with the next steps. Follow this article strictly in order to complete 
 
 * Apache/NGINX
 * MySQL 
-* PHP >= 7.3
+* PHP >= 8.2
 * BCMath PHP Extension
 * Ctype PHP Extension
 * Fileinfo PHP extension
@@ -27,10 +27,14 @@ Plainpad requires a few steps and minimum configuration for the installation to 
 1. Upload the contents of the zip archive to your server. 
 1. Make sure the web server is configured to only serve the `public` directory.
 1. Create an `.env` file based on the `.env.example` provided and enter your configuration values. 
+1. Run `php artisan key:generate` to create a random application key.
 1. Run `php artisan migrate:fresh --seed` to set up the database.
 
 Alternatively you can open the browser to the `/url/to/public/setup.php` file and submit the 
 installation form. 
+
+Log in with the default account `admin@example.org` / `12345678` and change its email and password right away 
+from the profile page.
 
 Make sure the entire application directory is completely writable by the PHP process so that the auto update feature 
 works properly.  

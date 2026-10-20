@@ -36,7 +36,7 @@ class NotesController extends Controller
     {
         $request->validate( [
             'title' => 'required|string',
-            'content' => 'required|string',
+            'content' => 'present|nullable|string', // An emptied note is still a valid note.
             'pinned' => 'required|boolean'
         ]);
 
@@ -44,7 +44,7 @@ class NotesController extends Controller
         $note->id = (string)Str::uuid();
         $note->user_id = Auth::user()->id;
         $note->title = $request->input('title');
-        $note->content = $request->input('content');
+        $note->content = $request->input('content') ?? '';
         $note->pinned = $request->input('pinned');
         $note->save();
 
@@ -55,7 +55,7 @@ class NotesController extends Controller
     {
         $request->validate( [
             'title' => 'required|string',
-            'content' => 'required|string',
+            'content' => 'present|nullable|string', // An emptied note is still a valid note.
             'pinned' => 'required|boolean'
         ]);
 
@@ -66,11 +66,11 @@ class NotesController extends Controller
         }
 
         if ($note->user_id !== Auth::user()->id) {
-            return response('', 401);
+            return response('', 404); // Not 401, the client treats that as an expired session and logs out.
         }
 
         $note->title = $request->input('title');
-        $note->content = $request->input('content');
+        $note->content = $request->input('content') ?? '';
         $note->pinned = $request->input('pinned');
         $note->save();
 
@@ -86,7 +86,7 @@ class NotesController extends Controller
         }
 
         if ($note->user_id !== Auth::user()->id) {
-            return response('', 401);
+            return response('', 404); // Not 401, the client treats that as an expired session and logs out.
         }
 
         $note->delete();
@@ -115,24 +115,25 @@ class NotesController extends Controller
 
         $user = Auth::user();
 
-        $occurrences = Note::where('user_id', $user->id)
-            ->select('id', 'title', 'content')
-            ->get()
-            ->filter(function($note) use ($filter) {
-                if (!$filter) {
-                    return true;
-                }
-
-                return stripos($note->title, $filter) !== false || stripos($note->content, $filter) !== false;
-            })
-            ->map(function($note) {
-                return $note->id;
-            });
-
-        $query = Note::whereIn('id', $occurrences)
-            ->where('user_id', $user->id)
+        $query = Note::where('user_id', $user->id)
             ->select(...$fields)
             ->orderBy($sort, $direction);
+
+        // Filtered in PHP because encrypted notes cannot be searched in SQL. Without a filter (every client sync) the
+        // contents are not loaded at all.
+        if ($filter) {
+            $occurrences = Note::where('user_id', $user->id)
+                ->select('id', 'title', 'content')
+                ->get()
+                ->filter(function($note) use ($filter) {
+                    return stripos($note->title, $filter) !== false || stripos($note->content, $filter) !== false;
+                })
+                ->map(function($note) {
+                    return $note->id;
+                });
+
+            $query->whereIn('id', $occurrences);
+        }
 
         if ($length) {
             $query->limit($length);
@@ -153,7 +154,7 @@ class NotesController extends Controller
         }
 
         if ($note->user_id !== Auth::user()->id) {
-            return response('', 401);
+            return response('', 404); // Not 401, the client treats that as an expired session and logs out.
         }
 
         return response()->json($note);
@@ -172,7 +173,7 @@ class NotesController extends Controller
         }
 
         if ($note->user_id !== Auth::user()->id) {
-            return response('', 401);
+            return response('', 404); // Not 401, the client treats that as an expired session and logs out.
         }
 
         $note->pinned = $request->input('pinned');

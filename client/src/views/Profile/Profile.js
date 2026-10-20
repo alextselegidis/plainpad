@@ -53,6 +53,7 @@ class Profile extends Component {
       email,
       password,
       passwordConfirmation,
+      currentPassword,
       locale,
       view,
       line,
@@ -104,6 +105,15 @@ class Profile extends Component {
                     </Label>
                     <Input type="password" value={passwordConfirmation}
                            onChange={(event) => profile.passwordConfirmation = event.target.value}/>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label>
+                      <FormattedMessage id="profile.currentPassword"/>
+                    </Label>
+                    <Input type="password" value={currentPassword} autoComplete="current-password"
+                           placeholder={translate('profile.currentPasswordHint')}
+                           onChange={(event) => profile.currentPassword = event.target.value}/>
                   </FormGroup>
                 </CardBody>
                 <CardFooter>

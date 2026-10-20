@@ -52,6 +52,7 @@ class SessionRevocationTest extends TestCase
             'name' => 'Victim',
             'email' => 'victim@example.com',
             'password' => 'new-password',
+            'current_password' => 'old-password',
         ])->assertStatus(200);
 
         $this->assertFalse($this->canAccess($stolen));

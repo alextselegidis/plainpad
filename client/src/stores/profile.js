@@ -32,6 +32,7 @@ class ProfileStore {
   email = '';
   password = '';
   passwordConfirmation = '';
+  currentPassword = '';
   locale = 'en-US';
   view = 'compact';
   line = 'full';
@@ -52,6 +53,7 @@ class ProfileStore {
     this.email = user.email;
     this.password = '';
     this.passwordConfirmation = '';
+    this.currentPassword = '';
     this.locale = user.locale;
     this.view = user.view;
     this.line = user.line;
@@ -66,10 +68,18 @@ class ProfileStore {
       return;
     }
 
+    const credentialsChanged = !!this.password || this.email !== account.user.email;
+
+    if (credentialsChanged && !this.currentPassword) {
+      application.error(translate('profile.currentPasswordRequired'));
+      return;
+    }
+
+    // The password is sent once and never kept in the account, which is stored in localStorage and re-sent on every
+    // later profile update (e.g. theme toggle).
     const profile = {
       name: this.name,
       email: this.email,
-      password: this.password,
       locale: this.locale,
       view: this.view,
       line: this.line,
@@ -80,13 +90,35 @@ class ProfileStore {
 
     const reload = this.locale !== account.user.locale;
 
+    if (credentialsChanged) {
+      // Email and password changes need the server to confirm the current password before they apply locally.
+      try {
+        await UsersHttpClient.update({
+          ...account.user,
+          ...profile,
+          password: this.password,
+          current_password: this.currentPassword,
+        });
+      } catch (error) {
+        application.error(translate('profile.saveFailure'));
+        console.error(error);
+        return;
+      }
+
+      this.password = '';
+      this.passwordConfirmation = '';
+      this.currentPassword = '';
+    }
+
     account.user = {...account.user, ...profile};
 
     this.updateLocalAccount();
 
     application.success(translate('profile.saveSuccess'));
 
-    await this.saveAccountUser();
+    if (!credentialsChanged) {
+      await this.saveAccountUser();
+    }
 
     await notes.list();
 
@@ -132,9 +164,12 @@ class ProfileStore {
   }
 
   updateLocalAccount() {
+    // Older versions stored the plain password in the account, drop it.
+    const {password, ...user} = account.user;
+
     const localAccount = {
       session: account.session,
-      user: account.user
+      user
     };
 
     localStorage.setItem('Plainpad.Account', JSON.stringify(localAccount));
@@ -142,7 +177,9 @@ class ProfileStore {
 
   async saveAccountUser() {
     try {
-      await UsersHttpClient.update(account.user);
+      const {password, ...user} = account.user;
+
+      await UsersHttpClient.update(user);
     } catch (error) {
       if (error instanceof OfflineError) {
         return;
@@ -158,6 +195,7 @@ decorate(ProfileStore, {
   name: observable,
   email: observable,
   password: observable,
+  currentPassword: observable,
   passwordConfirmation: observable,
   locale: observable,
   view: observable,

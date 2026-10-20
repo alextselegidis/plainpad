@@ -13,7 +13,7 @@ class Authenticate extends Middleware
         try {
             $this->authenticate($request, $guards);
         } catch(AuthenticationException $e) {
-            return response('Unauthorized.', 401);
+            return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
         return $next($request);

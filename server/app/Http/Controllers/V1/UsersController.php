@@ -34,6 +34,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Throwable;
+
+use function Illuminate\Support\defer;
 
 class UsersController extends Controller
 {
@@ -42,7 +45,7 @@ class UsersController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users|max:255',
-            'password' => 'required|string',
+            'password' => 'required|string|min:8',
             'view' => 'string',
             'line' => 'string',
             'sort' => 'string',
@@ -73,7 +76,8 @@ class UsersController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
-            'password' => 'string|nullable',
+            'password' => 'string|nullable|min:8',
+            'current_password' => 'string|nullable',
             'locale' => 'string',
             'view' => 'string',
             'line' => 'string',
@@ -95,7 +99,18 @@ class UsersController extends Controller
             return response('', 401);
         }
 
-        Note::toggleEncryption($user, $user->encrypt, (bool) $request->input('encrypt'));
+        // Changing your own email or password needs the current password, so a stolen token cannot take the account over.
+        // Admins editing another user are exempt.
+        $credentialsChanged = $request->input('password') || $request->input('email') !== $user->email;
+
+        if ($authUser->id === $user->id && $credentialsChanged
+            && ! Hash::check((string) $request->input('current_password'), $user->password)) {
+            // 422 and not 401, the client treats a 401 as an expired session and logs out.
+            return response()->json(['message' => 'The current password is incorrect.'], 422);
+        }
+
+        // Missing fields keep their current value, the admin users screen does not send "encrypt".
+        $encrypt = $request->boolean('encrypt', $user->encrypt);
 
         $user->name = $request->input('name');
         $user->email = $request->input('email');
@@ -105,20 +120,38 @@ class UsersController extends Controller
         $user->line = $request->input('line') ?? $user->line;
         $user->sort = $request->input('sort') ?? $user->sort;
         $user->theme = $request->input('theme') ?? $user->theme;
-        $user->encrypt = $request->input('encrypt') ?? $user->encrypt;
+        $user->encrypt = $encrypt;
 
-        if ($authUser->admin) {
-            $user->admin = (bool) $request->input('admin');
+        if ($authUser->admin && $request->has('admin')) {
+            $user->admin = $request->boolean('admin');
         }
 
-        $user->save();
+        // One transaction, so a failure halfway through the notes does not leave them partly encrypted. The admin rows
+        // are locked, so two admins demoting each other at the same time cannot both pass the last admin check.
+        $saved = DB::transaction(function () use ($user, $encrypt) {
+            if ($user->getOriginal('admin') && ! $user->admin
+                && User::where('admin', true)->lockForUpdate()->count() === 1) {
+                return false;
+            }
+
+            Note::toggleEncryption($user, (bool) $user->getOriginal('encrypt'), $encrypt);
+            $user->save();
+
+            return true;
+        });
+
+        if (! $saved) {
+            return response()->json(['message' => 'The last admin cannot be demoted.'], 422);
+        }
 
         if ($request->input('password')) {
             // Revoke every other session so a stolen token does not survive the password change.
             Session::where('user_id', $user->id)->where('token', '!=', $request->bearerToken())->delete();
         }
 
-        Auth::user()->encrypt = $user->encrypt;
+        if ($authUser->id === $user->id) {
+            $authUser->encrypt = $user->encrypt;
+        }
 
         return response()->json($user, 200);
     }
@@ -135,7 +168,18 @@ class UsersController extends Controller
             return response('', 400); // Cannot delete themselves.
         }
 
-        $user->delete();
+        // Locked, so two admins deleting each other at the same time cannot remove every admin.
+        $deleted = DB::transaction(function () use ($user) {
+            if ($user->admin && User::where('admin', true)->lockForUpdate()->count() === 1) {
+                return false;
+            }
+
+            return $user->delete();
+        });
+
+        if (! $deleted) {
+            return response()->json(['message' => 'The last admin cannot be deleted.'], 422);
+        }
 
         return response('', 200);
     }
@@ -216,7 +260,14 @@ class UsersController extends Controller
 
             $resetUrl = config('app.url').'/#/reset-password?email='.urlencode($user->email).'&token='.urlencode($token);
 
-            Mail::to($user)->send(new PasswordRecovered($resetUrl));
+            // Sent after the response, so neither a mail error (500) nor the send time reveals that the email exists.
+            defer(function () use ($user, $resetUrl) {
+                try {
+                    Mail::to($user)->send(new PasswordRecovered($resetUrl));
+                } catch (Throwable $e) {
+                    report($e);
+                }
+            });
         }
 
         // Always return 200 regardless of whether the email exists, to prevent account enumeration.

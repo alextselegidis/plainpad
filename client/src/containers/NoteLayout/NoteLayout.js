@@ -122,9 +122,10 @@ class NoteLayout extends Component {
       <div className={`app ${user.theme === 'dark' ? 'dark' : ''}`}>
         <AppHeader fixed>
           <Suspense  fallback={this.loading()}>
-            <NoteHeader onLogout={(event) => {
+            <NoteHeader onLogout={async (event) => {
               event.preventDefault();
-              account.logout();
+              // Wait for the server to revoke the session before leaving the app.
+              await account.logout();
               history.push('/login');
             }}/>
           </Suspense>

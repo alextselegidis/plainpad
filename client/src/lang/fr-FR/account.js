@@ -26,4 +26,7 @@ export default {
   failedToRecoverPassword: 'Une erreur s\'est produite lors de la récupération de votre mot de passe, veuillez réessayer.',
   invalidateSuccess: 'Le cache a été réinitialisé avec succès.',
   sessionExpired: 'Votre session a expiré, veuillez vous reconnecter.',
+  successfullyResetPassword: 'Votre mot de passe a été réinitialisé avec succès ! Vous pouvez maintenant vous connecter.',
+  failedToResetPassword: 'Une erreur s\'est produite lors de la réinitialisation de votre mot de passe. Le lien a peut-être expiré.',
+  passwordsDoNotMatch: 'Les mots de passe ne correspondent pas, veuillez réessayer.',
 }

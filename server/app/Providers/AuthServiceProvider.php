@@ -26,6 +26,11 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Auth::viaRequest('custom-token', function ($request) {
+            // No token, no lookup: the install request runs before the sessions table exists.
+            if (! $request->bearerToken()) {
+                return null;
+            }
+
             $session = Session::where('token', $request->bearerToken())
                 ->where('expires_at', '>', now())
                 ->first();

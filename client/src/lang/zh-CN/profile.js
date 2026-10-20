@@ -50,5 +50,8 @@ export default {
   yes: '是',
   no: '否',
   passwordsMismatch: '密码不匹配，请重试',
-  invalidateCachePrompt: '确定要清除本地缓存吗？未同步的信息将会丢失'
+  invalidateCachePrompt: '确定要清除本地缓存吗？未同步的信息将会丢失',
+  currentPassword: '当前密码',
+  currentPasswordHint: '修改邮箱或密码时需要填写',
+  currentPasswordRequired: '请输入当前密码以修改邮箱或密码',
 }

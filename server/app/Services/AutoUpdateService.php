@@ -69,6 +69,13 @@ class AutoUpdateService
     private $branch = '';
 
     /**
+     * Base64 Ed25519 public keys, release archives must be signed with one of them.
+     *
+     * @var string[]
+     */
+    private $publicKeys = [];
+
+    /**
      * Username authentication
      *
      * @var string
@@ -177,6 +184,11 @@ class AutoUpdateService
     const ERROR_SIMULATE = 70;
 
     /**
+     * The update archive signature is missing or invalid.
+     */
+    const ERROR_SIGNATURE = 80;
+
+    /**
      * Create new instance
      *
      * @param string $tempDir
@@ -275,6 +287,96 @@ class AutoUpdateService
         $this->updateUrl = $updateUrl;
 
         return $this;
+    }
+
+    /**
+     * Set the base64 Ed25519 public keys that update archives are verified with (any one of them must match).
+     *
+     * @param string[] $publicKeys
+     * @return $this
+     */
+    public function setPublicKeys(array $publicKeys)
+    {
+        $this->publicKeys = $publicKeys;
+
+        return $this;
+    }
+
+    /**
+     * Verify the detached signature published next to the archive ("<url>.sig", base64).
+     *
+     * Fails closed: without a valid public key, a signature or a match, nothing gets installed.
+     *
+     * @param string $updateFile
+     * @param string $updateUrl
+     * @return bool
+     */
+    protected function _verifySignature($updateFile, $updateUrl)
+    {
+        $publicKeys = array_filter(array_map(function ($publicKey) {
+            $publicKey = base64_decode(trim((string) $publicKey), true);
+
+            return $publicKey !== false && strlen($publicKey) === SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES ? $publicKey : null;
+        }, $this->publicKeys));
+
+        if (!$publicKeys) {
+            $this->log->critical('No valid update public key is configured, refusing to install updates.');
+
+            return false;
+        }
+
+        $signature = $this->_downloadCurl($updateUrl . '.sig');
+        $signature = $signature === false ? false : base64_decode(trim($signature), true);
+
+        if ($signature === false || strlen($signature) !== SODIUM_CRYPTO_SIGN_BYTES) {
+            $this->log->critical(sprintf('Missing or malformed signature "%s.sig"!', $updateUrl));
+
+            return false;
+        }
+
+        $contents = file_get_contents($updateFile);
+
+        foreach ($publicKeys as $publicKey) {
+            if (sodium_crypto_sign_verify_detached($signature, $contents, $publicKey)) {
+                return true;
+            }
+        }
+
+        $this->log->critical(sprintf('Invalid signature for update "%s"!', $updateUrl));
+
+        return false;
+    }
+
+    /**
+     * Check that the archive really is the version the manifest offers it as, so that a tampered manifest cannot
+     * serve an older (validly signed) release as a new version and roll an install back.
+     *
+     * @param string $updateFile
+     * @param string $version
+     * @return bool
+     */
+    protected function _verifyArchiveVersion($updateFile, $version)
+    {
+        $zip = new \ZipArchive();
+
+        if ($zip->open($updateFile) !== true) {
+            $this->log->critical(sprintf('Could not open update archive "%s"!', $updateFile));
+
+            return false;
+        }
+
+        $config = $zip->getFromName('config/app.php');
+        $zip->close();
+
+        if ($config === false
+            || !preg_match("/'version' => env\\('APP_VERSION', '([^']+)'\\)/", $config, $matches)
+            || $matches[1] !== $version) {
+            $this->log->critical(sprintf('Update archive "%s" is not version "%s"!', $updateFile, $version));
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -590,10 +692,13 @@ class AutoUpdateService
      * @param string $url URL to file
      * @return string|false
      */
-    protected function _downloadCurl($url)
+    protected function _downloadCurl($url, $timeout = 15)
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
+        // Admins check for updates on every app load, an unreachable update server must not hang the app.
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
@@ -630,7 +735,7 @@ class AutoUpdateService
     {
         $this->log->info(sprintf('Downloading update "%s" to "%s"', $updateUrl, $updateFile));
         if (function_exists('curl_version') && $this->_isValidUrl($updateUrl)) {
-            $update = $this->_downloadCurl($updateUrl);
+            $update = $this->_downloadCurl($updateUrl, 600);
             if ($update === false) {
                 return false;
             }
@@ -672,6 +777,27 @@ class AutoUpdateService
      * @param string $updateFile
      * @return bool
      */
+    /**
+     * Check that a zip entry stays inside the install directory (no absolute paths, no ".." segments).
+     *
+     * @param string $entryName
+     * @return bool
+     */
+    protected function _isSafeZipEntry($entryName)
+    {
+        if ($entryName === '' || strpos($entryName, "\0") !== false) {
+            return false;
+        }
+
+        $normalized = str_replace('\\', '/', $entryName);
+
+        if ($normalized[0] === '/' || preg_match('/^[a-zA-Z]:/', $normalized)) {
+            return false;
+        }
+
+        return !in_array('..', explode('/', $normalized), true);
+    }
+
     protected function _simulateInstall($updateFile)
     {
         $this->log->notice('[SIMULATE] Install new version');
@@ -693,6 +819,14 @@ class AutoUpdateService
             $i++;
 
             $filename = zip_entry_name($file);
+
+            if (!$this->_isSafeZipEntry($filename)) {
+                $this->log->critical(sprintf('[SIMULATE] Unsafe path "%s" in update archive', $filename));
+                zip_close($zip);
+
+                return false;
+            }
+
             $foldername = $this->installDir . dirname($filename);
             $absoluteFilename = $this->installDir . $filename;
 
@@ -815,6 +949,14 @@ class AutoUpdateService
 
         // Read every file from archive
         while ($file = zip_read($zip)) {
+            // Checked again here, the simulation is optional.
+            if (!$this->_isSafeZipEntry(zip_entry_name($file))) {
+                $this->log->critical(sprintf('Unsafe path "%s" in update archive', zip_entry_name($file)));
+                zip_close($zip);
+
+                return false;
+            }
+
             $filename = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, zip_entry_name($file));
             $foldername = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->installDir . dirname($filename));
             $absoluteFilename = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->installDir . $filename);
@@ -974,6 +1116,14 @@ class AutoUpdateService
                 $this->log->debug(sprintf('Latest update downloaded to "%s"', $updateFile));
             } else {
                 $this->log->info(sprintf('Latest update already downloaded to "%s"', $updateFile));
+            }
+
+            // Verified on every run, also for an archive left over from an earlier attempt.
+            if (!$this->_verifySignature($updateFile, $update['url'])
+                || !$this->_verifyArchiveVersion($updateFile, $update['version'])) {
+                @unlink($updateFile);
+
+                return self::ERROR_SIGNATURE;
             }
 
             // Install update

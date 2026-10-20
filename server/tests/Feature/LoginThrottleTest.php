@@ -26,6 +26,26 @@ class LoginThrottleTest extends TestCase
         $this->attempt('victim@example.com', 'wrong-guess-5')->assertStatus(429);
     }
 
+    public function test_failed_attempts_from_one_address_do_not_lock_the_owner_out_elsewhere(): void
+    {
+        for ($i = 0; $i < 6; $i++) {
+            $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.7'])->attempt('victim@example.com', 'wrong-guess-'.$i);
+        }
+
+        $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.20'])
+            ->attempt('victim@example.com', 'wrong-guess')->assertStatus(401);
+    }
+
+    public function test_attempts_spread_across_addresses_still_hit_the_account_limit(): void
+    {
+        for ($i = 0; $i < 50; $i++) {
+            $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.'.$i])->attempt('victim@example.com', 'wrong-guess-'.$i);
+        }
+
+        $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.20'])
+            ->attempt('victim@example.com', 'wrong-guess')->assertStatus(429);
+    }
+
     public function test_throttle_is_keyed_on_the_target_account_not_only_the_ip(): void
     {
         for ($i = 0; $i < 6; $i++) {

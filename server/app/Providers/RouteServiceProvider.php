@@ -40,17 +40,23 @@ class RouteServiceProvider extends ServiceProvider
         // Login attempts are keyed on the target account first, so that credential stuffing cannot be
         // spread across rotating source addresses. The account key resolves through the same lookup the
         // login uses, so accent/case variants of one email (utf8mb4_unicode_ci) share a single counter
-        // instead of each getting a fresh five attempts. The IP limit is deliberately loose because
-        // instances behind a reverse proxy see every client as the proxy address.
+        // instead of each getting a fresh five attempts. The strict limit is per account and address, so a
+        // single attacker cannot lock the owner out from elsewhere, the looser per account limit still caps
+        // guesses spread across rotating addresses. The IP limit is deliberately loose because instances
+        // behind a reverse proxy see every client as the proxy address.
         RateLimiter::for('login', function (Request $request) {
-            $user = User::where('email', (string) $request->input('email'))->first();
+            // Runs before validation, a non string email (e.g. an array) must not crash the request.
+            $email = is_string($request->input('email')) ? $request->input('email') : '';
+
+            $user = User::where('email', $email)->first();
 
             $key = $user
                 ? 'login-user:'.$user->id
-                : 'login-email:'.Str::lower((string) $request->input('email'));
+                : 'login-email:'.Str::lower($email);
 
             return [
-                Limit::perMinutes(15, 5)->by($key),
+                Limit::perMinutes(15, 5)->by($key.'|'.$request->ip()),
+                Limit::perMinutes(15, 50)->by($key),
                 Limit::perMinutes(15, 50)->by('login-ip:'.$request->ip()),
             ];
         });

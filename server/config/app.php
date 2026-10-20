@@ -29,6 +29,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Update Public Keys
+    |--------------------------------------------------------------------------
+    |
+    | Comma separated base64 Ed25519 public keys, auto update archives must be
+    | signed with one of them (a "<archive url>.sig" file next to each
+    | archive). Updates without a valid signature are refused. The first one
+    | is the release key, the second a backup kept offline, so that losing
+    | the release key does not stop the updates. See build.sh.
+    |
+    */
+
+    'update_public_keys' => array_filter(explode(',', env(
+        'APP_UPDATE_PUBLIC_KEYS',
+        'OEuhtEoc/Bp0km0UUk6A/wX+KunlWwFTFW5vk8l8mJc=,tJl9RkzX2ERf8ozQzSNysjtyvMM2TEL7OTdS0YMAvG0='
+    ))),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |

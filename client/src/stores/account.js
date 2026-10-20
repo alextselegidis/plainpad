@@ -23,6 +23,7 @@ import application from './application';
 import notes from './notes';
 import SessionsHttpClient from '../http/SessionsHttpClient';
 import UsersHttpClient from '../http/UsersHttpClient';
+import storage from '../storage';
 
 class AccountStore {
   session = null;
@@ -75,24 +76,44 @@ class AccountStore {
   }
 
   async logout() {
+    if (this.user) {
+      await this.removeLocalNotes();
+    }
+
+    // Revoke the session before clearing the user, clearing it already shows the login page.
+    if (this.session) {
+      try {
+        await SessionsHttpClient.delete(this.session);
+        application.success(translate('account.successfullyLoggedOut'));
+      } catch (error) {
+        application.error(translate('account.failedToLogOut'));
+        console.error(error);
+      }
+    }
+
     localStorage.removeItem('Plainpad.Account');
     notes.reset();
     notes.empty();
     this.user = null;
+    this.session = null;
+  }
 
-    if (!this.session) {
-      return;
-    }
-
+  async removeLocalNotes() {
+    // Upload pending changes first, notes that still cannot be synced (e.g. offline) stay on the device so that they
+    // are not lost and get uploaded on the next login.
     try {
-      await SessionsHttpClient.delete(this.session);
-      application.success(translate('account.successfullyLoggedOut'));
+      // The first call waits for a sync that may already be running (it would write into the database after the drop),
+      // the second one uploads the latest changes.
+      await notes.sync();
+      await notes.sync();
+      clearTimeout(notes.syncTimeout);
+
+      if (await storage.table('sync').length() === 0) {
+        await storage.drop();
+      }
     } catch (error) {
-      application.error(translate('account.failedToLogOut'));
       console.error(error);
     }
-
-    this.session = null;
   }
 
   async recoverPassword(email) {

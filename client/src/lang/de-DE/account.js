@@ -26,4 +26,7 @@ export default {
   failedToRecoverPassword: 'Bei der Wiederherstellung Ihres Passworts ist etwas schief gelaufen, bitte versuchen Sie es erneut.',
   invalidateSuccess: 'Cache wurde erfolgreich zurückgesetzt.',
   sessionExpired: 'Ihre Sitzung ist abgelaufen, bitte loggen Sie sich erneut ein.',
+  successfullyResetPassword: 'Ihr Passwort wurde erfolgreich zurückgesetzt! Sie können sich jetzt einloggen.',
+  failedToResetPassword: 'Beim Zurücksetzen Ihres Passworts ist etwas schief gelaufen. Der Link ist möglicherweise abgelaufen.',
+  passwordsDoNotMatch: 'Die Passwörter stimmen nicht überein, bitte versuchen Sie es erneut.',
 }

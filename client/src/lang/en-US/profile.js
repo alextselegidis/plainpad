@@ -50,5 +50,8 @@ export default {
   yes: 'Yes',
   no: 'No',
   passwordsMismatch: 'The provided passwords mismatch, please try again.',
-  invalidateCachePrompt: 'Are you sure that you want to invalidate the local cache? Not synchronized information will be lost.'
+  invalidateCachePrompt: 'Are you sure that you want to invalidate the local cache? Not synchronized information will be lost.',
+  currentPassword: 'Current Password',
+  currentPasswordHint: 'Required to change the email or password',
+  currentPasswordRequired: 'Enter your current password to change the email or password.',
 }

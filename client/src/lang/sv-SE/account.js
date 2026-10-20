@@ -26,4 +26,7 @@ export default {
   failedToRecoverPassword: 'Någonting gick fel vid återställningen av ditt lösenord, vänligen försök igen.',
   invalidateSuccess: 'Cachen har rensats.',
   sessionExpired: 'Din session har upphört att gälla, vänligen logga in igen.',
+  successfullyResetPassword: 'Ditt lösenord har återställts! Du kan nu logga in.',
+  failedToResetPassword: 'Någonting gick fel vid återställningen av ditt lösenord. Länken kan ha upphört att gälla.',
+  passwordsDoNotMatch: 'Lösenorden matchar inte, vänligen försök igen.',
 }

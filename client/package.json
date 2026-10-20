@@ -71,6 +71,9 @@
       "!**/*index.js",
       "!src/serviceWorker.js",
       "!src/polyfill.js"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(uuid|spin\\.js)/)"
     ]
   },
   "engines": {

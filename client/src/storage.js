@@ -28,14 +28,29 @@ class Storage {
       throw new Error('Cannot access the database without a connected user account.');
     }
 
-    if (!this.tables[name]) {
-      this.tables[name] = localforage.createInstance({
-        name: `Plainpad-${process.env.REACT_APP_VERSION}-${account.user.id}`,
+    // Cached per user, so a different user logging in within the same tab never sees the previous user's notes.
+    const key = `${account.user.id}-${name}`;
+
+    if (!this.tables[key]) {
+      this.tables[key] = localforage.createInstance({
+        name: this.databaseName(),
         storeName: name
       });
     }
 
-    return this.tables[name]
+    return this.tables[key]
+  }
+
+  databaseName() {
+    return `Plainpad-${process.env.REACT_APP_VERSION}-${account.user.id}`;
+  }
+
+  async drop() {
+    const name = this.databaseName();
+
+    this.tables = {};
+
+    await localforage.dropInstance({name});
   }
 }
 

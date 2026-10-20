@@ -82,6 +82,11 @@ class Note extends Model
      */
     public static function toggleEncryption(User $user, bool $previouslyEncrypted, bool $currentlyEncrypted)
     {
+        // Every profile save calls this, only touch the notes when the setting really changes.
+        if ($previouslyEncrypted === $currentlyEncrypted) {
+            return;
+        }
+
         $notes = DB::table('notes')->where('user_id', $user->id)->get();
 
         foreach ($notes as &$note) {

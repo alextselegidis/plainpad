@@ -58,7 +58,18 @@ function requirements()
 
 function location()
 {
-    return $_SERVER['HTTP_ORIGIN'] . dirname($_SERVER['PHP_SELF']);
+    // Built from the request host, the client controlled Origin header must not decide where setup connects to.
+    $scheme = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
+
+    return $scheme . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/');
+}
+
+/**
+ * Quote a value for the .env file, so that spaces, "#", quotes or "$" in it survive and cannot add new lines.
+ */
+function env_value($value)
+{
+    return '"' . str_replace(['\\', '"', '$'], ['\\\\', '\\"', '\\$'], $value) . '"';
 }
 
 function environment()
@@ -69,15 +80,22 @@ function environment()
         return true;
     }
 
+    foreach (['db_host', 'db_name', 'db_username', 'db_password'] as $field) {
+        if (!isset($_POST[$field]) || preg_match('/[\r\n\0]/', $_POST[$field])) {
+            alert('danger', 'The database settings must not contain line breaks.');
+            return false;
+        }
+    }
+
     $env = file_get_contents(__DIR__ . '/../.env.example');
 
     file_put_contents($path, strtr($env, [
-        '{KEY}' => strtoupper(md5(time())),
-        '{URL}' => location(),
-        '{DB_HOST}' => $_POST['db_host'],
-        '{DB_NAME}' => $_POST['db_name'],
-        '{DB_USERNAME}' => $_POST['db_username'],
-        '{DB_PASSWORD}' => $_POST['db_password'],
+        '{KEY}' => 'base64:' . base64_encode(random_bytes(32)),
+        '{URL}' => env_value(location()),
+        '{DB_HOST}' => env_value($_POST['db_host']),
+        '{DB_NAME}' => env_value($_POST['db_name']),
+        '{DB_USERNAME}' => env_value($_POST['db_username']),
+        '{DB_PASSWORD}' => env_value($_POST['db_password']),
     ]));
 
     if (!file_exists($path)) {
@@ -90,17 +108,25 @@ function environment()
 
 function migrations()
 {
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, location() . '/api.php/v1');
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_FAILONERROR, true);
-    curl_exec($ch);
-    if (curl_errno($ch)) {
-        alert('danger', 'The application migrations failed to execute: ' . curl_error($ch));
+    // Run in this process instead of an HTTP call back to the server, which would trust the client's Host header.
+    try {
+        require __DIR__ . '/../vendor/autoload.php';
+
+        $app = require __DIR__ . '/../bootstrap/app.php';
+        $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+        $kernel->bootstrap();
+
+        if (Illuminate\Support\Facades\Schema::hasTable('migrations')) {
+            alert('danger', 'The database already contains a Plainpad installation, please use an empty database.');
+            return false;
+        }
+
+        $kernel->call('migrate:fresh', ['--seed' => true, '--force' => true]);
+    } catch (Throwable $e) {
+        alert('danger', 'The application migrations failed to execute: ' . htmlspecialchars($e->getMessage()));
         return false;
     }
-    curl_close($ch);
+
     return true;
 }
 
@@ -111,11 +137,16 @@ function install()
     }
 
     if (!migrations()) {
+        // Remove the new environment file again, so that the setup can be retried with corrected values.
+        @unlink(__DIR__ . '/../.env');
         return false;
     }
 
-    alert('success', 'The application was installed successfully, visit <a href="' . location() . '">'
-        . str_replace(['http://', 'https://'], '', location()) . '</a> and login with admin@example.org / 12345');
+    $location = htmlspecialchars(location());
+
+    alert('success', 'The application was installed successfully, visit <a href="' . $location . '">'
+        . str_replace(['http://', 'https://'], '', $location) . '</a> and login with admin@example.org / 12345678. '
+        . 'Change this password right after your first login.');
 
     alert('info', 'You can now remove the setup.php file from the server.');
 
@@ -330,19 +361,19 @@ if (!$installed) {
 
         <div class="form-label-group">
             <input name="db_host" id="db-host" class="form-control" placeholder="localhost" required autofocus
-                   value="<?= $_POST['db_host'] ?? '' ?>">
+                   value="<?= htmlspecialchars($_POST['db_host'] ?? '') ?>">
             <label for="db-host">Host</label>
         </div>
 
         <div class="form-label-group">
             <input name="db_name" id="db-name" class="form-control" placeholder="plainpad" required
-                   value="<?= $_POST['db_name'] ?? '' ?>">
+                   value="<?= htmlspecialchars($_POST['db_name'] ?? '') ?>">
             <label for="db-name">Name</label>
         </div>
 
         <div class="form-label-group">
             <input name="db_username" id="db-username" class="form-control" placeholder="root" required
-                   autocomplete="new-username" value="<?= $_POST['db_username'] ?? '' ?>">
+                   autocomplete="new-username" value="<?= htmlspecialchars($_POST['db_username'] ?? '') ?>">
             <label for="db-username">Username</label>
         </div>
 

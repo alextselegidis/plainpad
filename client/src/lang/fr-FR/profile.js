@@ -50,5 +50,8 @@ export default {
   yes: 'Oui',
   no: 'Non',
   passwordsMismatch: 'Les mots de passe fournis ne correspondent pas, veuillez réessayer.',
-  invalidateCachePrompt: 'Êtes-vous sûr de vouloir invalider le cache local ? Les informations non synchronisées seront perdues.'
+  invalidateCachePrompt: 'Êtes-vous sûr de vouloir invalider le cache local ? Les informations non synchronisées seront perdues.',
+  currentPassword: 'Mot de passe actuel',
+  currentPasswordHint: 'Requis pour modifier l\'e-mail ou le mot de passe',
+  currentPasswordRequired: 'Saisissez votre mot de passe actuel pour modifier l\'e-mail ou le mot de passe.',
 }
