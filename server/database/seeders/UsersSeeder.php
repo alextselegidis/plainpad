@@ -47,6 +47,6 @@ class UsersSeeder extends Seeder
             'admin' => true,
         ]);
 
-        echo 'Login with the default admin user (email: admin@example.org & password: 12345678).' . PHP_EOL;
+        $this->command?->info('Login with the default admin user (email: admin@example.org & password: 12345678).');
     }
 }

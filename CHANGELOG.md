@@ -74,6 +74,10 @@
   without re-parsing dates and add database indexes for sessions and users
 - Prevent demoting the last admin
 - Answer 404 instead of 401 for another user's note, so the client does not log out
+- Check only the configured database for existing tables during setup, a database user that can see other
+  databases was always told the database is not empty
+- Stop printing the default admin login hint into the `setup.php` page
+- Show setup errors as readable alerts instead of raw PHP warnings and say which directory must be writable
 
 ### Changed
 

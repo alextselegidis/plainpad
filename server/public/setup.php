@@ -7,7 +7,8 @@ if (file_exists(__DIR__ . '/../.env')) {
 
 error_reporting(E_ALL);
 
-ini_set('display_errors', true);
+// Problems are reported through alerts, raw PHP warnings would break the page layout and leak server paths.
+ini_set('display_errors', false);
 
 $alerts = [
     'danger' => [],
@@ -89,7 +90,7 @@ function environment()
 
     $env = file_get_contents(__DIR__ . '/../.env.example');
 
-    file_put_contents($path, strtr($env, [
+    $written = @file_put_contents($path, strtr($env, [
         '{KEY}' => 'base64:' . base64_encode(random_bytes(32)),
         '{URL}' => env_value(location()),
         '{DB_HOST}' => env_value($_POST['db_host']),
@@ -98,8 +99,9 @@ function environment()
         '{DB_PASSWORD}' => env_value($_POST['db_password']),
     ]));
 
-    if (!file_exists($path)) {
-        alert('danger', 'The environment file could not be created.');
+    if ($written === false) {
+        alert('danger', 'The environment file could not be created. Make sure that the web server user can write to '
+            . htmlspecialchars(realpath(dirname($path))) . ' and try again.');
         return false;
     }
 
@@ -117,7 +119,7 @@ function migrations()
         $kernel->bootstrap();
 
         // migrate:fresh drops every table, never run it on a database that already holds data (of any app).
-        if (Illuminate\Support\Facades\Schema::getTables()) {
+        if (Illuminate\Support\Facades\Schema::getTables(Illuminate\Support\Facades\Schema::getCurrentSchemaName())) {
             alert('danger', 'The database is not empty, please use an empty database for Plainpad.');
             return false;
         }
@@ -211,7 +213,7 @@ if (!$installed) {
         }
 
         .alert small {
-            word-break: break-all;
+            overflow-wrap: anywhere;
         }
 
         .form-install {
