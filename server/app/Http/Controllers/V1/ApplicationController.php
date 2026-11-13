@@ -28,7 +28,6 @@ use App\Services\AutoUpdateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 use Throwable;
 
@@ -67,21 +66,6 @@ class ApplicationController extends Controller
         }
 
         return response()->json($response);
-    }
-
-    public function install()
-    {
-        // migrate:fresh drops every table, never run it on a database that already holds data (of any app).
-        if (Schema::getTables()) {
-            return response('', 401);
-        }
-
-        Artisan::call('migrate:fresh', [
-            '--seed' => true,
-            '--force' => true
-        ]);
-
-        return response('', 200);
     }
 
     public function update()

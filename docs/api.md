@@ -98,26 +98,6 @@ Not required
 }
 ```
 
-#### Install
-
-This will execute the database migrations if they were not executed yet.   
-
-**Authorization**
-
-Required 
-
-**URL**
-
-- `POST /v1`
-
-**Payload**
-
-(Empty)
-
-**Response**
-
-200 OK
-
 #### Update
 
 This will install the latest updates if available.    

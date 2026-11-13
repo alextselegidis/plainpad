@@ -7,15 +7,10 @@ use Tests\TestCase;
 
 class InstallTest extends TestCase
 {
-    public function test_install_works_on_an_empty_database(): void
+    public function test_install_is_not_reachable_over_http(): void
     {
-        $this->assertFalse(Schema::hasTable('sessions'));
+        $this->postJson('/v1')->assertStatus(405);
 
-        $this->postJson('/v1')->assertStatus(200);
-
-        $this->postJson('/v1/sessions', [
-            'email' => 'admin@example.org',
-            'password' => '12345678',
-        ])->assertStatus(201);
+        $this->assertFalse(Schema::hasTable('users'));
     }
 }

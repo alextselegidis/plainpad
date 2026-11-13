@@ -23,7 +23,6 @@ Route::group([
 ], function () {
     // Application
     Route::get('', [ApplicationController::class, 'retrieve']);
-    Route::post('', [ApplicationController::class, 'install']);
 
     // Sessions
     Route::post('sessions', [SessionsController::class, 'create'])->middleware('throttle:login');
